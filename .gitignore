@@ -1,0 +1,9 @@
+.idea
+/server/data
+/server/dist
+/client/dist
+/data
+/web/dist
+/web/node_modules
+*.aar
+*.jar

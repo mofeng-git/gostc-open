@@ -1,0 +1,15 @@
+package admin
+
+import (
+	"github.com/gin-gonic/gin"
+	"server/controller/admin/system_config"
+	"server/global"
+	"server/router/middleware"
+)
+
+func InitSystemConfig(group *gin.RouterGroup) {
+	g := group.Group("system/config", middleware.Auth(global.Jwt), middleware.AuthAdmin())
+	g.POST("base", system_config.Base)
+	g.POST("gost", system_config.Gost)
+	g.POST("query", system_config.Query)
+}
