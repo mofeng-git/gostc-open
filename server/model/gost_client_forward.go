@@ -56,6 +56,7 @@ func (forward *GostClientForward) GetSSHMatcher() (targetIp, targetPort string) 
 	}
 	return "", ""
 }
+
 func (forward *GostClientForward) SetSSHMatcher(targetIp, targetPort string) {
 	if !utils.ValidateLocalIP(targetIp) {
 		return
@@ -106,14 +107,14 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 	if forward.Node.Forward != 1 {
 		return clientCfg, ok
 	}
-	var target = forward.TargetIp + ":" + forward.TargetPort
 
 	var forwardNodes []*config.ForwardNodeConfig
 	if forward.MatcherEnable == 1 {
 		for _, matcher := range forward.GetMatcher() {
+			var addr = matcher.TargetIp + ":" + matcher.TargetPort
 			forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
-				Name: matcher.TargetIp + ":" + matcher.TargetPort,
-				Addr: matcher.TargetIp + ":" + matcher.TargetPort,
+				Name: addr,
+				Addr: addr,
 				Matcher: &config.NodeMatcherConfig{
 					Rule: fmt.Sprintf("Host(`%s`)", matcher.Host),
 				},
@@ -139,6 +140,7 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 			})
 		}
 	} else {
+		var target = forward.TargetIp + ":" + forward.TargetPort
 		forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
 			Name: target,
 			Addr: target,
@@ -160,18 +162,15 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 		CLimiter:   cLimiter,
 		RLimiter:   rLimiter,
 		Observer:   obs,
-		Recorders:  nil,
-		Handler:    &config.HandlerConfig{Type: "rtcp", Metadata: map[string]any{"keepAlive": true, "sniffing": true, "nodelay": true}},
-		Listener:   &config.ListenerConfig{Type: "rtcp", Chain: chain, Metadata: map[string]any{"keepAlive": true, "nodelay": true}},
+		Handler:    &config.HandlerConfig{Type: "rtcp"},
+		Listener:   &config.ListenerConfig{Type: "rtcp", Chain: chain},
 		Forwarder: &config.ForwarderConfig{
 			Nodes: forwardNodes,
 		},
 		Metadata: map[string]any{
-			"keepAlive":             true,
 			"enableStats":           true,
 			"observer.period":       "60s",
 			"observer.resetTraffic": true,
-			"nodelay":               true,
 		},
 	}
 	return clientCfg, true
@@ -181,44 +180,14 @@ func (forward *GostClientForward) GenerateUdpSvcConfig(chain, limiter, cLimiter,
 	if forward.Node.Forward != 1 {
 		return config.ServiceConfig{}, false
 	}
-	var target = forward.TargetIp + ":" + forward.TargetPort
 
 	var forwardNodes []*config.ForwardNodeConfig
-	if forward.MatcherEnable == 1 {
-		for _, matcher := range forward.GetMatcher() {
-			forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
-				Name: matcher.TargetIp + ":" + matcher.TargetPort,
-				Addr: matcher.TargetIp + ":" + matcher.TargetPort,
-				Matcher: &config.NodeMatcherConfig{
-					Rule: fmt.Sprintf("Host(`%s`)", matcher.Host),
-				},
-			})
-		}
-		sshIp, sshPort := forward.GetSSHMatcher()
-		if sshIp != "" && sshPort != "" {
-			var addr = sshIp + ":" + sshPort
-			forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
-				Name: addr,
-				Addr: addr,
-				Matcher: &config.NodeMatcherConfig{
-					Rule: "Proto(`ssh`)",
-				},
-			})
-		}
-		tcpIp, tcpPort := forward.GetTcpMatcher()
-		if tcpIp != "" && tcpPort != "" {
-			var addr = tcpIp + ":" + tcpPort
-			forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
-				Name: addr,
-				Addr: addr,
-			})
-		}
-	} else {
-		forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
-			Name: target,
-			Addr: target,
-		})
-	}
+
+	var target = forward.TargetIp + ":" + forward.TargetPort
+	forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
+		Name: target,
+		Addr: target,
+	})
 
 	var admissions []string
 	if forward.WhiteEnable == 1 {
@@ -231,33 +200,24 @@ func (forward *GostClientForward) GenerateUdpSvcConfig(chain, limiter, cLimiter,
 		Name:       "udp_" + forward.Code,
 		Addr:       ":" + forward.Port,
 		Admissions: admissions,
-		Limiter:    limiter,
-		CLimiter:   cLimiter,
-		RLimiter:   rLimiter,
-		Observer:   obs,
-		Handler:    &config.HandlerConfig{Type: "rudp", Metadata: map[string]any{"keepAlive": true, "sniffing": true, "nodelay": true}},
-		Listener:   &config.ListenerConfig{Type: "rudp", Chain: chain, Metadata: map[string]any{"keepAlive": true, "nodelay": true}},
+		//Limiter:    limiter, TODO UDP这里限速会导致连接被转到TCP
+		//CLimiter: cLimiter,
+		//RLimiter: rLimiter,
+		Observer: obs,
+		Handler:  &config.HandlerConfig{Type: "rudp"},
+		Listener: &config.ListenerConfig{Type: "rudp", Chain: chain},
 		Forwarder: &config.ForwarderConfig{
 			Nodes: forwardNodes,
 		},
 		Metadata: map[string]any{
-			"keepAlive":             true,
 			"enableStats":           true,
 			"observer.period":       "60s",
 			"observer.resetTraffic": true,
-			"nodelay":               true,
 		},
 	}, true
 }
 
 func (forward *GostClientForward) GenerateChainConfig(auth GostAuth) config.ChainConfig {
-	var metadata = make(map[string]any)
-	_ = json.Unmarshal([]byte(forward.Node.ForwardMetadata), &metadata)
-	if forward.NoDelay == 1 {
-		metadata["nodelay"] = true
-	}
-	metadata["keepAlive"] = true
-
 	var protocol, address string
 	protocol = forward.Node.Protocol
 	address = forward.Node.Address + ":" + forward.Node.ForwardConnPort
@@ -275,16 +235,14 @@ func (forward *GostClientForward) GenerateChainConfig(auth GostAuth) config.Chai
 					{
 						Addr: address,
 						Connector: &config.ConnectorConfig{
-							Type:     "relay",
-							Metadata: metadata,
+							Type: "relay",
 							Auth: &config.AuthConfig{
 								Username: auth.User,
 								Password: auth.Password,
 							},
 						},
 						Dialer: &config.DialerConfig{
-							Type:     protocol,
-							Metadata: metadata,
+							Type: protocol,
 						},
 					},
 				},

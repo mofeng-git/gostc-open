@@ -65,7 +65,6 @@ func (tunnel GostClientTunnel) GenerateChainConfig(auth GostAuth) config.ChainCo
 	var metadata = make(map[string]any)
 	_ = json.Unmarshal([]byte(tunnel.Node.TunnelMetadata), &metadata)
 	metadata["tunnel.id"] = tunnel.Code
-	metadata["keepAlive"] = true
 
 	var protocol, address string
 	protocol = tunnel.Node.Protocol
@@ -108,20 +107,17 @@ func (tunnel GostClientTunnel) GenerateVisitTcpSvcConfig(chain string, limiter, 
 		CLimiter: cLimiter,
 		RLimiter: rLimiter,
 		Handler: &config.HandlerConfig{
-			Type:     "tcp",
-			Metadata: map[string]any{"keepAlive": true, "nodelay": true},
-			Chain:    chain,
+			Type:  "tcp",
+			Chain: chain,
 		},
 		Listener: &config.ListenerConfig{
-			Type:     "tcp",
-			Metadata: map[string]any{"keepAlive": true},
+			Type: "tcp",
 		},
 		Forwarder: &config.ForwarderConfig{
 			Nodes: []*config.ForwardNodeConfig{
 				{Name: tunnel.Code, Addr: tunnel.Code},
 			},
 		},
-		Metadata: map[string]any{"keepAlive": true},
 	}, true
 }
 
@@ -133,20 +129,17 @@ func (tunnel GostClientTunnel) GenerateVisitUdpSvcConfig(chain string, limiter, 
 		CLimiter: cLimiter,
 		RLimiter: rLimiter,
 		Handler: &config.HandlerConfig{
-			Type:     "udp",
-			Metadata: map[string]any{"keepAlive": true, "nodelay": true},
-			Chain:    chain,
+			Type:  "udp",
+			Chain: chain,
 		},
 		Listener: &config.ListenerConfig{
-			Type:     "udp",
-			Metadata: map[string]any{"keepAlive": true},
+			Type: "udp",
 		},
 		Forwarder: &config.ForwarderConfig{
 			Nodes: []*config.ForwardNodeConfig{
 				{Name: tunnel.Code, Addr: tunnel.Code},
 			},
 		},
-		Metadata: map[string]any{"keepAlive": true},
 	}, true
 }
 
@@ -170,7 +163,6 @@ func (tunnel GostClientTunnel) GenerateVisitChainConfig(auth GostAuth) config.Ch
 							Type: "tunnel",
 							Metadata: map[string]any{
 								"tunnel.id": tunnel.Code,
-								"nodelay":   true,
 							},
 							Auth: &config.AuthConfig{
 								Username: auth.User,
