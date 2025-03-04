@@ -9,6 +9,8 @@
 如果想快速体验，可直接使用我提供的服务
 [地址](https://gost.sian.one)
 
+**mysql暂未进行完整测试，存在问题，请使用sqlite作为持久化存储**
+
 ## License
 This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/gostc-open?tab=CC0-1.0-1-ov-file).
 
@@ -34,7 +36,7 @@ cd server
 go build -ldflags "-s -w" -o server main.go
 ```
 
-## 编译节点/客户端(客户端和不开源版本通用)
+## 编译节点/客户端(客户端与不开源版本通用)
 
 编译方式一(当前平台)：
 ```shell
@@ -64,6 +66,7 @@ goreleaser release --snapshot --clean
 # 客户端
 ./gostc -tls=false -addr 127.0.0.1:8080 -key ******
 ```
-如果后台管理服务不启用SSL，需要设置-tls=false
--addr指定的127.0.0.1:8080修改为实际的后台管理
 
+如果后台管理服务不启用SSL，需要设置-tls=false
+
+-addr指定的127.0.0.1:8080修改为实际的后台管理

@@ -38,6 +38,8 @@ func (e *Event) OnOpen(socket *gws.Conn) {
 		for {
 			time.Sleep(time.Second * 10)
 			if err := socket.WritePing(nil); err != nil {
+				fmt.Println("send ping msg fail", err)
+				_ = socket.WriteClose(1000, nil)
 				return
 			}
 		}

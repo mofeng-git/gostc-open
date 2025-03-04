@@ -134,7 +134,6 @@ func main() {
 		}
 		os.Exit(0)
 	}
-	//system.EnableCompatibilityMode()
 
 	Init(logLevel, console)
 	var wsurl = func(tls bool, address string) string {
@@ -203,6 +202,8 @@ func main() {
 				case data := <-Writer.C():
 					marshal, _ := json.Marshal(common.NewMessage(uuid.NewString(), "logger", string(data)))
 					if err = socket.WriteString(string(marshal)); err != nil {
+						fmt.Println("send logger msg fail", err)
+						_ = socket.WriteClose(1000, nil)
 						return
 					}
 				case <-ticker.C:
