@@ -22,7 +22,7 @@ func (service *service) Checkin(claims jwt.Claims) (err error) {
 
 		checkin, _ := tx.SystemUserCheckin.Where(
 			tx.SystemUserCheckin.UserCode.Eq(claims.Code),
-			tx.SystemUserCheckin.EventDate.Eq(time.Now().Format(time.DateTime)),
+			tx.SystemUserCheckin.EventDate.Eq(time.Now().Format(time.DateOnly)),
 		).First()
 		if checkin != nil {
 			return errors.New("已签到")
