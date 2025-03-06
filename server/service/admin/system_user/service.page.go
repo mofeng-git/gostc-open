@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/shopspring/decimal"
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/repository"
 	"server/service/common/cache"
@@ -27,20 +27,14 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var users []model.SystemUser
-	var where = db
+	var where []gen.Condition
 	if req.Account != "" {
-		where = where.Where("account = ?", req.Account)
+		where = append(where, db.SystemUser.Account.Like("%"+req.Account+"%"))
 	}
 	if req.Admin > 0 {
-		where = where.Where("admin = ?", req.Admin)
+		where = append(where, db.SystemUser.Admin.Eq(req.Admin))
 	}
-
-	db.Where(where).Model(&users).Count(&total)
-	db.Where(where).Preload("BindQQ").Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&users)
+	users, total, _ := db.SystemUser.Where(where...).Order(db.SystemUser.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, user := range users {
 		obsInfo := cache.GetUserObsDateRange(cache.MONTH_DATEONLY_LIST, user.Code)
 		list = append(list, Item{

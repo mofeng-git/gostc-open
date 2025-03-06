@@ -4,9 +4,9 @@ import (
 	"errors"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/gost_engine"
 	"time"
@@ -31,9 +31,9 @@ func (service *service) Config(req ConfigReq) error {
 		return errors.New("到期时间错误")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		var forward model.GostClientForward
-		if tx.Where("code = ?", req.Code).First(&forward).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		forward, _ := tx.GostClientForward.Where(tx.GostClientForward.Code.Eq(req.Code)).First()
+		if forward == nil {
 			return nil
 		}
 
@@ -60,7 +60,7 @@ func (service *service) Config(req ConfigReq) error {
 		forward.CLimiter = req.CLimiter
 		forward.OnlyChina = req.OnlyChina
 		forward.ExpAt = expAt.Unix()
-		if err = tx.Save(&forward).Error; err != nil {
+		if err = tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

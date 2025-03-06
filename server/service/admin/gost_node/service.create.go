@@ -61,7 +61,7 @@ func (service *service) Create(req CreateReq) error {
 		Tags:                  strings.Join(req.Tags, ","),
 		IndexValue:            req.IndexValue,
 	}
-	if err := db.Create(&node).Error; err != nil {
+	if err := db.GostNode.Create(&node); err != nil {
 		log.Error("新增节点失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

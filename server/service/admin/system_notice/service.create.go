@@ -15,12 +15,12 @@ type CreateReq struct {
 
 func (service *service) Create(req CreateReq) error {
 	db, _, _ := repository.Get("")
-	if err := db.Create(&model.SystemNotice{
+	if err := db.SystemNotice.Create(&model.SystemNotice{
 		Title:      req.Title,
 		Content:    req.Content,
 		Hidden:     req.Hidden,
 		IndexValue: req.IndexValue,
-	}).Error; err != nil {
+	}); err != nil {
 		return errors.New("操作失败")
 	}
 	return nil

@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"server/model"
 	"server/global"
 	"server/pkg/utils"
 	"server/repository"
@@ -36,10 +35,11 @@ func (service *service) Login(ip string, req LoginReq) (result LoginResp, err er
 		return result, errors.New("验证码错误")
 	}
 
-	var user model.SystemUser
-	if db.Where("account = ?", req.Account).First(&user).RowsAffected == 0 {
+	user, _ := db.SystemUser.Where(db.SystemUser.Account.Eq(req.Account)).First()
+	if user == nil {
 		return result, errors.New("未查询到账户信息")
 	}
+
 	if utils.MD5AndSalt(req.Password, user.Salt) != user.Password {
 		return result, errors.New("账号或密码错误")
 	}

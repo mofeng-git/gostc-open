@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"server/model"
 	"server/pkg/utils"
 	"server/repository"
 )
@@ -18,8 +17,8 @@ type UpdateReq struct {
 
 func (service *service) Update(req UpdateReq) error {
 	db, _, log := repository.Get("")
-	var user model.SystemUser
-	if db.Where("code = ?", req.Code).First(&user).RowsAffected == 0 {
+	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(req.Code)).First()
+	if user == nil {
 		return errors.New("用户不存在")
 	}
 	user.Account = req.Account
@@ -29,7 +28,7 @@ func (service *service) Update(req UpdateReq) error {
 		user.Password = utils.MD5AndSalt(req.Password, user.Salt)
 	}
 
-	if err := db.Save(&user).Error; err != nil {
+	if err := db.SystemUser.Save(user); err != nil {
 		log.Error("修改用户失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

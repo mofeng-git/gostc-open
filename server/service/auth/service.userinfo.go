@@ -20,12 +20,18 @@ type UserInfoResp struct {
 
 func (service *service) UserInfo(claims jwt.Claims) (result UserInfoResp, err error) {
 	db, _, _ := repository.Get("")
-	var user model.SystemUser
-	if db.Preload("BindQQ").Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(claims.Code)).First()
+	if user == nil {
 		return result, errors.New("未查询到账户信息")
 	}
-	var checkIn model.SystemUserCheckin
-	db.Where("user_code = ? AND event_date = ?", user.Code, time.Now().Format(time.DateOnly)).First(&checkIn)
+	checkIn, _ := db.SystemUserCheckin.Where(
+		db.SystemUserCheckin.UserCode.Eq(user.Code),
+		db.SystemUserCheckin.EventDate.Eq(time.Now().Format(time.DateOnly)),
+	).First()
+	if checkIn == nil {
+		checkIn = &model.SystemUserCheckin{}
+	}
+
 	return UserInfoResp{
 		Account:       user.Account,
 		Amount:        user.Amount.String(),

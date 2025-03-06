@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/utils"
 	"server/repository"
 	"server/service/common/cache"
@@ -19,17 +19,20 @@ type ListItem struct {
 
 func (service *service) List(req ListReq) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var nodes []model.GostNode
-	var where = db
+	var where []gen.Condition
+
+	var nodeCodes []string
+	_ = db.GostNodeBind.Pluck(db.GostNodeBind.NodeCode, &nodeCodes)
 	switch req.Bind {
 	case 1:
 		// 用户节点
-		where = where.Where("code IN (?)", db.Model(&model.GostNodeBind{}).Select("node_code"))
+		where = append(where, db.GostNode.Code.In(nodeCodes...))
 	case 2:
 		// 系统节点
-		where = where.Where("code NOT IN (?)", db.Model(&model.GostNodeBind{}).Select("node_code"))
+		where = append(where, db.GostNode.Code.NotIn(nodeCodes...))
 	}
-	db.Where(where).Select("code, name").Order("index_value asc").Order("id desc").Find(&nodes)
+
+	nodes, _ := db.GostNode.Where(where...).Select(db.GostNode.Code, db.GostNode.Name).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Asc()).Find()
 	for _, node := range nodes {
 		list = append(list, ListItem{
 			Code:   node.Code,

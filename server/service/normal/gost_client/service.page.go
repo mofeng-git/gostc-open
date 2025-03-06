@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/pkg/bean"
 	"server/pkg/jwt"
 	"server/pkg/utils"
@@ -29,13 +28,7 @@ type Item struct {
 
 func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var clients []model.GostClient
-	var where = db.Where("user_code = ?", claims.Code)
-	db.Where(where).Model(&clients).Count(&total)
-	db.Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&clients)
+	clients, total, _ := db.GostClient.Where(db.GostClient.UserCode.Eq(claims.Code)).Order(db.GostClient.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, client := range clients {
 		obsInfo := cache.GetClientObsDateRange(cache.MONTH_DATEONLY_LIST, client.Code)
 		list = append(list, Item{

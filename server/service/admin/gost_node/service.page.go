@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -52,26 +52,25 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var nodes []model.GostNode
-	var where = db
+	var where []gen.Condition
 	if req.Name != "" {
-		where = where.Where("name like ?", "%"+req.Name+"%")
+		where = append(where, db.GostNode.Name.Like("%"+req.Name+"%"))
 	}
+
+	var nodeCodes []string
+	_ = db.GostNodeBind.Pluck(db.GostNodeBind.NodeCode, &nodeCodes)
 	switch req.Bind {
 	case 1:
 		// 用户节点
-		where = where.Where("code IN (?)", db.Model(&model.GostNodeBind{}).Select("node_code"))
+		where = append(where, db.GostNode.Code.In(nodeCodes...))
 	case 2:
 		// 系统节点
-		where = where.Where("code NOT IN (?)", db.Model(&model.GostNodeBind{}).Select("node_code"))
+		where = append(where, db.GostNode.Code.NotIn(nodeCodes...))
 	}
-	db.Where(where).Model(&nodes).Count(&total)
-	db.Where(where).Order("index_value asc").Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&nodes)
-	var nodeBinds []model.GostNodeBind
-	db.Preload("User").Find(&nodeBinds)
+	nodes, total, _ := db.GostNode.Where(where...).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Asc()).FindByPage(req.GetOffset(), req.GetLimit())
+
+	// 查询节点的绑定用户
+	nodeBinds, _ := db.GostNodeBind.Preload(db.GostNodeBind.User).Find()
 	var nodeBindAccountMap = make(map[string]string)
 	for _, bind := range nodeBinds {
 		nodeBindAccountMap[bind.NodeCode] = bind.User.Account

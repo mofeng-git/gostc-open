@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
+	"server/repository/query"
 	"server/service/gost_engine"
 )
 
@@ -28,14 +27,14 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		return errors.New("内网端口格式错误")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		var user model.SystemUser
-		if tx.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		if user == nil {
 			return errors.New("用户错误")
 		}
 
-		var tunnel model.GostClientTunnel
-		if tx.Where("code = ? AND user_code = ?", req.Code, user.Code).First(&tunnel).RowsAffected == 0 {
+		tunnel, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.Code.Eq(req.Code), tx.GostClientTunnel.UserCode.Eq(claims.Code)).First()
+		if tunnel == nil {
 			return errors.New("操作失败")
 		}
 
@@ -44,7 +43,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		tunnel.TargetPort = req.TargetPort
 		tunnel.NoDelay = req.NoDelay
 
-		if err := tx.Save(&tunnel).Error; err != nil {
+		if err := tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

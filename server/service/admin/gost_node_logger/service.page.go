@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/repository"
 )
@@ -21,16 +21,13 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var loggers []model.GostNodeLogger
-	var where = db.Where("node_code = ?", req.NodeCode)
-	if req.Level != "" {
-		where = where.Where("level = ?", req.Level)
+	var where = []gen.Condition{
+		db.GostNodeLogger.NodeCode.Eq(req.NodeCode),
 	}
-	db.Where(where).Model(&loggers).Count(&total)
-	db.Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&loggers)
+	if req.Level != "" {
+		where = append(where, db.GostNodeLogger.Level.Eq(req.Level))
+	}
+	loggers, total, _ := db.GostNodeLogger.Where(where...).Order(db.GostNodeLogger.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, logger := range loggers {
 		list = append(list, Item{
 			Id:        logger.Id,

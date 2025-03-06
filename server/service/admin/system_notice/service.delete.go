@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"server/model"
 	"server/repository"
 )
 
@@ -12,12 +11,7 @@ type DeleteReq struct {
 
 func (service *service) Delete(req DeleteReq) error {
 	db, _, _ := repository.Get("")
-	var notice model.SystemNotice
-	if db.Where("code = ?", req.Code).First(&notice).RowsAffected == 0 {
-		return nil
-	}
-
-	if err := db.Delete(&notice).Error; err != nil {
+	if _, err := db.SystemNotice.Where(db.SystemNotice.Code.Eq(req.Code)).Delete(); err != nil {
 		return errors.New("操作失败")
 	}
 	return nil

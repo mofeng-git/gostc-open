@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/repository"
+	"server/repository/query"
 )
 
 type UpdateReq struct {
@@ -15,16 +15,22 @@ type UpdateReq struct {
 
 func (service *service) Update(req UpdateReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *query.Query) error {
 		if req.UserCode == "" {
-			tx.Where("node_code = ?", req.NodeCode).Delete(&model.GostNodeBind{})
+			_, _ = tx.GostNodeBind.Where(tx.GostNodeBind.NodeCode.Eq(req.NodeCode)).Delete()
 			return nil
 		}
-		var bind model.GostNodeBind
-		tx.Where("user_code = ? AND node_code = ?", req.UserCode, req.NodeCode).First(&bind)
+
+		bind, _ := tx.GostNodeBind.Where(
+			tx.GostNodeBind.UserCode.Eq(req.UserCode),
+			tx.GostNodeBind.NodeCode.Eq(req.NodeCode),
+		).First()
+		if bind == nil {
+			bind = &model.GostNodeBind{}
+		}
 		bind.UserCode = req.UserCode
 		bind.NodeCode = req.NodeCode
-		if err := tx.Save(&bind).Error; err != nil {
+		if err := tx.GostNodeBind.Save(bind); err != nil {
 			log.Error("节点绑定用户失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

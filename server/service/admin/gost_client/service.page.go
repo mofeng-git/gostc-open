@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -32,18 +32,15 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var clients []model.GostClient
-	var where = db
+
+	var where []gen.Condition
 	if req.Account != "" {
-		where = where.Where("user_code in (?)",
-			db.Model(&model.SystemUser{}).Where("account like ?", "%"+req.Account+"%").Select("code"),
-		)
+		var userCodes []string
+		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
+		where = append(where, db.SystemUser.Code.In(userCodes...))
 	}
-	db.Where(where).Model(&clients).Count(&total)
-	db.Preload("User").Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&clients)
+
+	clients, total, _ := db.GostClient.Preload(db.GostClient.User).Order(db.GostClient.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, client := range clients {
 		obsInfo := cache.GetClientObsDateRange(cache.MONTH_DATEONLY_LIST, client.Code)
 		list = append(list, Item{

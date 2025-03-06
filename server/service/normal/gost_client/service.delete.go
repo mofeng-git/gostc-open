@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/gost_engine"
 )
 
@@ -16,29 +15,31 @@ type DeleteReq struct {
 
 func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var client model.GostClient
-		if tx.Where("code = ? AND user_code = ?", req.Code, claims.Code).First(&client).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		client, err := tx.GostClient.Where(tx.GostClient.Code.Eq(req.Code), tx.GostClient.UserCode.Eq(claims.Code)).First()
+		if err != nil {
 			return nil
 		}
-		var total int64
-		tx.Model(&model.GostClientHost{}).Where("client_code = ?", client.Code).Count(&total)
-		if total > 0 {
+		hostTotal, _ := tx.GostClientHost.Where(tx.GostClientHost.ClientCode.Eq(client.Code)).Count()
+		if hostTotal > 0 {
 			return errors.New("请先删除该客户端的所有隧道")
 		}
-		tx.Model(&model.GostClientForward{}).Where("client_code = ?", client.Code).Count(&total)
-		if total > 0 {
+
+		forwardTotal, _ := tx.GostClientForward.Where(tx.GostClientForward.ClientCode.Eq(client.Code)).Count()
+		if forwardTotal > 0 {
 			return errors.New("请先删除该客户端的所有隧道")
 		}
-		tx.Model(&model.GostClientTunnel{}).Where("client_code = ?", client.Code).Count(&total)
-		if total > 0 {
+
+		tunnelTotal, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.ClientCode.Eq(client.Code)).Count()
+		if tunnelTotal > 0 {
 			return errors.New("请先删除该客户端的所有隧道")
 		}
-		if err := tx.Delete(&client).Error; err != nil {
+
+		if _, err := tx.GostClient.Where(tx.GostClient.Code.Eq(client.Code)).Delete(); err != nil {
 			log.Error("删除客户端失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		tx.Where("client_code = ?", client.Code).Delete(&model.GostClientLogger{})
+		_, _ = tx.GostClientLogger.Where(tx.GostClientLogger.ClientCode.Eq(client.Code)).Delete()
 		gost_engine.ClientStop(client.Code, "客户端已被删除")
 		return nil
 	})

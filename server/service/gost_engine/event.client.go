@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"server/global"
 	"server/model"
+	"server/repository"
 	"server/service/common/cache"
 	"sync/atomic"
 	"time"
@@ -42,22 +43,23 @@ func (event *ClientEvent) OnOpen(socket *gws.Conn) {
 	cache.SetClientOnline(event.code, true, time.Second*30)
 	cache.SetClientLastTime(event.code)
 	cache.SetClientIp(event.code, event.ip)
-
 	go event.sendLoop(socket)
+
+	db, _, _ := repository.Get("")
 	var hostCodes []string
-	global.DB.GetDB().Model(&model.GostClientHost{}).Where("client_code = ?", event.code).Pluck("code", &hostCodes)
+	_ = db.GostClientHost.Where(db.GostClientHost.ClientCode.Eq(event.code)).Pluck(db.GostClientHost.Code, &hostCodes)
 	for _, code := range hostCodes {
-		ClientHostConfig(global.DB.GetDB(), code)
+		ClientHostConfig(db, code)
 	}
 	var forwardCodes []string
-	global.DB.GetDB().Model(&model.GostClientForward{}).Where("client_code = ?", event.code).Pluck("code", &forwardCodes)
+	_ = db.GostClientForward.Where(db.GostClientForward.ClientCode.Eq(event.code)).Pluck(db.GostClientForward.Code, &forwardCodes)
 	for _, code := range forwardCodes {
-		ClientForwardConfig(global.DB.GetDB(), code)
+		ClientForwardConfig(db, code)
 	}
 	var tunnelCodes []string
-	global.DB.GetDB().Model(&model.GostClientTunnel{}).Where("client_code = ?", event.code).Pluck("code", &tunnelCodes)
+	_ = db.GostClientTunnel.Where(db.GostClientTunnel.ClientCode.Eq(event.code)).Pluck(db.GostClientTunnel.Code, &tunnelCodes)
 	for _, code := range tunnelCodes {
-		ClientTunnelConfig(global.DB.GetDB(), code)
+		ClientTunnelConfig(db, code)
 	}
 }
 

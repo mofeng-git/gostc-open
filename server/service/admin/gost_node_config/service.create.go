@@ -35,7 +35,8 @@ func (service *service) Create(req CreateReq) (err error) {
 			return errors.New("计费循环周期错误")
 		}
 	}
-	if err = db.Create(&model.GostNodeConfig{
+
+	if err = db.GostNodeConfig.Create(&model.GostNodeConfig{
 		Name:         req.Name,
 		ChargingType: req.ChargingType,
 		Cycle:        req.Cycle,
@@ -46,7 +47,7 @@ func (service *service) Create(req CreateReq) (err error) {
 		NodeCode:     req.NodeCode,
 		OnlyChina:    req.OnlyChina,
 		IndexValue:   req.IndexValue,
-	}).Error; err != nil {
+	}); err != nil {
 		log.Error("新增套餐配置失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

@@ -1,13 +1,12 @@
 package bootstrap
 
-var todos []func()
+import "server/global"
 
-func AddTodo(f func()) {
-	todos = append(todos, f)
-}
+var TodoFunc func()
 
 func InitTodo() {
-	for _, todo := range todos {
-		todo()
+	if TodoFunc != nil {
+		TodoFunc()
 	}
+	global.Logger.Info("init todo finish")
 }

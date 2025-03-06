@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/repository"
 )
 
@@ -16,12 +16,13 @@ type ListItem struct {
 
 func (service *service) List(req ListReq) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var clients []model.GostClient
-	var where = db
+
+	var where []gen.Condition
 	if req.UserCode != "" {
-		where = where.Where("user_code = ?", req.UserCode)
+		where = append(where, db.GostClient.UserCode.Eq(req.UserCode))
 	}
-	db.Preload("User").Where(where).Order("id desc").Find(&clients)
+
+	clients, _ := db.GostClient.Preload(db.GostClient.User).Where(where...).Find()
 	for _, client := range clients {
 		list = append(list, ListItem{
 			Code: client.Code,

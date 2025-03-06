@@ -3,9 +3,8 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/node_port"
 	"server/service/gost_engine"
@@ -17,19 +16,20 @@ type DeleteReq struct {
 
 func (service *service) Delete(req DeleteReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var forward model.GostClientForward
-		if tx.Preload("Node").Where("code = ?", req.Code).First(&forward).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		forward, _ := tx.GostClientForward.Preload(tx.GostClientForward.Node).Where(tx.GostClientForward.Code.Eq(req.Code)).First()
+		if forward == nil {
 			return nil
 		}
-		tx.Where("port = ? AND node_code = ?", forward.Port, forward.NodeCode).Delete(&model.GostNodePort{})
-		tx.Where("tunnel_code = ?", forward.Code).Delete(&model.GostAuth{})
-		if err := tx.Omit("Node").Delete(&forward).Error; err != nil {
+
+		_, _ = tx.GostNodePort.Where(tx.GostNodePort.Port.Eq(forward.Port), tx.GostNodePort.NodeCode.Eq(forward.NodeCode)).Delete()
+		_, _ = tx.GostAuth.Where(tx.GostAuth.TunnelCode.Eq(forward.Code)).Delete()
+		if _, err := tx.GostClientForward.Where(tx.GostClientForward.Code.Eq(forward.Code)).Delete(); err != nil {
 			log.Error("删除用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
 		node_port.ReleasePort(forward.NodeCode, forward.Port)
-		gost_engine.ClientRemoveForwardConfig(forward, forward.Node)
+		gost_engine.ClientRemoveForwardConfig(*forward, forward.Node)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

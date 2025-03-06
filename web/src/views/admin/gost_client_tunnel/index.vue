@@ -87,7 +87,7 @@ const configFunc = () => {
       try {
         state.value.config.loading = true
         state.value.config.data.expAt = moment(state.value.config.expAt).format('yyyy-MM-DD HH:mm:ss')
-        await apiAdminGostClientForwardConfig(state.value.config.data)
+        await apiAdminGostClientTunnelConfig(state.value.config.data)
         closeConfig()
         await pageFunc()
       } finally {

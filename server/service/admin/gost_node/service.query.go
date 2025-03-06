@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"server/model"
 	"server/repository"
 	"server/service/common/node_rule"
 )
@@ -43,11 +42,10 @@ type QueryResp struct {
 
 func (service *service) Query(req QueryReq) (QueryResp, error) {
 	db, _, _ := repository.Get("")
-	var node model.GostNode
-	if db.Where("code = ?", req.Code).First(&node).RowsAffected == 0 {
+	node, err := db.GostNode.Where(db.GostNode.Code.Eq(req.Code)).First()
+	if err != nil {
 		return QueryResp{}, errors.New("节点不存在")
 	}
-
 	var ruleNames []string
 	for _, rule := range node.GetRules() {
 		ruleNames = append(ruleNames, node_rule.RuleMap[rule].Name())

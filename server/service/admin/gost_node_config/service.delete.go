@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"server/model"
 	"server/repository"
 )
 
@@ -13,12 +12,12 @@ type DeleteReq struct {
 
 func (service *service) Delete(req DeleteReq) error {
 	db, _, log := repository.Get("")
-	var cfg model.GostNodeConfig
-	if db.Where("code = ?", req.Code).First(&cfg).RowsAffected == 0 {
+	cfg, _ := db.GostNodeConfig.Where(db.GostNodeConfig.Code.Eq(req.Code)).First()
+	if cfg == nil {
 		return nil
 	}
 
-	if err := db.Delete(&cfg).Error; err != nil {
+	if _, err := db.GostNodeConfig.Where(db.GostNodeConfig.Code.Eq(cfg.Code)).Delete(); err != nil {
 		log.Error("删除套餐配置失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

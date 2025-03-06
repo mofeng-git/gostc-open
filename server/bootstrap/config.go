@@ -57,7 +57,7 @@ func writeConfigFile(path string) error {
 			User:     "root",
 			Pwd:      "root",
 			Prefix:   "gostc_",
-			Extend:   "?timeout=3s&readTimeout=3s&writeTimeout=3s&parseTime=true&loc=Local&charset=utf8mb4,utf8&useSSL=false",
+			Extend:   "?timeout=3s&readTimeout=3s&writeTimeout=3s&parseTime=true&loc=Local&charset=utf8mb4,utf8",
 			LogLevel: "info",
 		},
 	}

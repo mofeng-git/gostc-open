@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"server/model"
 	"server/repository"
 )
 
@@ -16,15 +15,15 @@ type UpdateReq struct {
 
 func (service *service) Update(req UpdateReq) error {
 	db, _, _ := repository.Get("")
-	var notice model.SystemNotice
-	if db.Where("code = ?", req.Code).First(&notice).RowsAffected == 0 {
+	notice, _ := db.SystemNotice.Where(db.SystemNotice.Code.Eq(req.Code)).First()
+	if notice == nil {
 		return errors.New("通知不存在")
 	}
 	notice.Title = req.Title
 	notice.Content = req.Content
 	notice.Hidden = req.Hidden
 	notice.IndexValue = req.IndexValue
-	if err := db.Save(&notice).Error; err != nil {
+	if err := db.SystemNotice.Save(notice); err != nil {
 		return errors.New("操作失败")
 	}
 	return nil

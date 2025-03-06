@@ -3,9 +3,8 @@ package gost_engine
 import (
 	"github.com/go-gost/x/config"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
-	"server/global"
 	"server/model"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/warn_msg"
 )
@@ -24,26 +23,25 @@ type NodeConfigData struct {
 	Obs     config.ObserverConfig
 }
 
-func NodeIngress(tx *gorm.DB, code string) {
-	var node model.GostNode
-	if tx.Where("code = ?", code).First(&node).RowsAffected == 0 {
+func NodeIngress(tx *query.Query, code string) {
+	node, _ := tx.GostNode.Where(tx.GostNode.Code.Eq(code)).First()
+	if node == nil {
 		return
 	}
 
-	var hosts []model.GostClientHost
-	tx.Where("node_code = ?", node.Code).Find(&hosts)
-	var newHosts []model.GostClientHost
+	hosts, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(code)).Find()
+	var newHosts []*model.GostClientHost
 	for _, host := range hosts {
-		if warn_msg.GetHostWarnMsg(host) != "" {
+		if warn_msg.GetHostWarnMsg(*host) != "" {
 			continue
 		}
 		newHosts = append(newHosts, host)
 	}
-	var tunnels []model.GostClientTunnel
-	tx.Where("node_code = ?", node.Code).Find(&tunnels)
-	var newTunnels []model.GostClientTunnel
+
+	tunnels, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(code)).Find()
+	var newTunnels []*model.GostClientTunnel
 	for _, tunnel := range tunnels {
-		if warn_msg.GetTunnelWarnMsg(tunnel) != "" {
+		if warn_msg.GetTunnelWarnMsg(*tunnel) != "" {
 			continue
 		}
 		newTunnels = append(newTunnels, tunnel)
@@ -53,9 +51,9 @@ func NodeIngress(tx *gorm.DB, code string) {
 	WriteMessage(code, NewMessage(uuid.NewString(), "config", data))
 }
 
-func NodeConfig(tx *gorm.DB, code string) {
-	var node model.GostNode
-	if global.DB.GetDB().Where("code = ?", code).First(&node).RowsAffected == 0 {
+func NodeConfig(tx *query.Query, code string) {
+	node, err := tx.GostNode.Where(tx.GostNode.Code.Eq(code)).First()
+	if err != nil {
 		return
 	}
 
@@ -65,10 +63,8 @@ func NodeConfig(tx *gorm.DB, code string) {
 	var data NodeConfigData
 	auther := node.GenerateAuther(baseConfig.BaseUrl)
 
-	var hosts []model.GostClientHost
-	tx.Where("node_code = ?", node.Code).Find(&hosts)
-	var tunnels []model.GostClientTunnel
-	tx.Where("node_code = ?", node.Code).Find(&tunnels)
+	hosts, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Find()
+	tunnels, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Find()
 	ingress := node.GenerateIngress(hosts, tunnels)
 
 	limiter := node.GenerateLimiter(baseConfig.BaseUrl)

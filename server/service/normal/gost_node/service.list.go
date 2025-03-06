@@ -1,8 +1,7 @@
 package service
 
 import (
-	"gorm.io/gorm"
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
@@ -44,27 +43,23 @@ type ListItemConfig struct {
 
 func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var nodes []model.GostNode
-	var excludeCodes []string
-	db.Model(&model.GostNodeBind{}).Where("user_code != ?", claims.Code).Pluck("node_code", &excludeCodes)
 
-	var where = db
-	if len(excludeCodes) > 0 {
-		where = where.Where("code NOT IN ?", excludeCodes)
+	var excludeCodes []string
+	_ = db.GostNodeBind.Where(db.GostNodeBind.UserCode.Neq(claims.Code)).Pluck(db.GostNodeBind.NodeCode, &excludeCodes)
+
+	var where = []gen.Condition{
+		db.GostNode.Code.NotIn(excludeCodes...),
 	}
+
+	var myNodeCodes []string
+	_ = db.GostNodeBind.Where(db.GostNodeBind.UserCode.Eq(claims.Code)).Pluck(db.GostNodeBind.NodeCode, &myNodeCodes)
 	switch req.Bind {
 	case 1:
-		where = where.Where("code IN (?)",
-			db.Model(&model.GostNodeBind{}).Where("user_code = ?", claims.Code).Select("node_code"),
-		)
+		where = append(where, db.GostNode.Code.In(myNodeCodes...))
 	case 2:
-		where = where.Where("code NOT IN (?)",
-			db.Model(&model.GostNodeBind{}).Where("user_code = ?", claims.Code).Select("node_code"),
-		)
+		where = append(where, db.GostNode.Code.NotIn(myNodeCodes...))
 	}
-	db.Preload("Configs", func(db *gorm.DB) *gorm.DB {
-		return db.Order("gost_node_config.index_value asc")
-	}).Where(where).Order("index_value asc").Order("id desc").Find(&nodes)
+	nodes, _ := db.GostNode.Preload(db.GostNode.Configs.Order(db.GostNodeConfig.IndexValue.Asc())).Where(where...).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Desc()).Find()
 	for _, node := range nodes {
 		if len(node.Configs) == 0 {
 			continue

@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/go-gost/x/config"
-	"server/model"
 	"server/repository"
 )
 
@@ -16,19 +15,20 @@ type VisitCfgResp struct {
 
 func (service *service) VisitCfg(key string) (result VisitCfgResp) {
 	db, _, _ := repository.Get("")
-	var tunnel model.GostClientTunnel
-	if db.Preload("Node").Where("v_key = ?", key).First(&tunnel).RowsAffected == 0 {
+	tunnel, _ := db.GostClientTunnel.Preload(db.GostClientTunnel.Node).Where(db.GostClientTunnel.VKey.Eq(key)).First()
+	if tunnel == nil {
 		return result
 	}
-	var auth model.GostAuth
-	if db.Where("tunnel_code = ?", tunnel.Code).First(&auth).RowsAffected == 0 {
+
+	auth, _ := db.GostAuth.Where(db.GostAuth.TunnelCode.Eq(tunnel.Code)).First()
+	if auth == nil {
 		return result
 	}
 
 	limiter := tunnel.GenerateVisitLimiter()
 	cLimiter := tunnel.GenerateVisitCLimiter()
 	rLimiter := tunnel.GenerateVisitRLimiter()
-	chain := tunnel.GenerateVisitChainConfig(auth)
+	chain := tunnel.GenerateVisitChainConfig(*auth)
 	tcpSvcConfig, ok := tunnel.GenerateVisitTcpSvcConfig(chain.Name, limiter.Name, cLimiter.Name, rLimiter.Name)
 	if ok {
 		result.SvcList = append(result.SvcList, tcpSvcConfig)

@@ -123,11 +123,11 @@ func (tunnel GostClientTunnel) GenerateVisitTcpSvcConfig(chain string, limiter, 
 
 func (tunnel GostClientTunnel) GenerateVisitUdpSvcConfig(chain string, limiter, cLimiter, rLimiter string) (config.ServiceConfig, bool) {
 	return config.ServiceConfig{
-		Name:     "udp_" + tunnel.Code,
-		Addr:     "",
-		Limiter:  limiter,
-		CLimiter: cLimiter,
-		RLimiter: rLimiter,
+		Name: "udp_" + tunnel.Code,
+		Addr: "",
+		//Limiter:  limiter,
+		//CLimiter: cLimiter,
+		//RLimiter: rLimiter,
 		Handler: &config.HandlerConfig{
 			Type:  "udp",
 			Chain: chain,

@@ -1,6 +1,8 @@
 package node_rule
 
-import "gorm.io/gorm"
+import (
+	"server/repository/query"
+)
 
 func init() {
 }
@@ -19,6 +21,6 @@ func (u DefaultRule) Description() string {
 	return "无使用条件约束"
 }
 
-func (u DefaultRule) Allow(tx *gorm.DB, userCode string) bool {
+func (u DefaultRule) Allow(tx *query.Query, userCode string) bool {
 	return true
 }

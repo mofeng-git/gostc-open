@@ -17,18 +17,19 @@ type CreateReq struct {
 
 func (service *service) Create(req CreateReq) error {
 	db, _, log := repository.Get("")
-	if db.Where("account = ?", req.Account).First(&model.SystemUser{}).RowsAffected == 1 {
+	user, _ := db.SystemUser.Where(db.SystemUser.Account.Eq(req.Account)).First()
+	if user != nil {
 		return errors.New("该账号已被使用")
 	}
 
 	salt := utils.RandStr(8, utils.AllDict)
-	if err := db.Create(&model.SystemUser{
+	if err := db.SystemUser.Create(&model.SystemUser{
 		Account:  req.Account,
 		Password: utils.MD5AndSalt(req.Password, salt),
 		Salt:     salt,
 		Admin:    model.SYSTEM_NO_ADMIN,
 		Amount:   req.Amount,
-	}).Error; err != nil {
+	}); err != nil {
 		log.Error("新增用户失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

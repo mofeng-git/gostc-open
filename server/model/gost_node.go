@@ -11,7 +11,7 @@ import (
 type GostNode struct {
 	Base
 	IndexValue            int              `gorm:"column:index_value;index;default:1000;comment:排序，升序"`
-	Key                   string           `gorm:"column:key;uniqueIndex"`
+	Key                   string           `gorm:"column:key;size:100;uniqueIndex"`
 	Name                  string           `gorm:"column:name;index;comment:名称"`
 	Remark                string           `gorm:"column:remark;comment:节点介绍"`
 	Web                   int              `gorm:"column:web;size:1;default:2;comment:WEB功能"`
@@ -154,8 +154,7 @@ func (n GostNode) GenerateForwardServiceConfig(limiter, auther, obs string) (con
 	var metadata = make(map[string]any)
 	_ = json.Unmarshal([]byte(n.TunnelMetadata), &metadata)
 	metadata["bind"] = true
-	metadata["nodelay"] = true
-	//metadata["limiter.refreshInterval"] = "5s"
+	//metadata["nodelay"] = true
 	metadata["limiter.scope"] = "service"
 	metadata["observer.period"] = "60s"
 	metadata["observer.resetTraffic"] = true
@@ -175,7 +174,7 @@ func (n GostNode) GenerateForwardServiceConfig(limiter, auther, obs string) (con
 	}, true
 }
 
-func (n GostNode) GenerateIngress(hosts []GostClientHost, tunnels []GostClientTunnel) config.IngressConfig {
+func (n GostNode) GenerateIngress(hosts []*GostClientHost, tunnels []*GostClientTunnel) config.IngressConfig {
 	var rules []*config.IngressRuleConfig
 	for _, host := range hosts {
 		rules = append(rules, &config.IngressRuleConfig{

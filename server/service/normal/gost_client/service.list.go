@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
@@ -16,9 +15,7 @@ type ListItem struct {
 
 func (service *service) List(claims jwt.Claims) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var clients []model.GostClient
-	var where = db.Where("user_code = ?", claims.Code)
-	db.Where(where).Order("id desc").Find(&clients)
+	clients, _ := db.GostClient.Where(db.GostClient.UserCode.Eq(claims.Code)).Order(db.GostClient.Id.Desc()).Find()
 	for _, client := range clients {
 		list = append(list, ListItem{
 			Code:   client.Code,

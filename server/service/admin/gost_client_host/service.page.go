@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -60,26 +60,22 @@ type ItemConfig struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var hosts []model.GostClientHost
-	var where = db
+	var where []gen.Condition
 	if req.Account != "" {
-		where = where.Where(
-			"user_code in (?)",
-			db.Model(&model.SystemUser{}).Where("account like ?", "%"+req.Account+"%").Select("code"),
-		)
+		var userCodes []string
+		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
+		where = append(where, db.GostClientHost.UserCode.In(userCodes...))
 	}
+
 	if req.Enable > 0 {
-		where = where.Where("enable = ?", req.Enable)
+		where = append(where, db.GostClientHost.Enable.Eq(req.Enable))
 	}
-	db.Where(where).Model(&hosts).Count(&total)
-	db.
-		Preload("User").
-		Preload("Client").
-		Preload("Node").
-		Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&hosts)
+
+	hosts, total, _ := db.GostClientHost.Preload(
+		db.GostClientHost.User,
+		db.GostClientHost.Client,
+		db.GostClientHost.Node,
+	).Where(where...).Order(db.GostClientHost.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, host := range hosts {
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, host.Code)
 		list = append(list, Item{
@@ -112,7 +108,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				OnlyChina:    host.OnlyChina,
 			},
 			Enable:      host.Enable,
-			WarnMsg:     warn_msg.GetHostWarnMsg(host),
+			WarnMsg:     warn_msg.GetHostWarnMsg(*host),
 			CreatedAt:   host.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,

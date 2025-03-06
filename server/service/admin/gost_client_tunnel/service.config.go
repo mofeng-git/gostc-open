@@ -4,9 +4,9 @@ import (
 	"errors"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/gost_engine"
 	"time"
@@ -31,12 +31,11 @@ func (service *service) Config(req ConfigReq) error {
 		return errors.New("到期时间错误")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		var tunnel model.GostClientTunnel
-		if tx.Where("code = ?", req.Code).First(&tunnel).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		tunnel, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.Code.Eq(req.Code)).First()
+		if tunnel == nil {
 			return nil
 		}
-
 		var amount decimal.Decimal
 		switch req.ChargingType {
 		case model.GOST_CONFIG_CHARGING_CUCLE_DAY, model.GOST_CONFIG_CHARGING_ONLY_ONCE:
@@ -60,7 +59,7 @@ func (service *service) Config(req ConfigReq) error {
 		tunnel.CLimiter = req.CLimiter
 		tunnel.OnlyChina = req.OnlyChina
 		tunnel.ExpAt = expAt.Unix()
-		if err = tx.Save(&tunnel).Error; err != nil {
+		if err = tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

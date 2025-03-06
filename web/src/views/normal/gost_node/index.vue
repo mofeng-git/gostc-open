@@ -407,7 +407,7 @@ onBeforeMount(() => {
         <n-form-item label="功能">
           <n-space>
             <n-checkbox
-                v-model:value="state.create.data.web"
+                v-model:checked="state.create.data.web"
                 :focusable="false"
                 :checked-value="1"
                 :unchecked-value="2"
@@ -415,7 +415,7 @@ onBeforeMount(() => {
             >域名解析
             </n-checkbox>
             <n-checkbox
-                v-model:value="state.create.data.forward"
+                v-model:checked="state.create.data.forward"
                 :focusable="false"
                 :checked-value="1"
                 :unchecked-value="2"
@@ -423,7 +423,7 @@ onBeforeMount(() => {
             >端口转发
             </n-checkbox>
             <n-checkbox
-                v-model:value="state.create.data.tunnel"
+                v-model:checked="state.create.data.tunnel"
                 :focusable="false"
                 :checked-value="1"
                 :unchecked-value="2"

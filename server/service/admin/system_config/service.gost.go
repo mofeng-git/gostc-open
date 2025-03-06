@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 )
 
@@ -16,9 +16,9 @@ type GostReq struct {
 
 func (service *service) Gost(req GostReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		tx.Where("kind = ?", model.SYSTEM_CONFIG_KIND_GOST).Delete(&model.SystemConfig{})
-		if err := tx.Create(model.GenerateSystemConfigGost(req.Version, req.Logger)).Error; err != nil {
+	return db.Transaction(func(tx *query.Query) error {
+		_, _ = tx.SystemConfig.Where(tx.SystemConfig.Kind.Eq(model.SYSTEM_CONFIG_KIND_GOST)).Delete()
+		if err := tx.SystemConfig.Create(model.GenerateSystemConfigGost(req.Version, req.Logger)...); err != nil {
 			log.Error("修改系统GOST配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

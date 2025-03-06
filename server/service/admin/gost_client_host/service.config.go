@@ -4,9 +4,9 @@ import (
 	"errors"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/gost_engine"
 	"time"
@@ -31,9 +31,9 @@ func (service *service) Config(req ConfigReq) error {
 		return errors.New("到期时间错误")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		var host model.GostClientHost
-		if tx.Where("code = ?", req.Code).First(&host).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		host, _ := tx.GostClientHost.Where(tx.GostClientHost.Code.Eq(req.Code)).First()
+		if host == nil {
 			return nil
 		}
 
@@ -60,7 +60,7 @@ func (service *service) Config(req ConfigReq) error {
 		host.CLimiter = req.CLimiter
 		host.OnlyChina = req.OnlyChina
 		host.ExpAt = expAt.Unix()
-		if err = tx.Save(&host).Error; err != nil {
+		if err = tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

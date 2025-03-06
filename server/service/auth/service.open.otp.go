@@ -4,10 +4,9 @@ import (
 	"errors"
 	"github.com/pquerna/otp/totp"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 )
 
@@ -18,10 +17,10 @@ type OpenOtpReq struct {
 
 func (service *service) OpenOtp(claims jwt.Claims, req OpenOtpReq) (err error) {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var user model.SystemUser
-		if tx.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
-			return errors.New("用户不存在")
+	return db.Transaction(func(tx *query.Query) error {
+		user, err := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		if err != nil {
+			return errors.New("账号错误")
 		}
 		if user.OtpKey != "" {
 			return errors.New("已开启二步验证")
@@ -34,7 +33,7 @@ func (service *service) OpenOtp(claims jwt.Claims, req OpenOtpReq) (err error) {
 			return errors.New("验证失败")
 		}
 		user.OtpKey = otpKey
-		if err := tx.Save(&user).Error; err != nil {
+		if err := tx.SystemUser.Save(user); err != nil {
 			log.Error("开启otp失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

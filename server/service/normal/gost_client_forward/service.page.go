@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/jwt"
 	"server/pkg/utils"
@@ -73,23 +73,20 @@ type ItemConfig struct {
 
 func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var forwards []model.GostClientForward
-	var where = db.Where("user_code = ?", claims.Code)
+	var where = []gen.Condition{
+		db.GostClientForward.UserCode.Eq(claims.Code),
+	}
 	if req.Name != "" {
-		where = where.Where("name like ?", "%"+req.Name+"%")
+		where = append(where, db.GostClientForward.Name.Like("%"+req.Name+"%"))
 	}
 	if req.Enable > 0 {
-		where = where.Where("enable = ?", req.Enable)
+		where = append(where, db.GostClientForward.Enable.Eq(req.Enable))
 	}
-	db.Model(&forwards).Count(&total)
-	db.
-		Preload("User").
-		Preload("Client").
-		Preload("Node").
-		Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&forwards)
+	forwards, total, _ := db.GostClientForward.Preload(
+		db.GostClientForward.User,
+		db.GostClientForward.Client,
+		db.GostClientForward.Node,
+	).Where(where...).Order(db.GostClientForward.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, forward := range forwards {
 		var mathcers []ItemMatcher
 		for _, item := range forward.GetMatcher() {
@@ -130,7 +127,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				OnlyChina:    forward.OnlyChina,
 			},
 			Enable:        forward.Enable,
-			WarnMsg:       warn_msg.GetForwardWarnMsg(forward),
+			WarnMsg:       warn_msg.GetForwardWarnMsg(*forward),
 			CreatedAt:     forward.CreatedAt.Format(time.DateTime),
 			InputBytes:    obsInfo.InputBytes,
 			OutputBytes:   obsInfo.OutputBytes,

@@ -5,7 +5,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"go.uber.org/zap"
-	"server/model"
 	"server/global"
 	"server/repository"
 	"server/service/common/cache"
@@ -29,11 +28,10 @@ func (service *service) LoginOtp(ip string, req LoginOtpReq) (result LoginOtpRes
 	if userCode == "" {
 		return result, errors.New("登录失败")
 	}
-	var user model.SystemUser
-	if db.Where("code = ?", userCode).First(&user).RowsAffected == 0 {
-		return result, errors.New("用户错误")
+	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(userCode)).First()
+	if user == nil {
+		return result, errors.New("未查询到账户信息")
 	}
-
 	// 进行二步验证
 	if ok, _ := totp.ValidateCustom(req.Value, user.OtpKey, time.Now(), totp.ValidateOpts{
 		Period: 30,

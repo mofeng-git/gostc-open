@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -59,26 +59,21 @@ type ItemConfig struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var tunnels []model.GostClientTunnel
-	var where = db
+	var where []gen.Condition
 	if req.Account != "" {
-		where = where.Where(
-			"user_code in (?)",
-			db.Model(&model.SystemUser{}).Where("account like ?", "%"+req.Account+"%").Select("code"),
-		)
+		var userCodes []string
+		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
+		where = append(where, db.GostClientTunnel.UserCode.In(userCodes...))
 	}
 	if req.Enable > 0 {
-		where = where.Where("enable = ?", req.Enable)
+		where = append(where, db.GostClientTunnel.Enable.Eq(req.Enable))
 	}
-	db.Model(&tunnels).Where(where).Count(&total)
-	db.
-		Preload("User").
-		Preload("Client").
-		Preload("Node").
-		Where(where).Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&tunnels)
+
+	tunnels, total, _ := db.GostClientTunnel.Preload(
+		db.GostClientTunnel.User,
+		db.GostClientTunnel.Client,
+		db.GostClientTunnel.Node,
+	).Where(where...).Order(db.GostClientTunnel.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, tunnel := range tunnels {
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, tunnel.Code)
 		list = append(list, Item{
@@ -110,7 +105,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				OnlyChina:    tunnel.OnlyChina,
 			},
 			Enable:      tunnel.Enable,
-			WarnMsg:     warn_msg.GetTunnelWarnMsg(tunnel),
+			WarnMsg:     warn_msg.GetTunnelWarnMsg(*tunnel),
 			CreatedAt:   tunnel.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,

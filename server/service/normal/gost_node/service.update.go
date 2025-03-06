@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
 	"server/service/common/node_port"
@@ -37,13 +36,13 @@ type UpdateReq struct {
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	db, _, log := repository.Get("")
-	var nodeBind model.GostNodeBind
-	if db.Where("node_code = ? AND user_code = ?", req.Code, claims.Code).First(&nodeBind).RowsAffected == 0 {
+	nodeBind, _ := db.GostNodeBind.Where(db.GostNodeBind.NodeCode.Eq(req.Code), db.GostNodeBind.UserCode.Eq(claims.Code)).First()
+	if nodeBind == nil {
 		return nil
 	}
 
-	var node model.GostNode
-	if db.Where("code = ?", req.Code).First(&node).RowsAffected == 0 {
+	node, _ := db.GostNode.Where(db.GostNode.Code.Eq(req.Code)).First()
+	if node == nil {
 		return errors.New("数据不存在")
 	}
 
@@ -72,24 +71,24 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	node.ForwardMetadata = req.ForwardMetadata
 	node.ForwardReplaceAddress = req.ForwardReplaceAddress
 	node.IndexValue = req.IndexValue
-	if err := db.Save(&node).Error; err != nil {
+	if err := db.GostNode.Save(node); err != nil {
 		log.Error("修改节点失败", zap.Error(err))
 		return errors.New("操作失败")
 	}
 	gost_engine.NodeConfig(db, node.Code)
 
 	var hostCodes []string
-	db.Model(&model.GostClientHost{}).Where("node_code = ?", node.Code).Pluck("code", &hostCodes)
+	_ = db.GostClientHost.Where(db.GostClientHost.NodeCode.Eq(node.Code)).Pluck(db.GostClientHost.Code, &hostCodes)
 	for _, code := range hostCodes {
 		gost_engine.ClientHostConfig(db, code)
 	}
 	var forwardCodes []string
-	db.Model(&model.GostClientForward{}).Where("node_code = ?", node.Code).Pluck("code", &forwardCodes)
+	_ = db.GostClientForward.Where(db.GostClientForward.NodeCode.Eq(node.Code)).Pluck(db.GostClientForward.Code, &forwardCodes)
 	for _, code := range forwardCodes {
 		gost_engine.ClientForwardConfig(db, code)
 	}
 	var tunnelCodes []string
-	db.Model(&model.GostClientTunnel{}).Where("node_code = ?", node.Code).Pluck("code", &tunnelCodes)
+	_ = db.GostClientTunnel.Where(db.GostClientTunnel.NodeCode.Eq(node.Code)).Pluck(db.GostClientTunnel.Code, &tunnelCodes)
 	for _, code := range tunnelCodes {
 		gost_engine.ClientTunnelConfig(db, code)
 	}

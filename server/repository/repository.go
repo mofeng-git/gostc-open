@@ -2,11 +2,11 @@ package repository
 
 import (
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/global"
 	"server/pkg/memory"
+	"server/repository/query"
 )
 
-func Get(domain string) (*gorm.DB, memory.Interface, *zap.Logger) {
-	return global.DB.GetDB(), global.Cache, global.Logger
+func Get(domain string) (*query.Query, memory.Interface, *zap.Logger) {
+	return query.Q, global.Cache, global.Logger
 }

@@ -7,8 +7,8 @@ import (
 	"github.com/pquerna/otp/totp"
 	"go.uber.org/zap"
 	"image/png"
-	"server/model"
 	"server/global"
+	"server/model"
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
@@ -23,17 +23,16 @@ type GenOtpResp struct {
 
 func (service *service) GenOtp(claims jwt.Claims) (result GenOtpResp, err error) {
 	db, _, _ := repository.Get("")
-	var user model.SystemUser
-	if db.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
-		return result, errors.New("用户不存在")
+	user, err := db.SystemUser.Where(db.SystemUser.Code.Eq(claims.Code)).First()
+	if err != nil {
+		return result, errors.New("账号错误")
 	}
 	if user.OtpKey != "" {
 		return result, errors.New("已开启二步验证")
 	}
 
-	var list []model.SystemConfig
-	db.Where("kind = ?", model.SYSTEM_CONFIG_KIND_BASE).Find(&list)
-	systemConfig := model.GetSystemConfigBase(list)
+	var systemConfig model.SystemConfigBase
+	cache.GetSystemConfigBase(&systemConfig)
 
 	result.Key = utils.RandStr(32, utils.AllDict)
 	optKey, err := totp.Generate(totp.GenerateOpts{

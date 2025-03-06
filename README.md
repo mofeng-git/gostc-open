@@ -7,9 +7,8 @@
 [GOST开源地址](https://github.com/go-gost/gost)
 
 如果想快速体验，可直接使用我提供的服务
-[地址](https://gost.sian.one)
 
-**mysql暂未进行完整测试，存在问题，请使用sqlite作为持久化存储**
+[地址](https://gost.sian.one)
 
 ## License
 This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/gostc-open?tab=CC0-1.0-1-ov-file).
@@ -70,3 +69,9 @@ goreleaser release --snapshot --clean
 如果后台管理服务不启用SSL，需要设置-tls=false
 
 -addr指定的127.0.0.1:8080修改为实际的后台管理
+
+## 基础使用教程(视频)
+[B站视频](https://www.bilibili.com/video/BV1nS98Y8Eaq/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
+
+## 自建教程(视频)
+[B站视频](https://www.bilibili.com/video/BV1s19nY3EB5/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)

@@ -1,12 +1,12 @@
 package node_rule
 
 import (
-	"gorm.io/gorm"
+	"server/repository/query"
 )
 
 type RuleInterface interface {
 	Code() string
-	Allow(db *gorm.DB, userCode string) bool
+	Allow(db *query.Query, userCode string) bool
 	Name() string
 	Description() string
 }

@@ -2,8 +2,7 @@ package node_port
 
 import (
 	"errors"
-	"gorm.io/gorm"
-	"server/model"
+	"server/repository/query"
 	"sync"
 	"time"
 )
@@ -11,7 +10,7 @@ import (
 var ports = make(map[string][]string)
 var lock = &sync.Mutex{}
 
-func Run(db *gorm.DB) {
+func Run(db *query.Query) {
 	for {
 		arrange(db)
 		time.Sleep(time.Hour * 2)
@@ -23,6 +22,9 @@ func GetPort(nodeCode string) (string, error) {
 	defer lock.Unlock()
 	nodePorts, ok := ports[nodeCode]
 	if !ok {
+		return "", errors.New("端口资源不足")
+	}
+	if len(nodePorts) == 0 {
 		return "", errors.New("端口资源不足")
 	}
 	var newPorts = make([]string, len(nodePorts)-1)
@@ -37,13 +39,11 @@ func ReleasePort(nodeCode string, port string) {
 	ports[nodeCode] = append(ports[nodeCode], port)
 }
 
-func arrange(db *gorm.DB) {
+func arrange(db *query.Query) {
 	lock.Lock()
 	defer lock.Unlock()
-	var nodes []model.GostNode
-	db.Find(&nodes)
-	var nodePorts []model.GostNodePort
-	db.Find(&nodePorts)
+	nodes, _ := db.GostNode.Find()
+	nodePorts, _ := db.GostNodePort.Find()
 	var nodeUsedPorts = make(map[string][]string)
 	for _, nodePort := range nodePorts {
 		nodeUsedPorts[nodePort.NodeCode] = append(nodeUsedPorts[nodePort.NodeCode], nodePort.Port)
@@ -53,12 +53,11 @@ func arrange(db *gorm.DB) {
 	}
 }
 
-func Arrange(db *gorm.DB, code string) {
+func Arrange(db *query.Query, code string) {
 	lock.Lock()
 	defer lock.Unlock()
-	var node model.GostNode
-	db.Where("code = ?", code).First(&node)
+	node, _ := db.GostNode.Where(db.GostNode.Code.Eq(code)).First()
 	var nodeUsedPorts []string
-	db.Model(&model.GostNodePort{}).Where("node_code = ?", code).Pluck("port", &nodeUsedPorts)
+	_ = db.GostNodePort.Where(db.GostNodePort.NodeCode.Eq(code)).Pluck(db.GostNodePort.Port, &nodeUsedPorts)
 	ports[node.Code] = node.GetPorts(nodeUsedPorts)
 }

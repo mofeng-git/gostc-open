@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/repository"
 	"time"
 )
@@ -16,8 +15,7 @@ type ListItem struct {
 
 func (service *service) List() (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var notices []model.SystemNotice
-	db.Where("hidden = 2").Order("index_value asc").Order("id desc").Find(&notices)
+	notices, _ := db.SystemNotice.Where(db.SystemNotice.Hidden.Eq(2)).Order(db.SystemNotice.IndexValue.Asc(), db.SystemNotice.Id.Desc()).Find()
 	for _, notice := range notices {
 		list = append(list, ListItem{
 			Code:       notice.Code,

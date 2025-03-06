@@ -15,11 +15,11 @@ type CreateReq struct {
 
 func (service *service) Create(req CreateReq) error {
 	db, _, log := repository.Get("")
-	if err := db.Create(&model.GostClient{
+	if err := db.GostClient.Create(&model.GostClient{
 		Name:     req.Name,
 		UserCode: req.UserCode,
 		Key:      uuid.NewString(),
-	}).Error; err != nil {
+	}); err != nil {
 		log.Error("新增用户客户端失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

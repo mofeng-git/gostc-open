@@ -11,7 +11,6 @@ const (
 	client_ip_key        = "client:ip:"
 	client_last_time_key = "client:last_time:"
 	client_version_key   = "client:version:"
-	client_china_key     = "client:china:"
 )
 
 func SetClientOnline(code string, online bool, duration time.Duration) {

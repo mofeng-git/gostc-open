@@ -1,7 +1,7 @@
 package node_rule
 
 import (
-	"gorm.io/gorm"
+	"server/repository/query"
 )
 
 type UserQQGroupRule struct{}
@@ -18,11 +18,6 @@ func (u UserQQGroupRule) Description() string {
 	return "需要绑定QQ号"
 }
 
-func (u UserQQGroupRule) Allow(tx *gorm.DB, userCode string) bool {
-	//var bindQQ model.SystemUserQQ
-	//if err := tx.Where("user_code = ?", userCode).First(&bindQQ).Error; err != nil {
-	//	return false
-	//}
-	//return bindQQ.QQ != ""
+func (u UserQQGroupRule) Allow(tx *query.Query, userCode string) bool {
 	return true
 }

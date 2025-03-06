@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/pkg/jwt"
 	"server/pkg/utils"
@@ -50,16 +50,14 @@ type Item struct {
 
 func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var nodes []model.GostNode
-	var where = db.Where(
-		"code in (?)",
-		db.Model(&model.GostNodeBind{}).Where("user_code = ?", claims.Code).Select("node_code"),
-	)
-	db.Where(where).Model(&nodes).Count(&total)
-	db.Where(where).Order("index_value asc").Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&nodes)
+
+	var myNodeCodes []string
+	_ = db.GostNodeBind.Where(db.GostNodeBind.UserCode.Eq(claims.Code)).Pluck(db.GostNodeBind.NodeCode, &myNodeCodes)
+	var where = []gen.Condition{
+		db.GostNode.Code.In(myNodeCodes...),
+	}
+
+	nodes, total, _ := db.GostNode.Where(where...).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, node := range nodes {
 		var ruleNames []string
 		for _, rule := range node.GetRules() {

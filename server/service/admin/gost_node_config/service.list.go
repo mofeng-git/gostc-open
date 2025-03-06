@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/repository"
 )
 
@@ -24,9 +23,10 @@ type ListItem struct {
 
 func (service *service) List(req ListReq) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var cfgs []model.GostNodeConfig
-	var where = db.Where("node_code = ?", req.NodeCode)
-	db.Where(where).Order("index_value asc").Order("id desc").Find(&cfgs)
+	cfgs, _ := db.GostNodeConfig.Where(db.GostNodeConfig.NodeCode.Eq(req.NodeCode)).Order(
+		db.GostNodeConfig.IndexValue.Asc(),
+		db.GostNodeConfig.Id.Desc(),
+	).Find()
 	for _, cfg := range cfgs {
 		list = append(list, ListItem{
 			Code:         cfg.Code,

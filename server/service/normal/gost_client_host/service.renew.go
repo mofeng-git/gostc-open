@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/gost_engine"
 	"time"
@@ -18,14 +18,17 @@ type RenewReq struct {
 
 func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var user model.SystemUser
-		if tx.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		if user == nil {
 			return errors.New("用户错误")
 		}
 
-		var host model.GostClientHost
-		if tx.Where("code = ? AND user_code = ?", req.Code, user.Code).First(&host).RowsAffected == 0 {
+		host, _ := tx.GostClientHost.Where(
+			tx.GostClientHost.UserCode.Eq(user.Code),
+			tx.GostClientHost.Code.Eq(req.Code),
+		).First()
+		if host == nil {
 			return errors.New("操作失败")
 		}
 
@@ -40,7 +43,7 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 				return errors.New("积分不足")
 			}
 			user.Amount = user.Amount.Sub(host.Amount)
-			if err := tx.Save(&user).Error; err != nil {
+			if err := tx.SystemUser.Save(user); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}
@@ -49,7 +52,7 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 		}
 		host.Status = 1
 		host.ExpAt = expAt.Unix()
-		if err := tx.Save(&host).Error; err != nil {
+		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("续费用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

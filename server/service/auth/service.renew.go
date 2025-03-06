@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"server/model"
 	"server/global"
 	"server/pkg/jwt"
 	"server/repository"
@@ -24,10 +23,11 @@ func (service *service) Renew(oldToken string, claims jwt.Claims) (result LoginR
 		}, nil
 	}
 
-	var user model.SystemUser
-	if db.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(claims.Code)).First()
+	if user == nil {
 		return result, errors.New("未查询到账户信息")
 	}
+
 	token, err := global.Jwt.GenerateToken(global.Jwt.NewClaims(user.Code, map[string]string{
 		"admin": strconv.Itoa(user.Admin),
 	}, global.Config.AuthExp))

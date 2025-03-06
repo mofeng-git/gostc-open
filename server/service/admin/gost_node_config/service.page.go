@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/model"
+	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/repository"
 )
@@ -26,16 +26,15 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var cfgs []model.GostNodeConfig
-	var where = db
+	var where []gen.Condition
 	if req.Name != "" {
-		where = where.Where("name like ?", "%"+req.Name+"%")
+		where = append(where, db.GostNodeConfig.Name.Like("%"+req.Name+"%"))
 	}
-	db.Where(where).Model(&cfgs).Count(&total)
-	db.Where(where).Order("index_value asc").Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&cfgs)
+
+	cfgs, total, _ := db.GostNodeConfig.Where(where...).Order(
+		db.GostNodeConfig.IndexValue.Asc(),
+		db.GostNodeConfig.Id.Desc(),
+	).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, cfg := range cfgs {
 		list = append(list, Item{
 			Code:         cfg.Code,

@@ -3,11 +3,11 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/node_port"
 	"server/service/common/node_rule"
@@ -34,14 +34,14 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		return errors.New("内网端口格式错误")
 	}
 
-	return db.Transaction(func(tx *gorm.DB) error {
-		var user model.SystemUser
-		if tx.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		if user == nil {
 			return errors.New("用户错误")
 		}
 
-		var node model.GostNode
-		if tx.Where("code = ?", req.NodeCode).First(&node).RowsAffected == 0 {
+		node, _ := tx.GostNode.Where(tx.GostNode.Code.Eq(req.NodeCode)).First()
+		if node == nil {
 			return errors.New("节点错误")
 		}
 		if node.Forward != 1 {
@@ -58,9 +58,19 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			}
 		}
 
-		var cfg model.GostNodeConfig
-		if tx.Where("code = ? AND node_code = ?", req.ConfigCode, node.Code).First(&cfg).RowsAffected == 0 {
+		cfg, _ := tx.GostNodeConfig.Where(
+			tx.GostNodeConfig.Code.Eq(req.ConfigCode),
+			tx.GostNodeConfig.NodeCode.Eq(node.Code),
+		).First()
+		if cfg == nil {
 			return errors.New("套餐错误")
+		}
+		client, _ := tx.GostClient.Where(
+			tx.GostClient.UserCode.Eq(claims.Code),
+			tx.GostClient.Code.Eq(req.ClientCode),
+		).First()
+		if client == nil {
+			return errors.New("客户端错误")
 		}
 
 		var expAt = time.Now().Unix()
@@ -71,7 +81,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				return errors.New("积分不足")
 			}
 			user.Amount = user.Amount.Sub(cfg.Amount)
-			if err := tx.Save(&user).Error; err != nil {
+			if err := tx.SystemUser.Save(user); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}
@@ -80,25 +90,20 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				return errors.New("积分不足")
 			}
 			user.Amount = user.Amount.Sub(cfg.Amount)
-			if err := tx.Save(&user).Error; err != nil {
+			if err := tx.SystemUser.Save(user); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}
-		}
-
-		var client model.GostClient
-		if tx.Where("code = ? AND user_code = ?", req.ClientCode, claims.Code).First(&client).RowsAffected == 0 {
-			return errors.New("客户端错误")
 		}
 
 		port, err := node_port.GetPort(node.Code)
 		if err != nil {
 			return err
 		}
-		if err = tx.Create(&model.GostNodePort{
+		if err = tx.GostNodePort.Create(&model.GostNodePort{
 			Port:     port,
 			NodeCode: node.Code,
-		}).Error; err != nil {
+		}); err != nil {
 			node_port.ReleasePort(node.Code, port)
 			log.Error("端口转发，端口冲突", zap.Error(err))
 			return errors.New("操作失败")
@@ -124,7 +129,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				ExpAt:        expAt,
 			},
 		}
-		if err = tx.Create(&forward).Error; err != nil {
+		if err = tx.GostClientForward.Create(&forward); err != nil {
 			node_port.ReleasePort(node.Code, port)
 			log.Error("新增用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
@@ -135,7 +140,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			User:       utils.RandStr(10, utils.AllDict),
 			Password:   utils.RandStr(10, utils.AllDict),
 		}
-		if err = tx.Create(&auth).Error; err != nil {
+		if err = tx.GostAuth.Create(&auth); err != nil {
 			node_port.ReleasePort(node.Code, port)
 			log.Error("生成授权信息失败", zap.Error(err))
 			return errors.New("操作失败")

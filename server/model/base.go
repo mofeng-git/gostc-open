@@ -19,7 +19,7 @@ const (
 
 type Base struct {
 	Id        int    `gorm:"primaryKey"`
-	Code      string `gorm:"column:code;uniqueIndex;comment:code"`
+	Code      string `gorm:"column:code;size:100;uniqueIndex;comment:code"`
 	AllowEdit int    `gorm:"column:allow_edit;default:1;size:1;comment:是否可编辑"`
 	AllowDel  int    `gorm:"column:allow_del;default:1;size:1;comment:是否可删除"`
 	CreatedAt time.Time

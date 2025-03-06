@@ -4,10 +4,10 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/node_port"
 	"strings"
 )
@@ -40,7 +40,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	if req.Web == 1 && req.Tunnel != 1 {
 		req.Web = 2
 	}
-	return db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(tx *query.Query) error {
 		var node = model.GostNode{
 			Key:                   uuid.NewString(),
 			Name:                  req.Name,
@@ -64,24 +64,24 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			Tags:                  strings.Join(req.Tags, ","),
 			IndexValue:            req.IndexValue,
 		}
-		if err := tx.Create(&node).Error; err != nil {
+		if err := tx.GostNode.Create(&node); err != nil {
 			log.Error("新增节点失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		if err := tx.Create(&model.GostNodeBind{
+		if err := tx.GostNodeBind.Create(&model.GostNodeBind{
 			NodeCode: node.Code,
 			UserCode: claims.Code,
-		}).Error; err != nil {
+		}); err != nil {
 			log.Error("新增节点失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		if err := tx.Create(&model.GostNodeConfig{
+		if err := tx.GostNodeConfig.Create(&model.GostNodeConfig{
 			IndexValue:   1000,
 			Name:         "自建节点套餐",
 			ChargingType: model.GOST_CONFIG_CHARGING_FREE,
 			NodeCode:     node.Code,
 			OnlyChina:    2,
-		}).Error; err != nil {
+		}); err != nil {
 			log.Error("新增节点失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

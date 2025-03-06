@@ -6,6 +6,7 @@ import (
 	"server/bootstrap"
 	"server/global"
 	"server/pkg/signal"
+	_ "server/router"
 	_ "server/task"
 	_ "server/todo"
 )
@@ -36,8 +37,7 @@ var RootCmd = cobra.Command{
 		bootstrap.InitJwt()
 		bootstrap.InitPersistence()
 		bootstrap.InitMemory()
-		bootstrap.InitTodo()
-		bootstrap.InitCron()
+		bootstrap.InitTask()
 		bootstrap.InitRouter()
 		bootstrap.InitTodo()
 		bootstrap.InitServer()

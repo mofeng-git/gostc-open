@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"server/global"
 	"server/model"
+	"server/repository"
 	"server/service/common/cache"
 	"sync/atomic"
 	"time"
@@ -41,7 +42,9 @@ func (event *NodeEvent) OnOpen(socket *gws.Conn) {
 		}
 	}()
 	go event.sendLoop(socket)
-	NodeConfig(global.DB.GetDB(), event.code)
+
+	db, _, _ := repository.Get("")
+	NodeConfig(db, event.code)
 }
 
 func (event *NodeEvent) sendLoop(socket *gws.Conn) {

@@ -14,8 +14,11 @@ func (service *service) ClientWs(c *gin.Context) {
 	if key == "" {
 		return
 	}
-	var client model.GostClient
-	db.Where("key = ?", key).First(&client)
+
+	client, _ := db.GostClient.Where(db.GostClient.Key.Eq(key)).First()
+	if client == nil {
+		client = &model.GostClient{}
+	}
 
 	value, ok := gost_engine.EngineRegistry.Get(client.Code)
 	if ok {

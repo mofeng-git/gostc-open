@@ -14,8 +14,11 @@ func (service *service) NodeWs(c *gin.Context) {
 	if key == "" {
 		return
 	}
-	var node model.GostNode
-	db.Where("key = ?", key).First(&node)
+
+	node, _ := db.GostNode.Where(db.GostNode.Key.Eq(key)).First()
+	if node == nil {
+		node = &model.GostNode{}
+	}
 
 	value, ok := gost_engine.EngineRegistry.Get(node.Code)
 	if ok {

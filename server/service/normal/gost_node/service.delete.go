@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/gost_engine"
 )
 
@@ -16,39 +15,40 @@ type DeleteReq struct {
 
 func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var nodeBind model.GostNodeBind
-		if tx.Where("node_code = ? AND user_code = ?", req.Code, claims.Code).First(&nodeBind).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		nodeBind, _ := tx.GostNodeBind.Where(tx.GostNodeBind.NodeCode.Eq(req.Code), tx.GostNodeBind.UserCode.Eq(claims.Code)).First()
+		if nodeBind == nil {
 			return nil
 		}
 
-		var node model.GostNode
-		if tx.Where("code = ?", req.Code).First(&node).RowsAffected == 0 {
+		node, _ := tx.GostNode.Where(tx.GostNode.Code.Eq(req.Code)).First()
+		if node == nil {
 			return nil
 		}
 
-		var hostTotal int64
-		tx.Model(&model.GostClientHost{}).Where("node_code = ?", node.Code).Count(&hostTotal)
+		hostTotal, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Count()
 		if hostTotal > 0 {
 			return errors.New("请先删除该节点的所有隧道")
 		}
-		var forwardTotal int64
-		tx.Model(&model.GostClientForward{}).Where("node_code = ?", node.Code).Count(&forwardTotal)
+
+		forwardTotal, _ := tx.GostClientForward.Where(tx.GostClientForward.NodeCode.Eq(node.Code)).Count()
 		if forwardTotal > 0 {
 			return errors.New("请先删除该节点的所有隧道")
 		}
-		var tunnelTotal int64
-		tx.Model(&model.GostClientTunnel{}).Where("node_code = ?", node.Code).Count(&tunnelTotal)
+
+		tunnelTotal, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Count()
 		if tunnelTotal > 0 {
 			return errors.New("请先删除该节点的所有隧道")
 		}
-		if err := tx.Delete(&node).Error; err != nil {
+
+		if _, err := tx.GostNode.Where(tx.GostNode.Code.Eq(node.Code)).Delete(); err != nil {
 			log.Error("删除节点失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		tx.Where("node_code = ?", node.Code).Delete(&model.GostNodeConfig{})
-		tx.Where("node_code = ?", node.Code).Delete(&model.GostNodeLogger{})
-		tx.Where("node_code = ?", node.Code).Delete(&model.GostNodeBind{})
+
+		_, _ = tx.GostNodeConfig.Where(tx.GostNodeConfig.NodeCode.Eq(node.Code)).Delete()
+		_, _ = tx.GostNodeLogger.Where(tx.GostNodeLogger.NodeCode.Eq(node.Code)).Delete()
+		_, _ = tx.GostNodeBind.Where(tx.GostNodeBind.NodeCode.Eq(node.Code)).Delete()
 		gost_engine.NodeStop(node.Code, "节点已被删除")
 		return nil
 	})

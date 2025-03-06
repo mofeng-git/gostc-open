@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/gost_engine"
 )
@@ -17,17 +16,17 @@ type DeleteReq struct {
 
 func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var tunnel model.GostClientTunnel
-		if tx.Where("code = ? AND user_code = ?", req.Code, claims.Code).First(&tunnel).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		tunnel, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.Code.Eq(req.Code), tx.GostClientTunnel.UserCode.Eq(claims.Code)).First()
+		if tunnel == nil {
 			return nil
 		}
-		tx.Where("tunnel_code = ?", tunnel.Code).Delete(&model.GostAuth{})
-		if err := tx.Delete(&tunnel).Error; err != nil {
+		_, _ = tx.GostAuth.Where(tx.GostAuth.TunnelCode.Eq(tunnel.Code)).Delete()
+		if _, err := tx.GostClientTunnel.Where(tx.GostClientTunnel.Code.Eq(tunnel.Code)).Delete(); err != nil {
 			log.Error("删除用户私有隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientRemoveTunnelConfig(tx, tunnel, tunnel.Node)
+		gost_engine.ClientRemoveTunnelConfig(tx, *tunnel, tunnel.Node)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
 	"server/service/common/cache"
@@ -18,10 +17,10 @@ type InfoResp struct {
 
 func (service *service) Info(claims jwt.Claims) (result InfoResp) {
 	db, _, _ := repository.Get("")
-	db.Model(&model.GostClient{}).Where("user_code = ?", claims.Code).Count(&result.Client)
-	db.Model(&model.GostClientHost{}).Where("user_code = ?", claims.Code).Count(&result.Host)
-	db.Model(&model.GostClientForward{}).Where("user_code = ?", claims.Code).Count(&result.Forward)
-	db.Model(&model.GostClientTunnel{}).Where("user_code = ?", claims.Code).Count(&result.Tunnel)
+	result.Client, _ = db.GostClient.Where(db.GostClient.UserCode.Eq(claims.Code)).Count()
+	result.Host, _ = db.GostClientHost.Where(db.GostClientHost.UserCode.Eq(claims.Code)).Count()
+	result.Forward, _ = db.GostClientForward.Where(db.GostClientForward.UserCode.Eq(claims.Code)).Count()
+	result.Tunnel, _ = db.GostClientTunnel.Where(db.GostClientTunnel.UserCode.Eq(claims.Code)).Count()
 	obsInfo := cache.GetUserObsDateRange(cache.MONTH_DATEONLY_LIST, claims.Code)
 	result.InputBytes = obsInfo.InputBytes
 	result.OutputBytes = obsInfo.OutputBytes

@@ -34,8 +34,9 @@ func (service *service) Update(req UpdateReq) (err error) {
 	default:
 		req.ChargingType = model.GOST_CONFIG_CHARGING_FREE
 	}
-	var cfg model.GostNodeConfig
-	if db.Where("code = ?", req.Code).First(&cfg).RowsAffected == 0 {
+
+	cfg, _ := db.GostNodeConfig.Where(db.GostNodeConfig.Code.Eq(req.Code)).First()
+	if cfg == nil {
 		return errors.New("数据不存在")
 	}
 
@@ -48,7 +49,7 @@ func (service *service) Update(req UpdateReq) (err error) {
 	cfg.CLimiter = req.CLimiter
 	cfg.OnlyChina = req.OnlyChina
 	cfg.IndexValue = req.IndexValue
-	if err := db.Save(&cfg).Error; err != nil {
+	if err := db.GostNodeConfig.Save(cfg); err != nil {
 		log.Error("修改套餐配置失败", zap.Error(err))
 		return errors.New("操作失败")
 	}

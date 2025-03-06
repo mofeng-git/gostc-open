@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/repository"
 )
 
@@ -16,8 +15,10 @@ type ListItem struct {
 
 func (service *service) List(req ListReq) (list []ListItem) {
 	db, _, _ := repository.Get("")
-	var users []model.SystemUser
-	db.Select("code, account").Where("account like ?", "%"+req.Account+"%").Order("id desc").Find(&users)
+	users, _ := db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Select(
+		db.SystemUser.Code,
+		db.SystemUser.Account,
+	).Order(db.SystemUser.Id.Desc()).Find()
 	for _, user := range users {
 		list = append(list, ListItem{
 			Code:    user.Code,

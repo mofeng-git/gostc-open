@@ -1,8 +1,6 @@
 package node_rule
 
-import (
-	"gorm.io/gorm"
-)
+import "server/repository/query"
 
 func init() {
 }
@@ -21,7 +19,7 @@ func (u UserLevelRule) Description() string {
 	return "需要账号等级达到1级"
 }
 
-func (u UserLevelRule) Allow(tx *gorm.DB, userCode string) bool {
+func (u UserLevelRule) Allow(tx *query.Query, userCode string) bool {
 	// 允许使用
 	return true
 }

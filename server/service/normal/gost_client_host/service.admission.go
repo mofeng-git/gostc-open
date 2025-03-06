@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/query"
 	"server/service/gost_engine"
 )
 
@@ -20,14 +19,17 @@ type AdmissionReq struct {
 
 func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *gorm.DB) error {
-		var user model.SystemUser
-		if tx.Where("code = ?", claims.Code).First(&user).RowsAffected == 0 {
+	return db.Transaction(func(tx *query.Query) error {
+		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		if user == nil {
 			return errors.New("用户错误")
 		}
 
-		var host model.GostClientHost
-		if tx.Where("code = ? AND user_code = ?", req.Code, user.Code).First(&host).RowsAffected == 0 {
+		host, _ := tx.GostClientHost.Where(
+			tx.GostClientHost.UserCode.Eq(user.Code),
+			tx.GostClientHost.Code.Eq(req.Code),
+		).First()
+		if host == nil {
 			return errors.New("操作失败")
 		}
 
@@ -36,7 +38,7 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 		host.SetWhiteList(req.White)
 		host.SetBlackList(req.Black)
 
-		if err := tx.Save(&host).Error; err != nil {
+		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}

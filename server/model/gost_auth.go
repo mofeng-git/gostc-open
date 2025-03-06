@@ -9,7 +9,7 @@ const (
 type GostAuth struct {
 	Base
 	TunnelType int    `gorm:"column:tunnel_type;index;default:1;comment:隧道类型"`
-	TunnelCode string `gorm:"column:tunnel_code;uniqueIndex;default:'';comment:隧道编号"`
-	User       string `gorm:"column:user;uniqueIndex:gost_auth_uidx;comment:连接用户"`
-	Password   string `gorm:"column:password;uniqueIndex:gost_auth_uidx;comment:连接密码"`
+	TunnelCode string `gorm:"column:tunnel_code;size:100;uniqueIndex;default:'';comment:隧道编号"`
+	User       string `gorm:"column:user;size:100;uniqueIndex:gost_auth_uidx;comment:连接用户"`
+	Password   string `gorm:"column:password;size:100;uniqueIndex:gost_auth_uidx;comment:连接密码"`
 }

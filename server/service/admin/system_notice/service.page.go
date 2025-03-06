@@ -1,7 +1,6 @@
 package service
 
 import (
-	"server/model"
 	"server/pkg/bean"
 	"server/repository"
 	"time"
@@ -22,13 +21,7 @@ type Item struct {
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
 	db, _, _ := repository.Get("")
-	var notices []model.SystemNotice
-	var where = db
-	db.Where(where).Model(&notices).Count(&total)
-	db.Where(where).Order("index_value asc").Order("id desc").
-		Offset(req.GetOffset()).
-		Limit(req.GetLimit()).
-		Find(&notices)
+	notices, total, _ := db.SystemNotice.Order(db.SystemNotice.IndexValue.Asc(), db.SystemNotice.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, notice := range notices {
 		list = append(list, Item{
 			Code:       notice.Code,
