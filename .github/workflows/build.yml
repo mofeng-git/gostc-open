@@ -52,8 +52,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./server/*.tar.gz
-            ./server/*.zip
-            ./client/*.tar.gz
-            ./client/*.zip
+            ./server/dist/*.tar.gz
+            ./server/dist/*.zip
+            ./client/dist/*.tar.gz
+            ./client/dist/*.zip
             
