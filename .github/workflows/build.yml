@@ -44,3 +44,15 @@ jobs:
           version: latest
           args: release --snapshot --clean
           workdir: ./client
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./server/*.tar.gz
+            ./server/*.zip
+            ./client/*.tar.gz
+            ./client/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            
