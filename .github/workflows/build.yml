@@ -36,11 +36,12 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --snapshot --clean
+          workdir: ./server
 
       - name: Build client
         uses: goreleaser/goreleaser-action@v4
-        working-directory: ./client
         with:
           distribution: goreleaser
           version: latest
           args: release --snapshot --clean
+          workdir: ./client
