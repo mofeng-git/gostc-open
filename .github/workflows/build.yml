@@ -30,16 +30,16 @@ jobs:
         run: mv web/dist.zip server/web/
 
       - name: Build backend
-        working-directory: ./server
         uses: goreleaser/goreleaser-action@v4
+        working-directory: ./server
         with:
           distribution: goreleaser
           version: latest
           args: release --snapshot --clean
 
       - name: Build client
-        working-directory: ./client
         uses: goreleaser/goreleaser-action@v4
+        working-directory: ./client
         with:
           distribution: goreleaser
           version: latest
