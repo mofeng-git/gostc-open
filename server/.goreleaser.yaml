@@ -19,7 +19,7 @@ builds:
       - -w
     binary: >-
       server
-    main: main.go
+    main: ./main.go
 archives:
   - format: tar.gz
     name_template: "server_{{ .Os }}_{{ .Arch }}"
