@@ -1,0 +1,44 @@
+name: Build
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./web
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./web
+        run: npm run build
+
+      - name: Compress dist directory
+        working-directory: ./web
+        run: zip -r dist.zip dist
+
+      - name: Move dist.zip to backend directory
+        run: mv web/dist.zip server/web/
+
+      - name: Build backend
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --snapshot --clean
+
+      - name: Build client
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --snapshot --clean
