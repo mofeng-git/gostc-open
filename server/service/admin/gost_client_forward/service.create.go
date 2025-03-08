@@ -15,13 +15,13 @@ import (
 )
 
 type CreateReq struct {
-	UserCode   string `binding:"required" json:"userCode" label:"用户编号"`
-	Name       string `binding:"required" json:"name" label:"名称"`
-	TargetIp   string `binding:"required" json:"targetIp" label:"内网IP"`
-	TargetPort string `binding:"required" json:"targetPort" label:"内网端口"`
-	NoDelay    int    `json:"noDelay" label:"兼容模式"`
-	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
+	UserCode      string `binding:"required" json:"userCode" label:"用户编号"`
+	Name          string `binding:"required" json:"name" label:"名称"`
+	TargetIp      string `binding:"required" json:"targetIp" label:"内网IP"`
+	TargetPort    string `binding:"required" json:"targetPort" label:"内网端口"`
+	ProxyProtocol int    `json:"proxyProtocol"`
+	NodeCode      string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ClientCode    string `binding:"required" json:"clientCode" label:"客户端编号"`
 
 	ChargingType int    `json:"chargingType"`
 	Cycle        int    `json:"cycle"`
@@ -96,14 +96,14 @@ func (service *service) Create(req CreateReq) error {
 		}
 
 		var forward = model.GostClientForward{
-			Name:       req.Name,
-			TargetIp:   req.TargetIp,
-			TargetPort: req.TargetPort,
-			Port:       port,
-			NoDelay:    req.NoDelay,
-			NodeCode:   req.NodeCode,
-			ClientCode: req.ClientCode,
-			UserCode:   req.UserCode,
+			Name:          req.Name,
+			TargetIp:      req.TargetIp,
+			TargetPort:    req.TargetPort,
+			Port:          port,
+			ProxyProtocol: req.ProxyProtocol,
+			NodeCode:      req.NodeCode,
+			ClientCode:    req.ClientCode,
+			UserCode:      req.UserCode,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: req.ChargingType,
 				Cycle:        req.Cycle,

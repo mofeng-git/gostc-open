@@ -64,9 +64,6 @@ func Logger(log *zap.Logger, console bool, conditions ...func(ctx *gin.Context) 
 		url := c.Request.RequestURI
 		ip := c.ClientIP()
 		reqBody, err := io.ReadAll(c.Request.Body)
-		if err == nil && len(reqBody) >= 4096 {
-			reqBody = reqBody[:4096]
-		}
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(reqBody))
 
 		writer := respPool.Get().(*responseBodyWriter)

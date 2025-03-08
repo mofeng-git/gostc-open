@@ -8,6 +8,7 @@ require (
 	github.com/go-gost/core v0.3.1
 	github.com/go-gost/x v0.5.3
 	github.com/google/uuid v1.6.0
+	github.com/kardianos/service v1.2.2
 	github.com/lxzan/gws v1.8.8
 )
 

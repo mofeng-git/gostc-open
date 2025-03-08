@@ -14,7 +14,7 @@ type GostClientForward struct {
 	TargetIp      string     `gorm:"column:target_ip;index;comment:内网IP"`
 	TargetPort    string     `gorm:"column:target_port;index;comment:内网端口"`
 	Port          string     `gorm:"column:port;comment:访问端口"`
-	NoDelay       int        `gorm:"column:no_delay;size:1;comment:无等待延迟"`
+	ProxyProtocol int        `gorm:"column:proxy_protocol;size:1;default:0;comment:代理协议"`
 	NodeCode      string     `gorm:"column:node_code;index;comment:节点编号"`
 	Node          GostNode   `gorm:"foreignKey:NodeCode;references:Code"`
 	ClientCode    string     `gorm:"column:client_code;index;comment:客户端编号"`
@@ -154,6 +154,13 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 	if forward.BlackEnable == 1 {
 		admissions = append(admissions, admissionBlack)
 	}
+
+	var handlerMetadata = map[string]any{
+		"sniffing": true,
+	}
+	if forward.ProxyProtocol != 0 {
+		handlerMetadata["proxyProtocol"] = forward.ProxyProtocol
+	}
 	clientCfg = config.ServiceConfig{
 		Name:       "tcp_" + forward.Code,
 		Addr:       ":" + forward.Port,
@@ -162,7 +169,7 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 		CLimiter:   cLimiter,
 		RLimiter:   rLimiter,
 		Observer:   obs,
-		Handler:    &config.HandlerConfig{Type: "rtcp"},
+		Handler:    &config.HandlerConfig{Type: "rtcp", Metadata: handlerMetadata},
 		Listener:   &config.ListenerConfig{Type: "rtcp", Chain: chain},
 		Forwarder: &config.ForwarderConfig{
 			Nodes: forwardNodes,

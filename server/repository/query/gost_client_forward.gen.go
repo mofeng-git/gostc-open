@@ -37,7 +37,7 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 	_gostClientForward.TargetIp = field.NewString(tableName, "target_ip")
 	_gostClientForward.TargetPort = field.NewString(tableName, "target_port")
 	_gostClientForward.Port = field.NewString(tableName, "port")
-	_gostClientForward.NoDelay = field.NewInt(tableName, "no_delay")
+	_gostClientForward.ProxyProtocol = field.NewInt(tableName, "proxy_protocol")
 	_gostClientForward.NodeCode = field.NewString(tableName, "node_code")
 	_gostClientForward.ClientCode = field.NewString(tableName, "client_code")
 	_gostClientForward.UserCode = field.NewString(tableName, "user_code")
@@ -114,7 +114,7 @@ type gostClientForward struct {
 	TargetIp      field.String
 	TargetPort    field.String
 	Port          field.String
-	NoDelay       field.Int
+	ProxyProtocol field.Int
 	NodeCode      field.String
 	ClientCode    field.String
 	UserCode      field.String
@@ -167,7 +167,7 @@ func (g *gostClientForward) updateTableName(table string) *gostClientForward {
 	g.TargetIp = field.NewString(table, "target_ip")
 	g.TargetPort = field.NewString(table, "target_port")
 	g.Port = field.NewString(table, "port")
-	g.NoDelay = field.NewInt(table, "no_delay")
+	g.ProxyProtocol = field.NewInt(table, "proxy_protocol")
 	g.NodeCode = field.NewString(table, "node_code")
 	g.ClientCode = field.NewString(table, "client_code")
 	g.UserCode = field.NewString(table, "user_code")
@@ -216,7 +216,7 @@ func (g *gostClientForward) fillFieldMap() {
 	g.fieldMap["target_ip"] = g.TargetIp
 	g.fieldMap["target_port"] = g.TargetPort
 	g.fieldMap["port"] = g.Port
-	g.fieldMap["no_delay"] = g.NoDelay
+	g.fieldMap["proxy_protocol"] = g.ProxyProtocol
 	g.fieldMap["node_code"] = g.NodeCode
 	g.fieldMap["client_code"] = g.ClientCode
 	g.fieldMap["user_code"] = g.UserCode

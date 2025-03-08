@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/google/uuid v1.6.0
+	github.com/kardianos/service v1.2.2
 	github.com/lxzan/gws v1.8.8
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pquerna/otp v1.4.0

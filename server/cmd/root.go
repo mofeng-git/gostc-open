@@ -24,14 +24,23 @@ func init() {
 }
 
 func init() {
-	global.CmdPerInit(&RootCmd, &VersionCmd)
 	RootCmd.AddCommand(&VersionCmd)
+	RootCmd.AddCommand(&ServiceCmd)
+	for _, cmd := range []*cobra.Command{
+		&RootCmd,
+		&VersionCmd,
+		&ServiceCmd,
+	} {
+		cmd.Flags().StringVarP(&global.BASE_PATH, "path", "p", "", "app run dir")
+		cmd.Flags().StringVarP(&global.LOGGER_LEVEL, "log-level", "", "warn", "log level debug|info|warn|error|fatal")
+		cmd.Flags().BoolVarP(&global.FLAG_DEV, "dev", "d", false, "app run dev")
+	}
 }
 
 var RootCmd = cobra.Command{
 	Use: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		global.CmdInit()
+		global.Init()
 		bootstrap.InitLogger()
 		bootstrap.InitConfig()
 		bootstrap.InitJwt()

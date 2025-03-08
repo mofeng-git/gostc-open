@@ -16,13 +16,13 @@ import (
 )
 
 type CreateReq struct {
-	Name       string `binding:"required" json:"name" label:"名称"`
-	TargetIp   string `binding:"required" json:"targetIp" label:"内网IP"`
-	TargetPort string `binding:"required" json:"targetPort" label:"内网端口"`
-	NoDelay    int    `json:"noDelay" label:"兼容模式"`
-	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
-	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ConfigCode string `binding:"required" json:"configCode" label:"套餐配置"`
+	Name          string `binding:"required" json:"name" label:"名称"`
+	TargetIp      string `binding:"required" json:"targetIp" label:"内网IP"`
+	TargetPort    string `binding:"required" json:"targetPort" label:"内网端口"`
+	ProxyProtocol int    `json:"proxyProtocol"`
+	ClientCode    string `binding:"required" json:"clientCode" label:"客户端编号"`
+	NodeCode      string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ConfigCode    string `binding:"required" json:"configCode" label:"套餐配置"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -110,14 +110,14 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		}
 
 		var forward = model.GostClientForward{
-			Name:       req.Name,
-			TargetIp:   req.TargetIp,
-			TargetPort: req.TargetPort,
-			Port:       port,
-			NoDelay:    req.NoDelay,
-			NodeCode:   req.NodeCode,
-			ClientCode: req.ClientCode,
-			UserCode:   claims.Code,
+			Name:          req.Name,
+			TargetIp:      req.TargetIp,
+			TargetPort:    req.TargetPort,
+			Port:          port,
+			ProxyProtocol: req.ProxyProtocol,
+			NodeCode:      req.NodeCode,
+			ClientCode:    req.ClientCode,
+			UserCode:      claims.Code,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,

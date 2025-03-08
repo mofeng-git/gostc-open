@@ -22,6 +22,7 @@ type Item struct {
 	Name          string        `json:"name"`
 	TargetIp      string        `json:"targetIp"`
 	TargetPort    string        `json:"targetPort"`
+	ProxyProtocol int           `json:"proxyProtocol"`
 	Port          string        `json:"port"`
 	Node          ItemNode      `json:"node"`
 	Client        ItemClient    `json:"client"`
@@ -96,12 +97,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		sshIp, sshPort := forward.GetSSHMatcher()
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, forward.Code)
 		list = append(list, Item{
-			UserAccount: forward.User.Account,
-			Code:        forward.Code,
-			Name:        forward.Name,
-			TargetIp:    forward.TargetIp,
-			TargetPort:  forward.TargetPort,
-			Port:        forward.Port,
+			UserAccount:   forward.User.Account,
+			Code:          forward.Code,
+			Name:          forward.Name,
+			TargetIp:      forward.TargetIp,
+			TargetPort:    forward.TargetPort,
+			ProxyProtocol: forward.ProxyProtocol,
+			Port:          forward.Port,
 			Node: ItemNode{
 				Code:    forward.NodeCode,
 				Name:    forward.Node.Name,
