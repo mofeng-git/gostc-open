@@ -338,7 +338,7 @@ onBeforeMount(() => {
                 </n-tab-pane>
                 <n-tab-pane name="forward" tab="端口转发">
                   <span>连接端口：{{ row.forwardConnPort }}</span><br>
-                  <span>开发端口：{{ row.forwardPorts }}</span><br>
+                  <span>开放端口：{{ row.forwardPorts }}</span><br>
                 </n-tab-pane>
                 <n-tab-pane name="tunnel" tab="私有隧道">
                   <span>连接端口：{{ row.tunnelConnPort }}</span><br>
