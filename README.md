@@ -13,6 +13,78 @@
 ## License
 This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/gostc-open?tab=CC0-1.0-1-ov-file).
 
+## 一键安装脚本
+
+### 服务端安装
+```shell
+curl -sSL https://raw.githubusercontent.com/SianHH/gostc-open/main/install.sh | bash -s -- server
+```
+
+install后，需要systemctl start gostc-admin启动服务
+
+安装完成后通过以下命令管理
+```shell
+systemctl start gostc-admin # 启动
+systemctl stop gostc-admin # 停止
+systemctl restart gostc-admin # 重启
+systemctl status gostc-admin # 查看状态
+```
+
+程序目录：**/usr/local/gostc-admin/**
+
+数据目录：**/usr/local/gostc-admin/data/**
+
+默认端口：8080
+
+默认账号密码：admin/admin
+
+### 服务端卸载
+```shell
+/usr/local/gostc-admin/server service uninstall
+rm -rf /usr/local/gostc-admin/server
+```
+
+
+### 客户端/节点安装
+```shell
+curl -sSL https://raw.githubusercontent.com/SianHH/gostc-open/main/install.sh | bash -s -- gostc
+```
+文件目录：**/usr/local/bin/gostc**
+
+### 客户端/节点卸载
+```shell
+rm -rf /usr/local/bin/gostc
+```
+
+### 将客户端/节点注册为服务
+```shell
+gostc install --tls=false -addr 127.0.0.1:8080 -key ****** # 客户端
+gostc install --tls=false -addr 127.0.0.1:8080 -s -key ****** # 节点
+# install后，需要systemctl start gostc启动服务
+```
+--tls：根据实际的情况设置
+
+-addr：根据实际的情况设置
+
+-key：启动客户端或节点的连接密钥
+
+注册为服务后，可以通过以下命令管理服务
+```shell
+systemctl start gostc # 启动
+systemctl stop gostc # 停止
+systemctl restart gostc # 重启
+systemctl status gostc # 查看状态
+```
+如需更换密钥，需要先卸载服务，然后重新注册
+```shell
+gostc uninstall
+gostc install --tls=false -addr 127.0.0.1:8080 -s -key ****** # 重新注册
+```
+
+**注意：由于服务名称重复，无法同时运行多个客户端/节点，如需启动多个客户端和节点，请将程序通过pm2、supervisor类似的进程管理工具启动**
+
+
+
 ## 目录结构
 ```text
 -- /
