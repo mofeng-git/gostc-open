@@ -43,6 +43,7 @@ func init() {
 		admin.InitSystemUser(adminGroup)
 		admin.InitSystemNotice(adminGroup)
 		admin.InitSystemConfig(adminGroup)
+		admin.InitDashboard(adminGroup)
 
 		publicGroup := engine.Group("api/v1/public")
 		public.InitSystemConfig(publicGroup)

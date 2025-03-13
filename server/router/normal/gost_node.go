@@ -10,6 +10,7 @@ import (
 func InitGostNode(group *gin.RouterGroup) {
 	g := group.Group("gost/node", middleware.Auth(global.Jwt))
 	g.POST("list", gost_node.List)
+	g.POST("cleanPort", gost_node.CleanPort)
 	g.POST("create", gost_node.Create)
 	g.POST("delete", gost_node.Delete)
 	g.POST("update", gost_node.Update)

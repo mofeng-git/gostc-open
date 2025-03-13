@@ -23,7 +23,7 @@ var Writer *common.LogWriter
 
 func Init(logLevel string, console bool) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
-	level := logger.InfoLevel
+	level := logger.WarnLevel
 	switch logLevel {
 	case "trace":
 		level = logger.TraceLevel

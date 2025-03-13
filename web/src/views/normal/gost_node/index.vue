@@ -1,6 +1,7 @@
 <script setup>
 import {onBeforeMount, ref, watch} from "vue";
 import {
+  apiNormalGostNodeCleanPort,
   apiNormalGostNodeCreate,
   apiNormalGostNodeDelete,
   apiNormalGostNodePage,
@@ -251,6 +252,19 @@ watch(() => ({type: state.value.obs.dataRange}), () => {
   obsFunc()
 })
 
+const nodeCleanPortFunc = async (row) => {
+  try {
+    await apiNormalGostNodeCleanPort({code: row.code})
+    $message.create('清除成功', {
+      duration: 1500,
+      closable: true,
+      type: "success"
+    })
+  } finally {
+
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
 })
@@ -336,6 +350,9 @@ onBeforeMount(() => {
             <n-space justify="end" style="width: 100%">
               <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
                 流量
+              </n-button>
+              <n-button size="tiny" :focusable="false" quaternary type="info" @click="nodeCleanPortFunc(row)">
+                清除端口占用缓存
               </n-button>
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                 编辑
@@ -472,7 +489,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.create.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
             </n-form-item>
             <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.forwardReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.create.data.forwardReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="forwardMetadata" label="METADATA">
               <n-input
@@ -493,7 +511,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.create.data.tunnelConnPort" placeholder="2096"></n-input>
             </n-form-item>
             <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.tunnelReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.create.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="tunnelMetadata" label="METADATA">
               <n-input
@@ -608,7 +627,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.update.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
             </n-form-item>
             <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.forwardReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.update.data.forwardReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="forwardMetadata" label="METADATA">
               <n-input
@@ -629,7 +649,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.update.data.tunnelConnPort" placeholder="2096"></n-input>
             </n-form-item>
             <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.tunnelReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.update.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="tunnelMetadata" label="METADATA">
               <n-input

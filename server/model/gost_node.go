@@ -230,3 +230,11 @@ func (n GostNode) GenerateObs(host string) config.ObserverConfig {
 		},
 	}
 }
+
+func (n GostNode) GenerateNodePortCheck(host string, port string) map[string]string {
+	return map[string]string{
+		"callback": fmt.Sprintf("%s/api/v1/public/gost/node/port", host),
+		"code":     n.Code,
+		"port":     port,
+	}
+}

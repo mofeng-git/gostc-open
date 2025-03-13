@@ -10,6 +10,15 @@ export const apiNormalGostNodeList = (data) => {
     })
 }
 
+export const apiNormalGostNodeCleanPort = (data) => {
+    return request.request({
+        url: `${baseUrl}/cleanPort`,
+        method: 'POST',
+        data
+    })
+}
+
+
 export const apiNormalGostNodePage = (data) => {
     return request.request({
         url: `${baseUrl}/page`,

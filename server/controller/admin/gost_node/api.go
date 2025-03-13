@@ -21,6 +21,19 @@ func Create(c *gin.Context) {
 	bean.Response.Ok(c)
 }
 
+func CleanPort(c *gin.Context) {
+	var req service.CleanPortReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.CleanPort(req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
 func Delete(c *gin.Context) {
 	var req service.DeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {

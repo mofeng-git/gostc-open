@@ -23,6 +23,7 @@ const state = ref({
     name: '',
     targetIp: '',
     targetPort: '',
+    proxyProtocol: 0,
   },
   dataRules: {
     name: requiredRule('请输入名称'),
@@ -278,6 +279,12 @@ onBeforeMount(() => {
         </n-form-item>
         <n-form-item path="targetPort" label="内网端口">
           <n-input v-model:value="state.data.targetPort" placeholder="80"></n-input>
+        </n-form-item>
+        <n-form-item path="proxyProtocol" label="PROXY Protocol">
+          <n-select
+              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"
+              v-model:value="state.data.proxyProtocol"
+          ></n-select>
         </n-form-item>
       </n-form>
       <n-space>

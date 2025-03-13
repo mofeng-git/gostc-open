@@ -10,6 +10,14 @@ export const apiAdminGostNodeList = (data) => {
     })
 }
 
+export const apiAdminGostNodeCleanPort = (data) => {
+    return request.request({
+        url: `${baseUrl}/cleanPort`,
+        method: 'POST',
+        data
+    })
+}
+
 export const apiAdminGostNodePage = (data) => {
     return request.request({
         url: `${baseUrl}/page`,

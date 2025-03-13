@@ -18,6 +18,15 @@ func List(c *gin.Context) {
 	bean.Response.OkData(c, svr.List(middleware.GetClaims(c), req))
 }
 
+func CleanPort(c *gin.Context) {
+	var req service.CleanPortReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	bean.Response.OkData(c, svr.CleanPort(middleware.GetClaims(c), req))
+}
+
 func Create(c *gin.Context) {
 	var req service.CreateReq
 	if err := c.ShouldBindJSON(&req); err != nil {

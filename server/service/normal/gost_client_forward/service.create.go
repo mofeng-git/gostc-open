@@ -25,6 +25,44 @@ type CreateReq struct {
 	ConfigCode    string `binding:"required" json:"configCode" label:"套餐配置"`
 }
 
+func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
+	for {
+		port, err = node_port.GetPort(node.Code)
+		if err != nil {
+			return "", err
+		}
+		version := cache.GetNodeVersion(node.Code)
+		if version >= "v1.1.7" {
+			gost_engine.NodePortCheck(tx, node.Code, port)
+			var available bool // 是否可用
+			var retry int
+			for {
+				time.Sleep(time.Millisecond * 200)
+				retry++
+				use, ok := cache.GetNodePortUse(node.Code, port)
+				if ok {
+					if use {
+						available = false
+					} else {
+						available = true
+					}
+					break
+				}
+				if retry > 5*5 {
+					break
+				}
+			}
+			// 可用，则结束获取端口
+			if available {
+				break
+			}
+		} else {
+			return port, err
+		}
+	}
+	return port, nil
+}
+
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	db, _, log := repository.Get("")
 	if !utils.ValidateLocalIP(req.TargetIp) {
@@ -96,10 +134,11 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			}
 		}
 
-		port, err := node_port.GetPort(node.Code)
+		port, err := GetPort(tx, *node)
 		if err != nil {
 			return err
 		}
+
 		if err = tx.GostNodePort.Create(&model.GostNodePort{
 			Port:     port,
 			NodeCode: node.Code,

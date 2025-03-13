@@ -86,3 +86,15 @@ func NodeConfig(tx *query.Query, code string) {
 	data.Obs = obs
 	WriteMessage(code, NewMessage(uuid.NewString(), "config", data))
 }
+
+func NodePortCheck(tx *query.Query, code string, port string) {
+	node, err := tx.GostNode.Where(tx.GostNode.Code.Eq(code)).First()
+	if err != nil {
+		return
+	}
+
+	var baseConfig model.SystemConfigBase
+	cache.GetSystemConfigBase(&baseConfig)
+	data := node.GenerateNodePortCheck(baseConfig.BaseUrl, port)
+	WriteMessage(code, NewMessage(uuid.NewString(), "port_check", data))
+}
