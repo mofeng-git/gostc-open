@@ -25,6 +25,7 @@ type Item struct {
 	Web     int `json:"web"`
 	Tunnel  int `json:"tunnel"`
 	Forward int `json:"forward"`
+	Proxy   int `json:"proxy"`
 
 	Domain           string `json:"domain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
@@ -92,6 +93,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Web:                   node.Web,
 			Tunnel:                node.Tunnel,
 			Forward:               node.Forward,
+			Proxy:                 node.Proxy,
 			Domain:                node.Domain,
 			DenyDomainPrefix:      node.DenyDomainPrefix,
 			Address:               node.Address,

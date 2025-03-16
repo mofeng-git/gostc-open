@@ -18,6 +18,7 @@ type CreateReq struct {
 	Web                   int      `binding:"required" json:"web" label:"是否启用域名解析"`
 	Tunnel                int      `binding:"required" json:"tunnel" label:"是否启用私有隧道"`
 	Forward               int      `binding:"required" json:"forward" label:"是否启用端口转发"`
+	Proxy                 int      `binding:"required" json:"proxy" label:"是否启用代理隧道"`
 	Address               string   `binding:"required" json:"address"`
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
@@ -38,6 +39,9 @@ func (service *service) Create(req CreateReq) error {
 	if req.Web == 1 && req.Tunnel != 1 {
 		req.Web = 2
 	}
+	if req.Proxy == 1 && req.Forward != 1 {
+		req.Proxy = 2
+	}
 	var node = model.GostNode{
 		Key:                   uuid.NewString(),
 		Name:                  req.Name,
@@ -45,6 +49,7 @@ func (service *service) Create(req CreateReq) error {
 		Web:                   req.Web,
 		Tunnel:                req.Tunnel,
 		Forward:               req.Forward,
+		Proxy:                 req.Proxy,
 		Domain:                req.Domain,
 		DenyDomainPrefix:      req.DenyDomainPrefix,
 		Address:               req.Address,

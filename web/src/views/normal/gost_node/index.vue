@@ -42,6 +42,7 @@ const state = ref({
       web: 1,
       tunnel: 1,
       forward: 1,
+      proxy: 2,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -73,6 +74,7 @@ const state = ref({
       web: 2,
       tunnel: 2,
       forward: 2,
+      proxy: 2,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -131,6 +133,7 @@ const openCreate = () => {
     web: 1,
     tunnel: 1,
     forward: 1,
+    proxy: 2,
     domain: '',
     denyDomainPrefix: '',
     address: '',
@@ -332,6 +335,7 @@ onBeforeMount(() => {
               <span>标签：{{ row.tags.join('、') }}</span><br>
               <span>规则：{{ row.ruleNames.join('、') }}</span><br>
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
+              <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
                 <n-tab-pane name="web" tab="域名解析">
                   <span>基础域名：{{ row.domain }}</span><br>
@@ -447,8 +451,20 @@ onBeforeMount(() => {
                 :on-update-checked="value=>{state.create.data.tunnel = value}"
             >私有隧道
             </n-checkbox>
+            <n-checkbox
+                v-model:checked="state.create.data.proxy"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.create.data.proxy = value}"
+            >代理隧道
+            </n-checkbox>
           </n-space>
         </n-form-item>
+        <n-alert type="warning" :show-icon="false"
+                 v-show="state.create.data.proxy===1 && state.create.data.forward!==1">
+          代理隧道，必须启用端口转发
+        </n-alert>
         <n-tabs type="line" animated>
           <n-tab-pane name="web" tab="域名解析">
             <div v-show="state.create.data.tunnel!==1 || state.create.data.web !==1">
@@ -585,8 +601,20 @@ onBeforeMount(() => {
                 :on-update-checked="value=>{state.update.data.tunnel = value}"
             >私有隧道
             </n-checkbox>
+            <n-checkbox
+                v-model:checked="state.update.data.proxy"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.update.data.proxy = value}"
+            >代理隧道
+            </n-checkbox>
           </n-space>
         </n-form-item>
+        <n-alert type="warning" :show-icon="false"
+                 v-show="state.update.data.proxy===1 && state.update.data.forward!==1">
+          代理隧道，必须启用端口转发
+        </n-alert>
         <n-tabs type="line" animated>
           <n-tab-pane name="web" tab="域名解析">
             <div v-show="state.update.data.tunnel!==1 || state.update.data.web !==1">

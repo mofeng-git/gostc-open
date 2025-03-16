@@ -1,6 +1,10 @@
 <script setup>
 import {onBeforeMount, ref, watch} from "vue";
-import {apiAdminGostClientTunnelDelete, apiAdminGostClientTunnelPage} from "../../../api/admin/gost_client_tunnel.js";
+import {
+  apiAdminGostClientTunnelConfig,
+  apiAdminGostClientTunnelDelete,
+  apiAdminGostClientTunnelPage
+} from "../../../api/admin/gost_client_tunnel.js";
 import AppCard from "../../../layout/components/AppCard.vue";
 import SearchCard from "../../../layout/components/SearchCard.vue";
 import SearchItem from "../../../layout/components/SearchItem.vue";
@@ -246,7 +250,7 @@ onBeforeMount(() => {
                       v-model:value="row.enable"
                       :checked-value="1"
                       :unchecked-value="2"
-                      :on-update:value="value => {enableFunc(value,row)}"
+                      disabled
                   ></n-switch>
                 </div>
               </n-space>

@@ -40,6 +40,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.Web = field.NewInt(tableName, "web")
 	_gostNode.Tunnel = field.NewInt(tableName, "tunnel")
 	_gostNode.Forward = field.NewInt(tableName, "forward")
+	_gostNode.Proxy = field.NewInt(tableName, "proxy")
 	_gostNode.Domain = field.NewString(tableName, "domain")
 	_gostNode.DenyDomainPrefix = field.NewString(tableName, "deny_domain_prefix")
 	_gostNode.Address = field.NewString(tableName, "address")
@@ -95,6 +96,7 @@ type gostNode struct {
 	Web                   field.Int
 	Tunnel                field.Int
 	Forward               field.Int
+	Proxy                 field.Int
 	Domain                field.String
 	DenyDomainPrefix      field.String
 	Address               field.String
@@ -139,6 +141,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.Web = field.NewInt(table, "web")
 	g.Tunnel = field.NewInt(table, "tunnel")
 	g.Forward = field.NewInt(table, "forward")
+	g.Proxy = field.NewInt(table, "proxy")
 	g.Domain = field.NewString(table, "domain")
 	g.DenyDomainPrefix = field.NewString(table, "deny_domain_prefix")
 	g.Address = field.NewString(table, "address")
@@ -169,7 +172,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 28)
+	g.fieldMap = make(map[string]field.Expr, 29)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -183,6 +186,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["web"] = g.Web
 	g.fieldMap["tunnel"] = g.Tunnel
 	g.fieldMap["forward"] = g.Forward
+	g.fieldMap["proxy"] = g.Proxy
 	g.fieldMap["domain"] = g.Domain
 	g.fieldMap["deny_domain_prefix"] = g.DenyDomainPrefix
 	g.fieldMap["address"] = g.Address

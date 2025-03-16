@@ -58,6 +58,7 @@ func InitPersistence() {
 		&model.GostClientHost{},
 		&model.GostClientForward{},
 		&model.GostClientTunnel{},
+		&model.GostClientProxy{},
 		&model.GostNode{},
 		&model.GostNodeBind{},
 		&model.GostNodeLogger{},

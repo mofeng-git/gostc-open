@@ -61,4 +61,20 @@ func gostClient() {
 		auth := authMap[tunnel.Code]
 		cache.SetGostAuth(auth.User, auth.Password, tunnel.Code)
 	}
+
+	proxys, _ := db.GostClientProxy.Find()
+	for _, proxy := range proxys {
+		cache.SetTunnelInfo(cache.TunnelInfo{
+			Code:        proxy.Code,
+			Type:        model.GOST_TUNNEL_TYPE_PROXY,
+			ClientCode:  proxy.ClientCode,
+			UserCode:    proxy.UserCode,
+			NodeCode:    proxy.NodeCode,
+			ChargingTye: proxy.ChargingType,
+			ExpAt:       proxy.ExpAt,
+			Limiter:     proxy.Limiter,
+		})
+		auth := authMap[proxy.Code]
+		cache.SetGostAuth(auth.User, auth.Password, proxy.Code)
+	}
 }

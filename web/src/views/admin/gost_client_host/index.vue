@@ -15,7 +15,6 @@ import {cLimiterText, configExpText, configText, limiterText, rLimiterText} from
 import moment from "moment/moment.js";
 import {NButton, NSpace} from "naive-ui";
 import Modal from "../../../components/Modal.vue";
-import router from "../../../router/index.js";
 import {flowFormat} from "../../../utils/flow.js";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
@@ -219,7 +218,7 @@ onBeforeMount(() => {
                       v-model:value="row.enable"
                       :checked-value="1"
                       :unchecked-value="2"
-                      :on-update:value="value => {enableFunc(value,row)}"
+                      disabled
                   ></n-switch>
                 </div>
               </n-space>

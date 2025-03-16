@@ -61,6 +61,11 @@ func (event *ClientEvent) OnOpen(socket *gws.Conn) {
 	for _, code := range tunnelCodes {
 		ClientTunnelConfig(db, code)
 	}
+	var proxyCodes []string
+	_ = db.GostClientProxy.Where(db.GostClientProxy.ClientCode.Eq(event.code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
+	for _, code := range proxyCodes {
+		ClientProxyConfig(db, code)
+	}
 }
 
 func (event *ClientEvent) sendLoop(socket *gws.Conn) {

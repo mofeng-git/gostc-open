@@ -15,7 +15,6 @@ import Alert from "../../../icon/alert.vue";
 import Online from "../../../icon/online.vue";
 import Modal from "../../../components/Modal.vue";
 import moment from "moment";
-import router from "../../../router/index.js";
 import {flowFormat} from "../../../utils/flow.js";
 import Obs from "../../../components/Obs.vue";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
@@ -242,7 +241,7 @@ onBeforeMount(() => {
                       v-model:value="row.enable"
                       :checked-value="1"
                       :unchecked-value="2"
-                      :on-update:value="value => {enableFunc(value,row)}"
+                      disabled
                   ></n-switch>
                 </div>
               </n-space>

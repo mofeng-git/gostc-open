@@ -33,15 +33,6 @@ export const apiAdminGostClientForwardConfig = (data) => {
     })
 }
 
-export const apiAdminGostClientForwardUpdate = (data) => {
-    return request.request({
-        url: `${baseUrl}/update`,
-        method: 'POST',
-        data
-    })
-}
-
-
 export const apiAdminGostClientForwardDelete = (data) => {
     return request.request({
         url: `${baseUrl}/delete`,

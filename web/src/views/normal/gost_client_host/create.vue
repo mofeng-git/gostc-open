@@ -78,21 +78,14 @@ const nodeListFunc = async () => {
     state.value.loading = true
     let res = await apiNormalGostNodeList(state.value.search)
     state.value.nodes = res.data || []
+    state.value.nodes = state.value.nodes.filter(item=>{
+      return item.web === 1
+    })
+    state.value.data.nodeCode = ''
     if (state.value.nodes.length > 0) {
-      for (let i = 0; i < state.value.nodes.length; i++) {
-        if (state.value.nodes[i].web === 1) {
-          state.value.data.nodeCode = state.value.nodes[i].code
-          break
-        }
-      }
-      if (state.value.data.nodeCode === '') {
-        $message.create('暂无节点信息', {
-          type: "warning",
-          closable: true,
-          duration: 1500,
-        })
-      }
-    } else {
+      state.value.data.nodeCode = state.value.nodes[0].code
+    }
+    if (state.value.data.nodeCode === '') {
       $message.create('暂无节点信息', {
         type: "warning",
         closable: true,
@@ -165,13 +158,12 @@ onBeforeMount(() => {
                   :show-icon="false"
                   :bordered="false"
                   style="height: 100%;cursor: pointer"
-                  @click="()=>{if (nodeItem.web ===1) state.data.nodeCode = nodeItem.code}"
+                  @click="state.data.nodeCode = nodeItem.code"
               >
                 <n-radio
                     :key="nodeItem.code"
                     :value="nodeItem.code"
                     style="width: 100%;"
-                    :disabled="nodeItem.web !== 1"
                 >
                   <n-space justify="space-between" style="width: 100%">
                     <Online :online="nodeItem.online===1"></Online>
@@ -189,6 +181,7 @@ onBeforeMount(() => {
             <n-tag type="info" size="small" bordered v-if="state.node.web===1">域名解析</n-tag>
             <n-tag type="info" size="small" bordered v-if="state.node.forward===1">端口转发</n-tag>
             <n-tag type="info" size="small" bordered v-if="state.node.tunnel===1">私有隧道</n-tag>
+            <n-tag type="info" size="small" bordered v-if="state.node.proxy===1">代理隧道</n-tag>
           </n-space>
           <n-space>
             <span>标签：</span>

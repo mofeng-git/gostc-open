@@ -91,6 +91,15 @@ type ClientTunnelConfigData struct {
 	Chain   config.ChainConfig
 }
 
+type ClientProxyConfigData struct {
+	Svc      config.ServiceConfig
+	Chain    config.ChainConfig
+	Limiter  config.LimiterConfig
+	CLimiter config.LimiterConfig
+	RLimiter config.LimiterConfig
+	Obs      config.ObserverConfig
+}
+
 type ConfigData struct {
 	SvcList []config.ServiceConfig
 	Auther  config.AutherConfig
@@ -229,6 +238,28 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 			if svc := registry.ServiceRegistry().Get(name); svc != nil {
 				_ = svc.Close()
 				registry.ServiceRegistry().Unregister(name)
+			}
+		}
+		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
+			"result": "success",
+		}))
+	case "proxy_config":
+		var data ClientProxyConfigData
+		_ = msg.GetContent(&data)
+		parseChain, err := chain.ParseChain(&data.Chain, logger.Default())
+		if err == nil {
+			registry.ChainRegistry().Unregister(data.Chain.Name)
+			_ = registry.ChainRegistry().Register(data.Chain.Name, parseChain)
+		}
+		if oldSvc := registry.ServiceRegistry().Get(data.Svc.Name); oldSvc != nil {
+			registry.ServiceRegistry().Unregister(data.Svc.Name)
+			_ = oldSvc.Close()
+		}
+		svc, err := service.ParseService(&data.Svc)
+		if err == nil {
+			go svc.Serve()
+			if err = registry.ServiceRegistry().Register(data.Svc.Name, svc); err != nil {
+				_ = svc.Close()
 			}
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{

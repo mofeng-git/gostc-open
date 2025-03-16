@@ -31,6 +31,9 @@ func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
 		if err != nil {
 			return "", err
 		}
+		if !cache.GetNodeOnline(node.Code) {
+			return port, err
+		}
 		version := cache.GetNodeVersion(node.Code)
 		if version >= "v1.1.7" {
 			gost_engine.NodePortCheck(tx, node.Code, port)

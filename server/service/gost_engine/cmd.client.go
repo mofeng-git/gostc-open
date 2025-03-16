@@ -168,3 +168,68 @@ func ClientRemoveTunnelConfig(tx *query.Query, tunnel model.GostClientTunnel, no
 	}))
 	NodeIngress(tx, node.Code)
 }
+
+type ClientProxyConfigData struct {
+	Svc      config.ServiceConfig
+	Chain    config.ChainConfig
+	Limiter  config.LimiterConfig
+	CLimiter config.LimiterConfig
+	RLimiter config.LimiterConfig
+	Obs      config.ObserverConfig
+}
+
+func ClientProxyConfig(tx *query.Query, proxyCode string) {
+	proxy, _ := tx.GostClientProxy.Preload(tx.GostClientProxy.Node).Where(tx.GostClientProxy.Code.Eq(proxyCode)).First()
+	if proxy == nil {
+		return
+	}
+	if warn_msg.GetProxyWarnMsg(*proxy) != "" {
+		ClientRemoveProxyConfig(*proxy, proxy.Node)
+		return
+	}
+
+	auth, _ := tx.GostAuth.Where(tx.GostAuth.TunnelCode.Eq(proxyCode)).First()
+	if auth == nil {
+		return
+	}
+
+	var baseConfig model.SystemConfigBase
+	cache.GetSystemConfigBase(&baseConfig)
+	nodeVersion := cache.GetNodeVersion(proxy.NodeCode)
+
+	var data ClientProxyConfigData
+	chain := proxy.GenerateChainConfig(*auth)
+	limiter := proxy.GenerateLimiter()
+	rLimiter := proxy.GenerateRLimiter()
+	cLimiter := proxy.GenerateCLimiter()
+	obs := proxy.GenerateObs(baseConfig.BaseUrl, nodeVersion)
+
+	svcCfg, ok := proxy.GenerateSvcConfig(chain.Name, limiter.Name, cLimiter.Name, rLimiter.Name, obs.Name)
+	if ok {
+		data.Svc = svcCfg
+	}
+	data.Chain = chain
+	data.Limiter = limiter
+	data.CLimiter = cLimiter
+	data.RLimiter = rLimiter
+	data.Obs = obs
+	WriteMessage(proxy.ClientCode, NewMessage(uuid.NewString(), "proxy_config", data))
+}
+
+func ClientRemoveProxyConfig(proxy model.GostClientProxy, node model.GostNode) {
+	WriteMessage(proxy.ClientCode, NewMessage(uuid.NewString(), "remove_config", []string{
+		"proxy_" + proxy.Code,
+	}))
+}
+
+func ClientPortCheck(tx *query.Query, code string, port string) {
+	client, err := tx.GostClient.Where(tx.GostClient.Code.Eq(code)).First()
+	if err != nil {
+		return
+	}
+
+	var baseConfig model.SystemConfigBase
+	cache.GetSystemConfigBase(&baseConfig)
+	data := client.GenerateClientPortCheck(baseConfig.BaseUrl, port)
+	WriteMessage(code, NewMessage(uuid.NewString(), "port_check", data))
+}

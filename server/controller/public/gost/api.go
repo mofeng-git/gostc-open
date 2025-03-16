@@ -23,6 +23,14 @@ func NodePort(c *gin.Context) {
 	svr.NodePort(req)
 }
 
+func ClientPort(c *gin.Context) {
+	var req service.ClientPortReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		return
+	}
+	svr.ClientPort(req)
+}
+
 func Ingress(c *gin.Context) {
 	c.JSON(200, svr.Ingress(c.Query("host")))
 }

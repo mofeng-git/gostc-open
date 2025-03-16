@@ -42,3 +42,16 @@ func GetTunnelWarnMsg(tunnel model.GostClientTunnel) string {
 	}
 	return ""
 }
+
+func GetProxyWarnMsg(proxy model.GostClientProxy) string {
+	if proxy.Enable != 1 {
+		return "已停用"
+	}
+	if proxy.ChargingType == model.GOST_CONFIG_CHARGING_CUCLE_DAY && proxy.ExpAt < time.Now().Unix() {
+		return "已到期"
+	}
+	if proxy.Status == 2 {
+		return "因未知原因被禁用"
+	}
+	return ""
+}

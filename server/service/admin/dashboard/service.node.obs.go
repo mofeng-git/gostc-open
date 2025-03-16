@@ -1,6 +1,7 @@
 package service
 
 import (
+	"server/pkg/utils"
 	"server/repository"
 	"server/service/common/cache"
 	"sort"
@@ -9,6 +10,7 @@ import (
 type NodeObsItem struct {
 	Code        string `json:"code"`
 	Name        string `json:"name"`
+	Online      int    `json:"online"`
 	InputBytes  int64  `json:"inputBytes"`
 	OutputBytes int64  `json:"outputBytes"`
 }
@@ -40,6 +42,7 @@ func (service *service) NodeObs() (result []NodeObsItem) {
 			obs := nodeObsMap[node.Code]
 			obs.Code = node.Code
 			obs.Name = node.Name
+			obs.Online = utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2)
 			obs.InputBytes += obsInfo.InputBytes
 			obs.OutputBytes += obsInfo.OutputBytes
 			nodeObsMap[node.Code] = obs

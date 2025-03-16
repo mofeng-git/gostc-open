@@ -17,6 +17,7 @@ type GostNode struct {
 	Web                   int              `gorm:"column:web;size:1;default:2;comment:WEB功能"`
 	Tunnel                int              `gorm:"column:tunnel;size:1;default:2;comment:私有隧道功能"`
 	Forward               int              `gorm:"column:forward;size:1;default:2;comment:端口转发功能"`
+	Proxy                 int              `gorm:"column:proxy;size:1;default:2;comment:代理隧道功能"`
 	Domain                string           `gorm:"column:domain;comment:基础域名"`
 	DenyDomainPrefix      string           `gorm:"column:deny_domain_prefix;comment:不允许的域名前缀"`
 	Address               string           `gorm:"column:address;comment:服务地址"`

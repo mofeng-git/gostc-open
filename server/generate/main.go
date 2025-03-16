@@ -29,6 +29,7 @@ func main() {
 		model.GostClientHost{},
 		model.GostClientLogger{},
 		model.GostClientTunnel{},
+		model.GostClientProxy{},
 		model.GostNode{},
 		model.GostNodeBind{},
 		model.GostNodeConfig{},
