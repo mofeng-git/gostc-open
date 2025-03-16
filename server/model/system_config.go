@@ -12,10 +12,12 @@ type SystemConfig struct {
 }
 
 type SystemConfigBase struct {
-	Title   string `json:"title"`
-	Favicon string `json:"favicon"`
-	BaseUrl string `json:"baseUrl"`
-	ApiKey  string `json:"apiKey"`
+	Title    string `json:"title"`
+	Favicon  string `json:"favicon"`
+	BaseUrl  string `json:"baseUrl"`
+	ApiKey   string `json:"apiKey"`
+	Register string `json:"register"`
+	CheckIn  string `json:"checkIn"`
 }
 
 func GetSystemConfigBase(list []*SystemConfig) (result SystemConfigBase) {
@@ -29,17 +31,23 @@ func GetSystemConfigBase(list []*SystemConfig) (result SystemConfigBase) {
 			result.BaseUrl = item.Value
 		case "apiKey":
 			result.ApiKey = item.Value
+		case "register":
+			result.Register = item.Value
+		case "checkIn":
+			result.CheckIn = item.Value
 		}
 	}
 	return result
 }
 
-func GenerateSystemConfigBase(title, favicon, baseUrl, apiKey string) []*SystemConfig {
+func GenerateSystemConfigBase(title, favicon, baseUrl, apiKey, register, checkIn string) []*SystemConfig {
 	return []*SystemConfig{
 		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "title", Value: title},
 		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "favicon", Value: favicon},
 		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "baseUrl", Value: baseUrl},
 		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "apiKey", Value: apiKey},
+		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "register", Value: register},
+		{Kind: SYSTEM_CONFIG_KIND_BASE, Key: "checkIn", Value: checkIn},
 	}
 }
 

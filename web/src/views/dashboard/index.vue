@@ -249,24 +249,26 @@ onBeforeMount(() => {
                 <n-descriptions-item label="积分">{{ state.userInfo.amount }}</n-descriptions-item>
                 <n-descriptions-item label="注册时间">{{ state.userInfo.createdAt }}</n-descriptions-item>
               </n-descriptions>
-              <p></p>
-              <n-spin :show="state.checkinLoading">
-                <n-tag type="info" :bordered="false" v-if="state.userInfo.checkinAmount!=='0'">
-                  今日已签到，获取{{ state.userInfo?.checkinAmount }}积分
-                </n-tag>
-                <n-alert type="info" v-else>
-                  今日还未进行签到，签到可随机获取1-5积分，
-                  <n-button
-                      text
-                      type="info"
-                      size="small"
-                      :focusable="false"
-                      @click="checkinFunc">
-                    点击
-                  </n-button>
-                  进行签到
-                </n-alert>
-              </n-spin>
+              <div v-if="appStore().siteConfig.checkIn==='1'">
+                <p></p>
+                <n-spin :show="state.checkinLoading">
+                  <n-tag type="info" :bordered="false" v-if="state.userInfo.checkinAmount!=='0'">
+                    今日已签到，获取{{ state.userInfo?.checkinAmount }}积分
+                  </n-tag>
+                  <n-alert type="info" v-else>
+                    今日还未进行签到，签到可随机获取1-5积分，
+                    <n-button
+                        text
+                        type="info"
+                        size="small"
+                        :focusable="false"
+                        @click="checkinFunc">
+                      点击
+                    </n-button>
+                    进行签到
+                  </n-alert>
+                </n-spin>
+              </div>
               <p></p>
               <n-grid :cols="2">
                 <n-grid-item>

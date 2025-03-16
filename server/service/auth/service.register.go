@@ -18,6 +18,12 @@ type RegisterReq struct {
 }
 
 func (service *service) Register(ip string, req RegisterReq) (err error) {
+	var cfg model.SystemConfigBase
+	cache.GetSystemConfigBase(&cfg)
+	if cfg.Register != "1" {
+		return errors.New("未启用注册功能")
+	}
+
 	db, _, log := repository.Get("")
 	if !cache.GetIpSecurity(ip) && !cache.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
 		return errors.New("验证码错误")

@@ -9,10 +9,17 @@ import (
 	"server/pkg/utils"
 	"server/repository"
 	"server/repository/query"
+	"server/service/common/cache"
 	"time"
 )
 
 func (service *service) Checkin(claims jwt.Claims) (err error) {
+	var cfg model.SystemConfigBase
+	cache.GetSystemConfigBase(&cfg)
+	if cfg.CheckIn != "1" {
+		return errors.New("未启用签到功能")
+	}
+
 	db, _, log := repository.Get("")
 	return db.Transaction(func(tx *query.Query) error {
 		user, err := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()

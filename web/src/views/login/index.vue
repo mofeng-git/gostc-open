@@ -213,7 +213,7 @@ onBeforeMount(() => {
           </n-form>
         </n-tab-pane>
 
-        <n-tab-pane name="register" tab="注册">
+        <n-tab-pane name="register" tab="注册" v-if="appStore().siteConfig.register === '1'">
           <n-form
               ref="registerRef"
               :model="state.register.data"
