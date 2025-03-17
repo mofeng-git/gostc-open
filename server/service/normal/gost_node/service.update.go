@@ -97,6 +97,11 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	for _, code := range tunnelCodes {
 		gost_engine.ClientTunnelConfig(db, code)
 	}
+	var proxyCodes []string
+	_ = db.GostClientProxy.Where(db.GostClientProxy.NodeCode.Eq(node.Code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
+	for _, code := range proxyCodes {
+		gost_engine.ClientProxyConfig(db, code)
+	}
 	node_port.Arrange(db, node.Code)
 	return nil
 }
