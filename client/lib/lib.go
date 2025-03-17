@@ -100,22 +100,21 @@ func RunClient(useTls string, address string, key string) string {
 	return "success"
 }
 
-func DelClient(key string) {
+func DelClient() {
 	// 服务没启动，直接结束
 	if !svrRunTag {
 		return
 	}
-	key = strings.Trim(key, "")
-	if key == "" {
-		return
-	}
 	svrRunTag = false
-	svr := registry.ServiceRegistry().Get(key)
-	if svr != nil {
-		_ = svr.Close()
-		registry.ServiceRegistry().Unregister(key)
+	for k, v := range common.SvcMap {
+		if v == true {
+			svc := registry.ServiceRegistry().Get(k)
+			if svc != nil {
+				_ = svc.Close()
+			}
+		}
 	}
-	registry.ChainRegistry().Unregister(key)
+	common.SvcMap = make(map[string]bool)
 	_ = socket.WriteClose(1000, nil)
 }
 

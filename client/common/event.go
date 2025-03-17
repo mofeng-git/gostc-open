@@ -24,6 +24,8 @@ import (
 	"time"
 )
 
+var SvcMap = make(map[string]bool)
+
 type Event struct {
 	server bool
 	key    string
@@ -170,6 +172,7 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 				_ = svc.Close()
 				continue
 			}
+			SvcMap[svcCfg.Name] = true
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
@@ -201,7 +204,9 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 			if err = registry.ServiceRegistry().Register(data.Svc.Name, svc); err != nil {
 				_ = svc.Close()
 			}
+			SvcMap[data.Svc.Name] = true
 		}
+
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
 		}))
@@ -227,18 +232,7 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 				_ = svc.Close()
 				continue
 			}
-		}
-		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
-			"result": "success",
-		}))
-	case "remove_config":
-		var names []string
-		_ = msg.GetContent(&names)
-		for _, name := range names {
-			if svc := registry.ServiceRegistry().Get(name); svc != nil {
-				_ = svc.Close()
-				registry.ServiceRegistry().Unregister(name)
-			}
+			SvcMap[svcCfg.Name] = true
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
@@ -260,6 +254,20 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 			go svc.Serve()
 			if err = registry.ServiceRegistry().Register(data.Svc.Name, svc); err != nil {
 				_ = svc.Close()
+			}
+			SvcMap[data.Svc.Name] = true
+		}
+		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
+			"result": "success",
+		}))
+	case "remove_config":
+		var names []string
+		_ = msg.GetContent(&names)
+		for _, name := range names {
+			if svc := registry.ServiceRegistry().Get(name); svc != nil {
+				_ = svc.Close()
+				registry.ServiceRegistry().Unregister(name)
+				SvcMap[name] = false
 			}
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
@@ -305,6 +313,7 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 				_ = svc.Close()
 				continue
 			}
+			SvcMap[svcCfg.Name] = true
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
