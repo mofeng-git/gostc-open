@@ -4,6 +4,7 @@ import (
 	"github.com/go-gost/x/config"
 	"github.com/google/uuid"
 	"server/model"
+	v1 "server/pkg/p2p_cfg/v1"
 	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/warn_msg"
@@ -16,11 +17,13 @@ func NodeStop(code string, msg string) {
 }
 
 type NodeConfigData struct {
-	SvcList []config.ServiceConfig
-	Auther  config.AutherConfig
-	Ingress config.IngressConfig
-	Limiter config.LimiterConfig
-	Obs     config.ObserverConfig
+	SvcList    []config.ServiceConfig
+	Auther     config.AutherConfig
+	Ingress    config.IngressConfig
+	Limiter    config.LimiterConfig
+	Obs        config.ObserverConfig
+	P2PCfgCode string
+	P2PCfg     v1.ServerConfig
 }
 
 func NodeIngress(tx *query.Query, code string) {
@@ -62,12 +65,11 @@ func NodeConfig(tx *query.Query, code string) {
 
 	var data NodeConfigData
 	auther := node.GenerateAuther(baseConfig.BaseUrl)
-
 	hosts, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Find()
 	tunnels, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Find()
 	ingress := node.GenerateIngress(hosts, tunnels)
-
 	limiter := node.GenerateLimiter(baseConfig.BaseUrl)
+	p2pCfg := node.GenerateP2PServiceConfig(baseConfig.BaseUrl)
 	obs := node.GenerateObs(baseConfig.BaseUrl)
 	tunnelAndHostSvcCfg, ok := node.GenerateTunnelAndHostServiceConfig(limiter.Name, auther.Name, ingress.Name, obs.Name)
 	if ok {
@@ -84,6 +86,10 @@ func NodeConfig(tx *query.Query, code string) {
 	data.Ingress = ingress
 	data.Limiter = limiter
 	data.Obs = obs
+	if node.P2P == 1 {
+		data.P2PCfgCode = node.Code
+		data.P2PCfg = p2pCfg
+	}
 	WriteMessage(code, NewMessage(uuid.NewString(), "config", data))
 }
 

@@ -31,6 +31,7 @@ func (p *program) run() {
 	var tlsEnable bool
 	var address string
 	var visit bool
+	var p2p bool
 	var vTunnels string
 	var logLevel string
 	var version bool
@@ -41,6 +42,7 @@ func (p *program) run() {
 	flag.BoolVar(&server, "s", false, "server mode")
 	flag.BoolVar(&tlsEnable, "tls", true, "enable tls")
 	flag.BoolVar(&visit, "v", false, "visit client")
+	flag.BoolVar(&p2p, "p2p", false, "p2p client")
 	flag.StringVar(&vTunnels, "vts", "", "visit tunnels,example: vkey1:8080,vkey2:8081,vkey3:8082")
 
 	flag.StringVar(&logLevel, "log-level", "error", "log-level trace|debug|info|warn|error|fatal")
@@ -85,10 +87,15 @@ func (p *program) run() {
 		os.Exit(0)
 	}
 
+	if p2p {
+		runP2P(vTunnels, apiurl)
+		os.Exit(0)
+	}
+
 	// 连接密钥
 	if key == "" {
 		fmt.Println("please enter key")
-		return
+		os.Exit(1)
 	}
 
 	fmt.Println("WS_URL：", wsurl)

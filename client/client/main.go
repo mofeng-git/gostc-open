@@ -7,6 +7,7 @@ import (
 	xlogger "github.com/go-gost/x/logger"
 	system_service "github.com/kardianos/service"
 	"gostc-sub/common"
+	log2 "gostc-sub/p2p/pkg/util/log"
 	"log"
 	"os"
 )
@@ -35,6 +36,7 @@ func Init(logLevel string, console bool) {
 	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level), xlogger.OutputOption(Writer)))
 	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
 	parsing.SetDefaultTLSConfig(tlsConfig)
+	log2.RefreshDefault()
 }
 
 func main() {

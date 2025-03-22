@@ -36,6 +36,7 @@ func init() {
 		admin.InitGostClientHost(adminGroup)
 		admin.InitGostClientTunnel(adminGroup)
 		admin.InitGostClientProxy(adminGroup)
+		admin.InitGostClientP2P(adminGroup)
 		admin.InitGostNodeConfig(adminGroup)
 		admin.InitGostNode(adminGroup)
 		admin.InitGostNodeBind(adminGroup)
@@ -49,6 +50,7 @@ func init() {
 		publicGroup := engine.Group("api/v1/public")
 		public.InitSystemConfig(publicGroup)
 		public.InitGost(publicGroup)
+		public.InitP2P(publicGroup)
 
 		authGroup := engine.Group("api/v1/auth")
 		auth.InitAuth(authGroup)
@@ -61,6 +63,7 @@ func init() {
 		normal.InitGostClientHost(normalGroup)
 		normal.InitGostClientTunnel(normalGroup)
 		normal.InitGostClientProxy(normalGroup)
+		normal.InitGostClientP2P(normalGroup)
 		normal.InitGostNode(normalGroup)
 		normal.InitGostObs(normalGroup)
 		normal.InitSystemNotice(normalGroup)

@@ -5,6 +5,7 @@ const (
 	GOST_TUNNEL_TYPE_FORWARD = 2 // 端口转发
 	GOST_TUNNEL_TYPE_TUNNEL  = 3 // 私有隧道
 	GOST_TUNNEL_TYPE_PROXY   = 4 // 代理隧道
+	GOST_TUNNEL_TYPE_P2P     = 5 // 代理隧道
 )
 
 type GostAuth struct {

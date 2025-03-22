@@ -4,6 +4,7 @@ import (
 	"github.com/go-gost/x/config"
 	"github.com/google/uuid"
 	"server/model"
+	v1 "server/pkg/p2p_cfg/v1"
 	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/warn_msg"
@@ -219,6 +220,38 @@ func ClientProxyConfig(tx *query.Query, proxyCode string) {
 func ClientRemoveProxyConfig(proxy model.GostClientProxy, node model.GostNode) {
 	WriteMessage(proxy.ClientCode, NewMessage(uuid.NewString(), "remove_config", []string{
 		"proxy_" + proxy.Code,
+	}))
+}
+
+type ClientP2PConfigData struct {
+	Code    string
+	Common  v1.ClientCommonConfig
+	STCPCfg v1.STCPProxyConfig
+	XTCPCfg v1.XTCPProxyConfig
+}
+
+func ClientP2PConfig(tx *query.Query, p2pCode string) {
+	p2p, _ := tx.GostClientP2P.Preload(tx.GostClientP2P.Node).Where(tx.GostClientP2P.Code.Eq(p2pCode)).First()
+	if p2p == nil {
+		return
+	}
+	if warn_msg.GetP2PWarnMsg(*p2p) != "" {
+		ClientRemoveP2PConfig(*p2p, p2p.Node)
+		return
+	}
+
+	var data ClientP2PConfigData
+	if p2p.Node.P2P == 1 {
+		data.Code = p2pCode
+		data.Common, _ = p2p.GenerateCommonCfg()
+		data.STCPCfg, data.XTCPCfg = p2p.GenerateProxyCfgs()
+	}
+	WriteMessage(p2p.ClientCode, NewMessage(uuid.NewString(), "p2p_config", data))
+}
+
+func ClientRemoveP2PConfig(p2p model.GostClientP2P, node model.GostNode) {
+	WriteMessage(p2p.ClientCode, NewMessage(uuid.NewString(), "remove_config", []string{
+		p2p.Code,
 	}))
 }
 

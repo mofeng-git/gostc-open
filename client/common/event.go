@@ -17,6 +17,10 @@ import (
 	"github.com/go-gost/x/registry"
 	"github.com/google/uuid"
 	"github.com/lxzan/gws"
+	"gostc-sub/p2p/frpc"
+	"gostc-sub/p2p/frps"
+	v1 "gostc-sub/p2p/pkg/config/v1"
+	registry2 "gostc-sub/p2p/registry"
 	"gostc-sub/pkg/utils"
 	"net/http"
 	"os"
@@ -103,11 +107,20 @@ type ClientProxyConfigData struct {
 }
 
 type ConfigData struct {
-	SvcList []config.ServiceConfig
-	Auther  config.AutherConfig
-	Ingress config.IngressConfig
-	Limiter config.LimiterConfig
-	Obs     config.ObserverConfig
+	SvcList    []config.ServiceConfig
+	Auther     config.AutherConfig
+	Ingress    config.IngressConfig
+	Limiter    config.LimiterConfig
+	Obs        config.ObserverConfig
+	P2PCfgCode string
+	P2PCfg     v1.ServerConfig
+}
+
+type ClientP2PConfigData struct {
+	Code    string
+	Common  v1.ClientCommonConfig
+	STCPCfg v1.STCPProxyConfig
+	XTCPCfg v1.XTCPProxyConfig
 }
 
 func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
@@ -260,6 +273,23 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
 		}))
+	case "p2p_config":
+		var data ClientP2PConfigData
+		if err := msg.GetContent(&data); err != nil {
+			panic(err)
+		}
+		registry2.Del(data.Code)
+		svc := frpc.NewService(data.Common, []v1.ProxyConfigurer{
+			&data.STCPCfg,
+			&data.XTCPCfg,
+		}, nil)
+		if err := svc.Start(); err == nil {
+			_ = registry2.Set(data.Code, svc)
+			SvcMap[data.Code] = true
+		}
+		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
+			"result": "success",
+		}))
 	case "remove_config":
 		var names []string
 		_ = msg.GetContent(&names)
@@ -267,8 +297,9 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 			if svc := registry.ServiceRegistry().Get(name); svc != nil {
 				_ = svc.Close()
 				registry.ServiceRegistry().Unregister(name)
-				SvcMap[name] = false
 			}
+			registry2.Del(name)
+			SvcMap[name] = false
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",
@@ -281,13 +312,11 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 			registry.TrafficLimiterRegistry().Unregister(data.Limiter.Name)
 			_ = registry.TrafficLimiterRegistry().Register(data.Limiter.Name, trafficLimiter)
 		}
-
 		if data.Ingress.Name != "" {
 			parseIngress := ingress.ParseIngress(&data.Ingress)
 			registry.IngressRegistry().Unregister(data.Ingress.Name)
 			_ = registry.IngressRegistry().Register(data.Ingress.Name, parseIngress)
 		}
-
 		if data.Auther.Name != "" {
 			parseAuther := auth.ParseAuther(&data.Auther)
 			registry.AutherRegistry().Unregister(data.Auther.Name)
@@ -314,6 +343,14 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 				continue
 			}
 			SvcMap[svcCfg.Name] = true
+		}
+
+		if data.P2PCfgCode != "" {
+			registry2.Del(data.P2PCfgCode)
+			svc := frps.NewService(data.P2PCfg)
+			if err := svc.Start(); err == nil {
+				_ = registry2.Set(data.P2PCfgCode, svc)
+			}
 		}
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
 			"result": "success",

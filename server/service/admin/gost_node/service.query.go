@@ -20,6 +20,7 @@ type QueryResp struct {
 	Tunnel  int `json:"tunnel"`
 	Forward int `json:"forward"`
 	Proxy   int `json:"proxy"`
+	P2P     int `json:"p2p"`
 
 	Domain           string `json:"domain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
@@ -29,12 +30,15 @@ type QueryResp struct {
 	TunnelInPort     string `json:"tunnelInPort"`
 	TunnelMetadata   string `json:"tunnelMetadata"`
 
-	ForwardConnPort string   `json:"forwardConnPort"`
-	ForwardPorts    string   `json:"forwardPorts"`
-	ForwardMetadata string   `json:"forwardMetadata"`
-	Rules           []string `json:"rules"`
-	RuleNames       []string `json:"ruleNames"`
-	Tags            []string `json:"tags"`
+	ForwardConnPort string `json:"forwardConnPort"`
+	ForwardPorts    string `json:"forwardPorts"`
+	ForwardMetadata string `json:"forwardMetadata"`
+
+	P2PPort string `json:"p2pPort"`
+
+	Rules     []string `json:"rules"`
+	RuleNames []string `json:"ruleNames"`
+	Tags      []string `json:"tags"`
 
 	TunnelReplaceAddress  string `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string `json:"forwardReplaceAddress"`
@@ -60,6 +64,7 @@ func (service *service) Query(req QueryReq) (QueryResp, error) {
 		Tunnel:                node.Tunnel,
 		Forward:               node.Forward,
 		Proxy:                 node.Proxy,
+		P2P:                   node.P2P,
 		Domain:                node.Domain,
 		DenyDomainPrefix:      node.DenyDomainPrefix,
 		Address:               node.Address,
@@ -70,6 +75,7 @@ func (service *service) Query(req QueryReq) (QueryResp, error) {
 		ForwardConnPort:       node.ForwardConnPort,
 		ForwardPorts:          node.ForwardPorts,
 		ForwardMetadata:       node.ForwardMetadata,
+		P2PPort:               node.P2PPort,
 		Rules:                 node.GetRules(),
 		RuleNames:             ruleNames,
 		Tags:                  node.GetTags(),

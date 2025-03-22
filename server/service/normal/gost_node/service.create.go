@@ -21,6 +21,7 @@ type CreateReq struct {
 	Tunnel                int      `binding:"required" json:"tunnel" label:"是否启用私有隧道"`
 	Forward               int      `binding:"required" json:"forward" label:"是否启用端口转发"`
 	Proxy                 int      `binding:"required" json:"proxy" label:"是否启用代理隧道"`
+	P2P                   int      `binding:"required" json:"p2p" label:"是否启用P2P隧道"`
 	Address               string   `binding:"required" json:"address"`
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
@@ -33,6 +34,7 @@ type CreateReq struct {
 	ForwardMetadata       string   `json:"forwardMetadata"`
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
+	P2PPort               string   `json:"p2pPort"`
 	IndexValue            int      `json:"indexValue"`
 }
 
@@ -52,8 +54,9 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			Web:                   req.Web,
 			Tunnel:                req.Tunnel,
 			Forward:               req.Forward,
-			Domain:                req.Domain,
 			Proxy:                 req.Proxy,
+			P2P:                   req.P2P,
+			Domain:                req.Domain,
 			DenyDomainPrefix:      req.DenyDomainPrefix,
 			Address:               req.Address,
 			TunnelConnPort:        req.TunnelConnPort,
@@ -65,6 +68,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			ForwardMetadata:       req.ForwardMetadata,
 			TunnelReplaceAddress:  req.TunnelReplaceAddress,
 			ForwardReplaceAddress: req.ForwardReplaceAddress,
+			P2PPort:               req.P2PPort,
 			Rules:                 strings.Join(req.Rules, ","),
 			Tags:                  strings.Join(req.Tags, ","),
 			IndexValue:            req.IndexValue,

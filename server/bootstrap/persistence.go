@@ -59,6 +59,7 @@ func InitPersistence() {
 		&model.GostClientForward{},
 		&model.GostClientTunnel{},
 		&model.GostClientProxy{},
+		&model.GostClientP2P{},
 		&model.GostNode{},
 		&model.GostNodeBind{},
 		&model.GostNodeLogger{},
@@ -69,6 +70,5 @@ func InitPersistence() {
 		global.Logger.Fatal("init table struct fail", zap.Error(err))
 		Release()
 	}
-	global.DB.GetDB().Exec("VACUUM;")
 	global.Logger.Info("init table struct finish")
 }

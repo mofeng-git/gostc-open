@@ -52,7 +52,7 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			log.Error("续费用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientForwardConfig(tx, tunnel.Code)
+		gost_engine.ClientTunnelConfig(tx, tunnel.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        tunnel.Code,
 			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,

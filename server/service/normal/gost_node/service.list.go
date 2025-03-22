@@ -22,6 +22,7 @@ type ListItem struct {
 	Tunnel  int `json:"tunnel"`
 	Forward int `json:"forward"`
 	Proxy   int `json:"proxy"`
+	P2P     int `json:"p2p"`
 
 	Rules     []string         `json:"rules"`
 	RuleNames []string         `json:"ruleNames"`
@@ -91,6 +92,7 @@ func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 			Tunnel:    node.Tunnel,
 			Forward:   node.Forward,
 			Proxy:     node.Proxy,
+			P2P:       node.P2P,
 			Rules:     node.GetRules(),
 			RuleNames: ruleNames,
 			Tags:      node.GetTags(),

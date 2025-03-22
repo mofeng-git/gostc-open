@@ -29,6 +29,7 @@ func (impl *Sqlite) Close() {
 	if impl.log != nil {
 		_ = impl.log.Close()
 	}
+	impl.db.Exec("VACUUM;")
 	d, err := impl.db.DB()
 	if err != nil {
 		return

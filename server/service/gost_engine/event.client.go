@@ -66,12 +66,17 @@ func (event *ClientEvent) OnOpen(socket *gws.Conn) {
 	for _, code := range proxyCodes {
 		ClientProxyConfig(db, code)
 	}
+	var p2pCodes []string
+	_ = db.GostClientP2P.Where(db.GostClientP2P.ClientCode.Eq(event.code)).Pluck(db.GostClientP2P.Code, &p2pCodes)
+	for _, code := range p2pCodes {
+		ClientP2PConfig(db, code)
+	}
 }
 
 func (event *ClientEvent) sendLoop(socket *gws.Conn) {
 	ticker := time.NewTicker(time.Second)
 	defer func() {
-		event.log.Info("stop sendLoop", zap.String("code", event.code))
+		event.log.Info("stop sendLoop", zap.String("type", "client"), zap.String("code", event.code))
 		ticker.Stop()
 	}()
 	for {
@@ -168,7 +173,6 @@ func (event *ClientEvent) OnMessage(socket *gws.Conn, message *gws.Message) {
 			CreatedAt:  time.Now().Unix(),
 		})
 	}
-	//fmt.Println(string(message.Bytes()))
 }
 
 func (event *ClientEvent) WriteAny(socket *gws.Conn, data any) {

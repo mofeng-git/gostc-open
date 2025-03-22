@@ -55,3 +55,16 @@ func GetProxyWarnMsg(proxy model.GostClientProxy) string {
 	}
 	return ""
 }
+
+func GetP2PWarnMsg(p2p model.GostClientP2P) string {
+	if p2p.Enable != 1 {
+		return "已停用"
+	}
+	if p2p.ChargingType == model.GOST_CONFIG_CHARGING_CUCLE_DAY && p2p.ExpAt < time.Now().Unix() {
+		return "已到期"
+	}
+	if p2p.Status == 2 {
+		return "因未知原因被禁用"
+	}
+	return ""
+}

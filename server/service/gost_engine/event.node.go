@@ -3,7 +3,6 @@ package gost_engine
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/lxzan/gws"
 	"go.uber.org/zap"
 	"server/global"
@@ -50,7 +49,7 @@ func (event *NodeEvent) OnOpen(socket *gws.Conn) {
 func (event *NodeEvent) sendLoop(socket *gws.Conn) {
 	ticker := time.NewTicker(time.Second)
 	defer func() {
-		fmt.Println("stop sendLoop")
+		event.log.Info("stop sendLoop", zap.String("type", "node"), zap.String("code", event.code))
 		ticker.Stop()
 	}()
 	for {

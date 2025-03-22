@@ -24,6 +24,7 @@ var (
 	GostClientForward   *gostClientForward
 	GostClientHost      *gostClientHost
 	GostClientLogger    *gostClientLogger
+	GostClientP2P       *gostClientP2P
 	GostClientProxy     *gostClientProxy
 	GostClientTunnel    *gostClientTunnel
 	GostNode            *gostNode
@@ -48,6 +49,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	GostClientForward = &Q.GostClientForward
 	GostClientHost = &Q.GostClientHost
 	GostClientLogger = &Q.GostClientLogger
+	GostClientP2P = &Q.GostClientP2P
 	GostClientProxy = &Q.GostClientProxy
 	GostClientTunnel = &Q.GostClientTunnel
 	GostNode = &Q.GostNode
@@ -73,6 +75,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		GostClientForward:   newGostClientForward(db, opts...),
 		GostClientHost:      newGostClientHost(db, opts...),
 		GostClientLogger:    newGostClientLogger(db, opts...),
+		GostClientP2P:       newGostClientP2P(db, opts...),
 		GostClientProxy:     newGostClientProxy(db, opts...),
 		GostClientTunnel:    newGostClientTunnel(db, opts...),
 		GostNode:            newGostNode(db, opts...),
@@ -99,6 +102,7 @@ type Query struct {
 	GostClientForward   gostClientForward
 	GostClientHost      gostClientHost
 	GostClientLogger    gostClientLogger
+	GostClientP2P       gostClientP2P
 	GostClientProxy     gostClientProxy
 	GostClientTunnel    gostClientTunnel
 	GostNode            gostNode
@@ -126,6 +130,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		GostClientForward:   q.GostClientForward.clone(db),
 		GostClientHost:      q.GostClientHost.clone(db),
 		GostClientLogger:    q.GostClientLogger.clone(db),
+		GostClientP2P:       q.GostClientP2P.clone(db),
 		GostClientProxy:     q.GostClientProxy.clone(db),
 		GostClientTunnel:    q.GostClientTunnel.clone(db),
 		GostNode:            q.GostNode.clone(db),
@@ -160,6 +165,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		GostClientForward:   q.GostClientForward.replaceDB(db),
 		GostClientHost:      q.GostClientHost.replaceDB(db),
 		GostClientLogger:    q.GostClientLogger.replaceDB(db),
+		GostClientP2P:       q.GostClientP2P.replaceDB(db),
 		GostClientProxy:     q.GostClientProxy.replaceDB(db),
 		GostClientTunnel:    q.GostClientTunnel.replaceDB(db),
 		GostNode:            q.GostNode.replaceDB(db),
@@ -184,6 +190,7 @@ type queryCtx struct {
 	GostClientForward   IGostClientForwardDo
 	GostClientHost      IGostClientHostDo
 	GostClientLogger    IGostClientLoggerDo
+	GostClientP2P       IGostClientP2PDo
 	GostClientProxy     IGostClientProxyDo
 	GostClientTunnel    IGostClientTunnelDo
 	GostNode            IGostNodeDo
@@ -208,6 +215,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		GostClientForward:   q.GostClientForward.WithContext(ctx),
 		GostClientHost:      q.GostClientHost.WithContext(ctx),
 		GostClientLogger:    q.GostClientLogger.WithContext(ctx),
+		GostClientP2P:       q.GostClientP2P.WithContext(ctx),
 		GostClientProxy:     q.GostClientProxy.WithContext(ctx),
 		GostClientTunnel:    q.GostClientTunnel.WithContext(ctx),
 		GostNode:            q.GostNode.WithContext(ctx),

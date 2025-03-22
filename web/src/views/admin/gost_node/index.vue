@@ -46,6 +46,8 @@ const state = ref({
       web: 1,
       tunnel: 1,
       forward: 1,
+      proxy: 2,
+      p2p: 1,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -58,6 +60,7 @@ const state = ref({
       forwardMetadata: '',
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
+      p2pPort: '',
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -77,6 +80,8 @@ const state = ref({
       web: 2,
       tunnel: 2,
       forward: 2,
+      proxy: 2,
+      p2p: 1,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -89,6 +94,7 @@ const state = ref({
       forwardMetadata: '',
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
+      p2pPort: '',
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -99,14 +105,14 @@ const state = ref({
     },
   },
   rules: [],
-  bind:{
-    loading:false,
-    open:false,
+  bind: {
+    loading: false,
+    open: false,
     users: [],
     usersLoading: false,
-    data:{
-      nodeCode:'',
-      userCode:'',
+    data: {
+      nodeCode: '',
+      userCode: '',
     },
   },
   obs: {
@@ -145,6 +151,8 @@ const openCreate = () => {
     web: 1,
     tunnel: 1,
     forward: 1,
+    proxy: 2,
+    p2p: 1,
     domain: '',
     denyDomainPrefix: '',
     address: '',
@@ -157,6 +165,7 @@ const openCreate = () => {
     forwardMetadata: '',
     tunnelReplaceAddress: '',
     forwardReplaceAddress: '',
+    p2pPort: '',
     rules: [],
     tags: [],
     indexValue: 1000,
@@ -217,13 +226,13 @@ const deleteFunc = async (row) => {
   }
 }
 
-const openBind = (row)=>{
+const openBind = (row) => {
   state.value.bind.data.nodeCode = row.code
   state.value.bind.data.userCode = null
   state.value.bind.open = true
 }
 
-const closeBind = ()=>{
+const closeBind = () => {
   state.value.bind.open = false
 }
 
@@ -314,15 +323,15 @@ watch(() => ({type: state.value.obs.dataRange}), () => {
   obsFunc()
 })
 
-const nodeCleanPortFunc = async (row)=>{
+const nodeCleanPortFunc = async (row) => {
   try {
-    await apiAdminGostNodeCleanPort({code:row.code})
+    await apiAdminGostNodeCleanPort({code: row.code})
     $message.create('清除成功', {
       duration: 1500,
       closable: true,
       type: "success"
     })
-  }finally {
+  } finally {
 
   }
 }
@@ -412,10 +421,14 @@ onBeforeMount(() => {
                   <span>连接端口：{{ row.tunnelConnPort }}</span><br>
                   <span>访问端口：{{ row.tunnelInPort }}</span><br>
                 </n-tab-pane>
+                <n-tab-pane name="p2p" tab="P2P隧道">
+                  <span>连接端口：{{ row.p2pPort }}</span><br>
+                </n-tab-pane>
               </n-tabs>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="router.push({name: 'AdminGostNodeLogger', query: {nodeCode: row.code}})">
+              <n-button size="tiny" :focusable="false" quaternary type="info"
+                        @click="router.push({name: 'AdminGostNodeLogger', query: {nodeCode: row.code}})">
                 日志
               </n-button>
               <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
@@ -541,6 +554,14 @@ onBeforeMount(() => {
             >私有隧道
             </n-checkbox>
             <n-checkbox
+                v-model:checked="state.create.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.create.data.p2p = value}"
+            >P2P隧道
+            </n-checkbox>
+            <n-checkbox
                 v-model:checked="state.create.data.proxy"
                 :focusable="false"
                 :checked-value="1"
@@ -594,7 +615,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.create.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
             </n-form-item>
             <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.forwardReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.create.data.forwardReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="forwardMetadata" label="METADATA">
               <n-input
@@ -615,7 +637,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.create.data.tunnelConnPort" placeholder="2096"></n-input>
             </n-form-item>
             <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.tunnelReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.create.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="tunnelMetadata" label="METADATA">
               <n-input
@@ -623,6 +646,17 @@ onBeforeMount(() => {
                   v-model:value.trim="state.create.data.tunnelMetadata"
                   placeholder="JSON格式"
               ></n-input>
+            </n-form-item>
+          </n-tab-pane>
+          <n-tab-pane name="p2p" tab="P2P隧道">
+            <div v-show="state.create.data.p2p!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用P2P隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="p2pPort" label="连接端口">
+              <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
           </n-tab-pane>
         </n-tabs>
@@ -708,6 +742,14 @@ onBeforeMount(() => {
             >私有隧道
             </n-checkbox>
             <n-checkbox
+                v-model:checked="state.update.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.update.data.p2p = value}"
+            >P2P隧道
+            </n-checkbox>
+            <n-checkbox
                 v-model:checked="state.update.data.proxy"
                 :focusable="false"
                 :checked-value="1"
@@ -761,7 +803,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.update.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
             </n-form-item>
             <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.forwardReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.update.data.forwardReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="forwardMetadata" label="METADATA">
               <n-input
@@ -782,7 +825,8 @@ onBeforeMount(() => {
               <n-input v-model:value="state.update.data.tunnelConnPort" placeholder="2096"></n-input>
             </n-form-item>
             <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.tunnelReplaceAddress" placeholder="grpc://1.1.1.1:8080"></n-input>
+              <n-input v-model:value="state.update.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
             </n-form-item>
             <n-form-item path="tunnelMetadata" label="METADATA">
               <n-input
@@ -790,6 +834,17 @@ onBeforeMount(() => {
                   v-model:value.trim="state.update.data.tunnelMetadata"
                   placeholder="JSON格式"
               ></n-input>
+            </n-form-item>
+          </n-tab-pane>
+          <n-tab-pane name="p2p" tab="P2P隧道">
+            <div v-show="state.update.data.p2p!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用P2P隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="p2pPort" label="连接端口">
+              <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
           </n-tab-pane>
         </n-tabs>

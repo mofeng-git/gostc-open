@@ -1,8 +1,15 @@
 import request from "../../request/index.js";
 
-const baseUrl = '/v1/admin/gost/user/config'
+const baseUrl = '/v1/admin/gost/client/p2p'
 
-export const apiAdminGostUserConfigPage = (data) => {
+export const apiAdminGostClientP2PList = () => {
+    return request.request({
+        url: `${baseUrl}/list`,
+        method: 'POST',
+    })
+}
+
+export const apiAdminGostClientP2PPage = (data) => {
     return request.request({
         url: `${baseUrl}/page`,
         method: 'POST',
@@ -10,23 +17,7 @@ export const apiAdminGostUserConfigPage = (data) => {
     })
 }
 
-export const apiAdminGostUserConfigList = (data) => {
-    return request.request({
-        url: `${baseUrl}/list`,
-        method: 'POST',
-        data
-    })
-}
-
-export const apiAdminGostUserConfigNodeList = (data) => {
-    return request.request({
-        url: `${baseUrl}/node/list`,
-        method: 'POST',
-        data
-    })
-}
-
-export const apiAdminGostUserConfigCreate = (data) => {
+export const apiAdminGostClientP2PCreate = (data) => {
     return request.request({
         url: `${baseUrl}/create`,
         method: 'POST',
@@ -34,7 +25,15 @@ export const apiAdminGostUserConfigCreate = (data) => {
     })
 }
 
-export const apiAdminGostUserConfigUpdate = (data) => {
+export const apiAdminGostClientP2PConfig = (data) => {
+    return request.request({
+        url: `${baseUrl}/config`,
+        method: 'POST',
+        data
+    })
+}
+
+export const apiAdminGostClientP2PUpdate = (data) => {
     return request.request({
         url: `${baseUrl}/update`,
         method: 'POST',
@@ -43,7 +42,7 @@ export const apiAdminGostUserConfigUpdate = (data) => {
 }
 
 
-export const apiAdminGostUserConfigDelete = (data) => {
+export const apiAdminGostClientP2PDelete = (data) => {
     return request.request({
         url: `${baseUrl}/delete`,
         method: 'POST',

@@ -43,6 +43,7 @@ const state = ref({
       tunnel: 1,
       forward: 1,
       proxy: 2,
+      p2p: 1,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -55,6 +56,7 @@ const state = ref({
       forwardMetadata: '',
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
+      p2pPort: '',
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -75,6 +77,7 @@ const state = ref({
       tunnel: 2,
       forward: 2,
       proxy: 2,
+      p2p: 1,
       domain: '',
       denyDomainPrefix: '',
       address: '',
@@ -87,6 +90,7 @@ const state = ref({
       forwardMetadata: '',
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
+      p2pPort: '',
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -134,6 +138,7 @@ const openCreate = () => {
     tunnel: 1,
     forward: 1,
     proxy: 2,
+    p2p: 2,
     domain: '',
     denyDomainPrefix: '',
     address: '',
@@ -146,6 +151,7 @@ const openCreate = () => {
     forwardMetadata: '',
     tunnelReplaceAddress: '',
     forwardReplaceAddress: '',
+    p2pPort: '',
     rules: [],
     tags: [],
     indexValue: 1000,
@@ -349,6 +355,9 @@ onBeforeMount(() => {
                   <span>连接端口：{{ row.tunnelConnPort }}</span><br>
                   <span>访问端口：{{ row.tunnelInPort }}</span><br>
                 </n-tab-pane>
+                <n-tab-pane name="p2p" tab="P2P隧道">
+                  <span>连接端口：{{ row.p2pPort }}</span><br>
+                </n-tab-pane>
               </n-tabs>
             </div>
             <n-space justify="end" style="width: 100%">
@@ -452,6 +461,14 @@ onBeforeMount(() => {
             >私有隧道
             </n-checkbox>
             <n-checkbox
+                v-model:checked="state.create.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.create.data.p2p = value}"
+            >P2P隧道
+            </n-checkbox>
+            <n-checkbox
                 v-model:checked="state.create.data.proxy"
                 :focusable="false"
                 :checked-value="1"
@@ -538,6 +555,17 @@ onBeforeMount(() => {
               ></n-input>
             </n-form-item>
           </n-tab-pane>
+          <n-tab-pane name="p2p" tab="P2P隧道">
+            <div v-show="state.create.data.p2p!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用P2P隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="p2pPort" label="连接端口">
+              <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
+            </n-form-item>
+          </n-tab-pane>
         </n-tabs>
       </n-form>
     </Modal>
@@ -600,6 +628,14 @@ onBeforeMount(() => {
                 :unchecked-value="2"
                 :on-update-checked="value=>{state.update.data.tunnel = value}"
             >私有隧道
+            </n-checkbox>
+            <n-checkbox
+                v-model:checked="state.update.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.update.data.p2p = value}"
+            >P2P隧道
             </n-checkbox>
             <n-checkbox
                 v-model:checked="state.update.data.proxy"
@@ -686,6 +722,17 @@ onBeforeMount(() => {
                   v-model:value.trim="state.update.data.tunnelMetadata"
                   placeholder="JSON格式"
               ></n-input>
+            </n-form-item>
+          </n-tab-pane>
+          <n-tab-pane name="p2p" tab="P2P隧道">
+            <div v-show="state.update.data.p2p!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用P2P隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="p2pPort" label="连接端口">
+              <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
           </n-tab-pane>
         </n-tabs>

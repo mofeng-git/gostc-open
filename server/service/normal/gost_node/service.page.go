@@ -24,6 +24,7 @@ type Item struct {
 	Tunnel  int `json:"tunnel"`
 	Forward int `json:"forward"`
 	Proxy   int `json:"proxy"`
+	P2P     int `json:"p2p"`
 
 	Domain           string `json:"domain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
@@ -42,6 +43,7 @@ type Item struct {
 	IndexValue            int      `json:"indexValue"`
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
+	P2PPort               string   `json:"p2pPort"`
 
 	Online      int    `json:"online"`
 	Version     string `json:"version"`
@@ -74,6 +76,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			Tunnel:                node.Tunnel,
 			Forward:               node.Forward,
 			Proxy:                 node.Proxy,
+			P2P:                   node.P2P,
 			Domain:                node.Domain,
 			DenyDomainPrefix:      node.DenyDomainPrefix,
 			Address:               node.Address,
@@ -90,6 +93,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			IndexValue:            node.IndexValue,
 			TunnelReplaceAddress:  node.TunnelReplaceAddress,
 			ForwardReplaceAddress: node.ForwardReplaceAddress,
+			P2PPort:               node.P2PPort,
 			Online:                utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
 			Version:               cache.GetNodeVersion(node.Code),
 			InputBytes:            obsInfo.InputBytes,

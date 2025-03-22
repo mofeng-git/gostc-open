@@ -12,8 +12,13 @@ import (
 	"github.com/go-gost/x/registry"
 	"github.com/lxzan/gws"
 	"gostc-sub/common"
+	"gostc-sub/p2p/frpc"
+	v1 "gostc-sub/p2p/pkg/config/v1"
+	log2 "gostc-sub/p2p/pkg/util/log"
+	registry2 "gostc-sub/p2p/registry"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -42,6 +47,7 @@ func Init(logLevel string, console bool) {
 	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level), xlogger.OutputOption(Writer)))
 	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
 	parsing.SetDefaultTLSConfig(tlsConfig)
+	log2.RefreshDefault()
 }
 
 func init() {
@@ -108,10 +114,10 @@ func DelClient() {
 	svrRunTag = false
 	for k, v := range common.SvcMap {
 		if v == true {
-			svc := registry.ServiceRegistry().Get(k)
-			if svc != nil {
+			if svc := registry.ServiceRegistry().Get(k); svc != nil {
 				_ = svc.Close()
 			}
+			registry2.Del(k)
 		}
 	}
 	common.SvcMap = make(map[string]bool)
@@ -168,4 +174,40 @@ func DelTunnel(key string) {
 		_ = registry.ServiceRegistry().Get(svcCfg.Name).Close()
 		registry.ServiceRegistry().Unregister(svcCfg.Name)
 	}
+}
+
+func RunP2P(useTls string, address string, key string, port string) string {
+	tlsEnable := useTls == "1"
+	var apiurl = func(tls bool, address string) string {
+		var scheme string
+		if tlsEnable {
+			scheme = "https"
+		} else {
+			scheme = "http"
+		}
+		return scheme + "://" + address
+	}(tlsEnable, address)
+	data, err := common.GetP2PConfig(apiurl + "/api/v1/public/p2p/visit?key=" + key)
+	if err != nil {
+		return "获取配置失败"
+	}
+
+	data.XTCPCfg.BindPort, _ = strconv.Atoi(port)
+	svc := frpc.NewService(data.Common, nil, []v1.VisitorConfigurer{
+		&data.STCPCfg,
+		&data.XTCPCfg,
+	})
+
+	if err := svc.Start(); err == nil {
+		_ = registry2.Set(key, svc)
+	}
+	return "success"
+}
+
+func DelP2P(key string) {
+	key = strings.Trim(key, "")
+	if key == "" {
+		return
+	}
+	registry2.Del(key)
 }

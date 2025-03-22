@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-gost/x/config"
+	v1 "server/pkg/p2p_cfg/v1"
 	"strconv"
 	"strings"
 )
@@ -18,6 +19,7 @@ type GostNode struct {
 	Tunnel                int              `gorm:"column:tunnel;size:1;default:2;comment:私有隧道功能"`
 	Forward               int              `gorm:"column:forward;size:1;default:2;comment:端口转发功能"`
 	Proxy                 int              `gorm:"column:proxy;size:1;default:2;comment:代理隧道功能"`
+	P2P                   int              `gorm:"column:p2p;size:1;default:2;comment:P2P隧道功能"`
 	Domain                string           `gorm:"column:domain;comment:基础域名"`
 	DenyDomainPrefix      string           `gorm:"column:deny_domain_prefix;comment:不允许的域名前缀"`
 	Address               string           `gorm:"column:address;comment:服务地址"`
@@ -30,6 +32,7 @@ type GostNode struct {
 	ForwardPorts          string           `gorm:"column:forward_ports;comment:转发端口组"`
 	ForwardMetadata       string           `gorm:"column:forward_metadata;comment:其他信息"`
 	ForwardReplaceAddress string           `gorm:"column:forward_replace_address;comment:替换地址"`
+	P2PPort               string           `gorm:"column:p2p_port;comment:p2p连接端口"`
 	Rules                 string           `gorm:"column:rules;comment:规则限制"`
 	Tags                  string           `gorm:"column:tags;comment:标签"`
 	Configs               []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
@@ -237,5 +240,28 @@ func (n GostNode) GenerateNodePortCheck(host string, port string) map[string]str
 		"callback": fmt.Sprintf("%s/api/v1/public/gost/node/port", host),
 		"code":     n.Code,
 		"port":     port,
+	}
+}
+
+func (n GostNode) GenerateP2PServiceConfig(host string) v1.ServerConfig {
+	port, _ := strconv.Atoi(n.P2PPort)
+	return v1.ServerConfig{
+		BindPort: port,
+		HTTPPlugins: []v1.HTTPPluginOptions{
+			//{
+			//	Name:      "login-plugin",
+			//	Addr:      host,
+			//	Path:      "/api/v1/public/p2p/login",
+			//	Ops:       []string{"Login"},
+			//	TLSVerify: true,
+			//},
+			{
+				Name:      "new-plugin",
+				Addr:      host,
+				Path:      "/api/v1/public/p2p/new",
+				Ops:       []string{"NewProxy"},
+				TLSVerify: true,
+			},
+		},
 	}
 }

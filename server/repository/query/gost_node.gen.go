@@ -41,6 +41,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.Tunnel = field.NewInt(tableName, "tunnel")
 	_gostNode.Forward = field.NewInt(tableName, "forward")
 	_gostNode.Proxy = field.NewInt(tableName, "proxy")
+	_gostNode.P2P = field.NewInt(tableName, "p2p")
 	_gostNode.Domain = field.NewString(tableName, "domain")
 	_gostNode.DenyDomainPrefix = field.NewString(tableName, "deny_domain_prefix")
 	_gostNode.Address = field.NewString(tableName, "address")
@@ -53,6 +54,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.ForwardPorts = field.NewString(tableName, "forward_ports")
 	_gostNode.ForwardMetadata = field.NewString(tableName, "forward_metadata")
 	_gostNode.ForwardReplaceAddress = field.NewString(tableName, "forward_replace_address")
+	_gostNode.P2PPort = field.NewString(tableName, "p2p_port")
 	_gostNode.Rules = field.NewString(tableName, "rules")
 	_gostNode.Tags = field.NewString(tableName, "tags")
 	_gostNode.Configs = gostNodeHasManyConfigs{
@@ -97,6 +99,7 @@ type gostNode struct {
 	Tunnel                field.Int
 	Forward               field.Int
 	Proxy                 field.Int
+	P2P                   field.Int
 	Domain                field.String
 	DenyDomainPrefix      field.String
 	Address               field.String
@@ -109,6 +112,7 @@ type gostNode struct {
 	ForwardPorts          field.String
 	ForwardMetadata       field.String
 	ForwardReplaceAddress field.String
+	P2PPort               field.String
 	Rules                 field.String
 	Tags                  field.String
 	Configs               gostNodeHasManyConfigs
@@ -142,6 +146,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.Tunnel = field.NewInt(table, "tunnel")
 	g.Forward = field.NewInt(table, "forward")
 	g.Proxy = field.NewInt(table, "proxy")
+	g.P2P = field.NewInt(table, "p2p")
 	g.Domain = field.NewString(table, "domain")
 	g.DenyDomainPrefix = field.NewString(table, "deny_domain_prefix")
 	g.Address = field.NewString(table, "address")
@@ -154,6 +159,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.ForwardPorts = field.NewString(table, "forward_ports")
 	g.ForwardMetadata = field.NewString(table, "forward_metadata")
 	g.ForwardReplaceAddress = field.NewString(table, "forward_replace_address")
+	g.P2PPort = field.NewString(table, "p2p_port")
 	g.Rules = field.NewString(table, "rules")
 	g.Tags = field.NewString(table, "tags")
 
@@ -172,7 +178,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 29)
+	g.fieldMap = make(map[string]field.Expr, 31)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -187,6 +193,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["tunnel"] = g.Tunnel
 	g.fieldMap["forward"] = g.Forward
 	g.fieldMap["proxy"] = g.Proxy
+	g.fieldMap["p2p"] = g.P2P
 	g.fieldMap["domain"] = g.Domain
 	g.fieldMap["deny_domain_prefix"] = g.DenyDomainPrefix
 	g.fieldMap["address"] = g.Address
@@ -199,6 +206,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["forward_ports"] = g.ForwardPorts
 	g.fieldMap["forward_metadata"] = g.ForwardMetadata
 	g.fieldMap["forward_replace_address"] = g.ForwardReplaceAddress
+	g.fieldMap["p2p_port"] = g.P2PPort
 	g.fieldMap["rules"] = g.Rules
 	g.fieldMap["tags"] = g.Tags
 

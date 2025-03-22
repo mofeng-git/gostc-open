@@ -30,6 +30,7 @@ func main() {
 		model.GostClientLogger{},
 		model.GostClientTunnel{},
 		model.GostClientProxy{},
+		model.GostClientP2P{},
 		model.GostNode{},
 		model.GostNodeBind{},
 		model.GostNodeConfig{},

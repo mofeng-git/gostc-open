@@ -19,6 +19,7 @@ type UpdateReq struct {
 	Tunnel                int      `binding:"required" json:"tunnel" label:"是否启用私有隧道"`
 	Forward               int      `binding:"required" json:"forward" label:"是否启用端口转发"`
 	Proxy                 int      `binding:"required" json:"proxy" label:"是否启用代理隧道"`
+	P2P                   int      `binding:"required" json:"p2p" label:"是否启用P2P隧道"`
 	Address               string   `binding:"required" json:"address"`
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
@@ -31,6 +32,7 @@ type UpdateReq struct {
 	ForwardMetadata       string   `json:"forwardMetadata"`
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
+	P2PPort               string   `json:"p2pPort"`
 	IndexValue            int      `json:"indexValue"`
 }
 
@@ -56,6 +58,7 @@ func (service *service) Update(req UpdateReq) error {
 	node.Tunnel = req.Tunnel
 	node.Forward = req.Forward
 	node.Proxy = req.Proxy
+	node.P2P = req.P2P
 	node.Domain = req.Domain
 	node.DenyDomainPrefix = req.DenyDomainPrefix
 	node.Address = req.Address
@@ -68,6 +71,7 @@ func (service *service) Update(req UpdateReq) error {
 	node.ForwardPorts = req.ForwardPorts
 	node.ForwardMetadata = req.ForwardMetadata
 	node.ForwardReplaceAddress = req.ForwardReplaceAddress
+	node.P2PPort = req.P2PPort
 	node.IndexValue = req.IndexValue
 	if err := db.GostNode.Save(node); err != nil {
 		log.Error("修改节点失败", zap.Error(err))
@@ -94,6 +98,11 @@ func (service *service) Update(req UpdateReq) error {
 	_ = db.GostClientProxy.Where(db.GostClientProxy.NodeCode.Eq(node.Code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
 	for _, code := range proxyCodes {
 		gost_engine.ClientProxyConfig(db, code)
+	}
+	var p2pCodes []string
+	_ = db.GostClientP2P.Where(db.GostClientP2P.NodeCode.Eq(node.Code)).Pluck(db.GostClientP2P.Code, &p2pCodes)
+	for _, code := range p2pCodes {
+		gost_engine.ClientP2PConfig(db, code)
 	}
 	node_port.Arrange(db, node.Code)
 	return nil

@@ -187,6 +187,7 @@ onBeforeMount(() => {
             <n-tag type="info" size="small" bordered v-if="state.node.forward===1">端口转发</n-tag>
             <n-tag type="info" size="small" bordered v-if="state.node.tunnel===1">私有隧道</n-tag>
             <n-tag type="info" size="small" bordered v-if="state.node.proxy===1">代理隧道</n-tag>
+            <n-tag type="info" size="small" bordered v-if="state.node.p2p===1">P2P隧道</n-tag>
           </n-space>
           <n-space>
             <span>标签：</span>
