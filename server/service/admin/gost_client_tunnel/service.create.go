@@ -107,7 +107,7 @@ func (service *service) Create(req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		var auth = model.GostAuth{
-			TunnelType: model.GOST_TUNNEL_TYPE_FORWARD,
+			TunnelType: model.GOST_TUNNEL_TYPE_TUNNEL,
 			TunnelCode: tunnel.Code,
 			User:       utils.RandStr(10, utils.AllDict),
 			Password:   utils.RandStr(10, utils.AllDict),

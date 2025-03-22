@@ -77,4 +77,20 @@ func gostClient() {
 		auth := authMap[proxy.Code]
 		cache.SetGostAuth(auth.User, auth.Password, proxy.Code)
 	}
+
+	p2ps, _ := db.GostClientP2P.Find()
+	for _, p2p := range p2ps {
+		cache.SetTunnelInfo(cache.TunnelInfo{
+			Code:        p2p.Code,
+			Type:        model.GOST_TUNNEL_TYPE_P2P,
+			ClientCode:  p2p.ClientCode,
+			UserCode:    p2p.UserCode,
+			NodeCode:    p2p.NodeCode,
+			ChargingTye: p2p.ChargingType,
+			ExpAt:       p2p.ExpAt,
+			Limiter:     p2p.Limiter,
+		})
+		auth := authMap[p2p.Code]
+		cache.SetGostAuth(auth.User, auth.Password, p2p.Code)
+	}
 }

@@ -66,7 +66,7 @@ func (service *service) Config(req ConfigReq) error {
 		gost_engine.ClientP2PConfig(tx, p2p.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        p2p.Code,
-			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,
+			Type:        model.GOST_TUNNEL_TYPE_P2P,
 			ClientCode:  p2p.ClientCode,
 			UserCode:    p2p.UserCode,
 			NodeCode:    p2p.NodeCode,

@@ -149,7 +149,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		var auth = model.GostAuth{
-			TunnelType: model.GOST_TUNNEL_TYPE_FORWARD,
+			TunnelType: model.GOST_TUNNEL_TYPE_PROXY,
 			TunnelCode: proxy.Code,
 			User:       utils.RandStr(10, utils.AllDict),
 			Password:   utils.RandStr(10, utils.AllDict),
