@@ -50,14 +50,6 @@ const state = ref({
   closeOtp: {
     loading: false,
   },
-  checkinLoading: false,
-  unBindQQLoading: false,
-  bindQQCode: {
-    open: false,
-    code: '',
-    loading: false,
-    refreshLoading: false,
-  },
   obsDataRange: 1,
   obsLoading: false,
   obsData: []
@@ -284,6 +276,12 @@ onBeforeMount(() => {
                   <n-thing title="私有隧道">{{ state.gost.tunnel }}</n-thing>
                 </n-grid-item>
                 <n-grid-item>
+                  <n-thing title="代理隧道">{{ state.gost.proxy }}</n-thing>
+                </n-grid-item>
+                <n-grid-item>
+                  <n-thing title="P2P隧道">{{ state.gost.p2p }}</n-thing>
+                </n-grid-item>
+                <n-grid-item>
                   <n-thing title="下行流量">{{ flowFormat(state.gost.inputBytes) }}</n-thing>
                 </n-grid-item>
                 <n-grid-item>
@@ -319,7 +317,7 @@ onBeforeMount(() => {
           <n-el tag="div" :style="cardStyleComputed">
             <AppCard :show-border="false">
               <n-h4 style="font-weight: bold">通知公告</n-h4>
-              <n-scrollbar style="max-height: 400px">
+              <n-scrollbar style="max-height: 600px">
                 <n-alert style="margin-bottom: 8px" type="info" v-for="item in state.notices" :key="item.code"
                          :bordered="false">
                   <template #header>
@@ -344,7 +342,7 @@ onBeforeMount(() => {
                   <n-radio-button :value="2">最近30天</n-radio-button>
                 </n-radio-group>
               </n-space>
-              <Obs :data="state.obsData" :loading="state.obsLoading"></Obs>
+              <Obs :data="state.obsData" :loading="state.obsLoading" :dark="localStore().darkTheme" style="width: 100%"></Obs>
             </AppCard>
           </n-el>
         </n-grid-item>

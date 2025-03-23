@@ -7,6 +7,7 @@ import {
 } from "../../../api/admin/dashboard.js";
 import {flowFormat} from "../../../utils/flow.js";
 import AppCard from "../../../layout/components/AppCard.vue";
+import Online from "../../../icon/online.vue";
 
 const state = ref({
   count: {
@@ -109,6 +110,20 @@ onBeforeMount(() => {
           </n-card>
         </n-grid-item>
         <n-grid-item>
+          <n-card size="small" title="代理隧道" :content-style="{padding:'6px 16px !important'}">
+            <div style="font-size: 1.5em">
+              <span style="font-weight: bold">{{ state.count.proxy }}</span>
+            </div>
+          </n-card>
+        </n-grid-item>
+        <n-grid-item>
+          <n-card size="small" title="P2P隧道" :content-style="{padding:'6px 16px !important'}">
+            <div style="font-size: 1.5em">
+              <span style="font-weight: bold">{{ state.count.p2p }}</span>
+            </div>
+          </n-card>
+        </n-grid-item>
+        <n-grid-item>
           <n-card size="small" title="下行流量(今日)" :content-style="{padding:'6px 16px !important'}">
             <div style="font-size: 1.5em">
               <span style="font-weight: bold">{{ flowFormat(state.count.inputBytes) }}</span>
@@ -131,11 +146,11 @@ onBeforeMount(() => {
             <n-list>
               <n-list-item v-for="obs in state.nodeObs">
                 <div style="display: flex;justify-content: space-between;align-items: center">
-                  <span>{{obs.name}}</span>
+                  <span><Online :online="obs.online === 1"></Online> {{ obs.name }}</span>
                   <div>
-                    <span>{{flowFormat(obs.inputBytes)}}</span>
+                    <span>{{ flowFormat(obs.inputBytes) }}</span>
                     <n-divider vertical></n-divider>
-                    <span>{{flowFormat(obs.outputBytes)}}</span>
+                    <span>{{ flowFormat(obs.outputBytes) }}</span>
                   </div>
                 </div>
               </n-list-item>
@@ -147,11 +162,11 @@ onBeforeMount(() => {
             <n-list>
               <n-list-item v-for="obs in state.userObs">
                 <div style="display: flex;justify-content: space-between;align-items: center">
-                  <span>{{ obs.account}}</span>
+                  <span>{{ obs.account }}</span>
                   <div>
-                    <span>{{flowFormat(obs.inputBytes)}}</span>
+                    <span>{{ flowFormat(obs.inputBytes) }}</span>
                     <n-divider vertical></n-divider>
-                    <span>{{flowFormat(obs.outputBytes)}}</span>
+                    <span>{{ flowFormat(obs.outputBytes) }}</span>
                   </div>
                 </div>
               </n-list-item>

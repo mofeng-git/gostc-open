@@ -19,6 +19,7 @@ import {flowFormat} from "../../../utils/flow.js";
 import {apiNormalGostObsClientMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
 import moment from "moment";
+import {localStore} from "../../../store/local.js";
 
 const state = ref({
   table: {
@@ -27,7 +28,6 @@ const state = ref({
       page: 1,
       size: 12,
       account: '',
-      admin: 0,
     },
     list: [],
     total: 0,
@@ -353,7 +353,7 @@ onBeforeMount(() => {
           <n-radio-button :value="2">最近30天</n-radio-button>
         </n-radio-group>
       </n-space>
-      <Obs :data="state.obs.data" :loading="state.obs.loading"></Obs>
+      <Obs :data="state.obs.data" style="width:100%" :loading="state.obs.loading" :dark="localStore().darkTheme"></Obs>
     </Modal>
   </div>
 </template>

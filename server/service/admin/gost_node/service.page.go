@@ -70,7 +70,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		// 系统节点
 		where = append(where, db.GostNode.Code.NotIn(nodeCodes...))
 	}
-	nodes, total, _ := db.GostNode.Where(where...).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Asc()).FindByPage(req.GetOffset(), req.GetLimit())
+	nodes, total, _ := db.GostNode.Where(where...).Order(db.GostNode.IndexValue.Asc(), db.GostNode.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 
 	// 查询节点的绑定用户
 	nodeBinds, _ := db.GostNodeBind.Preload(db.GostNodeBind.User).Find()

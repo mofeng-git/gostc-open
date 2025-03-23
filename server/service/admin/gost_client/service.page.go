@@ -40,7 +40,11 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		where = append(where, db.SystemUser.Code.In(userCodes...))
 	}
 
-	clients, total, _ := db.GostClient.Preload(db.GostClient.User).Order(db.GostClient.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
+	clients, total, _ := db.GostClient.
+		Preload(db.GostClient.User).
+		Where(where...).
+		Order(db.GostClient.Id.Desc()).
+		FindByPage(req.GetOffset(), req.GetLimit())
 	for _, client := range clients {
 		obsInfo := cache.GetClientObsDateRange(cache.MONTH_DATEONLY_LIST, client.Code)
 		list = append(list, Item{

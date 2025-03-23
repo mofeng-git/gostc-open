@@ -12,8 +12,10 @@ import (
 
 type PageReq struct {
 	bean.PageParam
-	Account string `json:"account"`
-	Enable  int    `json:"enable"`
+	Name       string `json:"name"`
+	Account    string `json:"account"`
+	ClientName string `json:"clientName"`
+	Enable     int    `json:"enable"`
 }
 
 type Item struct {
@@ -66,6 +68,14 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 	}
 	if req.Enable > 0 {
 		where = append(where, db.GostClientProxy.Enable.Eq(req.Enable))
+	}
+	if req.Name != "" {
+		where = append(where, db.GostClientProxy.Name.Like("%"+req.Name+"%"))
+	}
+	if req.ClientName != "" {
+		var clientCodes []string
+		_ = db.GostClient.Where(db.GostClient.Name.Like("%"+req.ClientName+"%")).Pluck(db.GostClient.Code, &clientCodes)
+		where = append(where, db.GostClientProxy.ClientCode.In(clientCodes...))
 	}
 	proxys, total, _ := db.GostClientProxy.Preload(
 		db.GostClientProxy.User,

@@ -19,6 +19,7 @@ import router from "../../../router/index.js";
 import {flowFormat} from "../../../utils/flow.js";
 import Obs from "../../../components/Obs.vue";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
+import {localStore} from "../../../store/local.js";
 
 const state = ref({
   table: {
@@ -27,6 +28,8 @@ const state = ref({
       page: 1,
       size: 12,
       account: '',
+      name: '',
+      clientName: '',
     },
     list: [],
     total: 0,
@@ -171,6 +174,20 @@ onBeforeMount(() => {
           clearable
           label="账号"
           @onChange="value => state.table.search.account=value"
+      ></SearchItem>
+      <SearchItem
+          type="input"
+          :label-width="70"
+          clearable
+          label="名称"
+          @onChange="value => state.table.search.name=value"
+      ></SearchItem>
+      <SearchItem
+          type="input"
+          :label-width="70"
+          clearable
+          label="客户端"
+          @onChange="value => state.table.search.clientName=value"
       ></SearchItem>
       <SearchItem
           type="select"
@@ -349,7 +366,7 @@ onBeforeMount(() => {
           <n-radio-button :value="2">最近30天</n-radio-button>
         </n-radio-group>
       </n-space>
-      <Obs :data="state.obs.data" :loading="state.obs.loading"></Obs>
+      <Obs :data="state.obs.data" style="width:100%" :loading="state.obs.loading" :dark="localStore().darkTheme"></Obs>
     </Modal>
   </div>
 </template>

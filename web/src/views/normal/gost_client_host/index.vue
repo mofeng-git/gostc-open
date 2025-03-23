@@ -26,6 +26,7 @@ import {goToUrl} from "../../../utils/browser.js";
 import moment from "moment/moment.js";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
+import {localStore} from "../../../store/local.js";
 
 const state = ref({
   table: {
@@ -461,7 +462,7 @@ onBeforeMount(() => {
           <n-radio-button :value="2">最近30天</n-radio-button>
         </n-radio-group>
       </n-space>
-      <Obs :data="state.obs.data" :loading="state.obs.loading"></Obs>
+      <Obs :data="state.obs.data" style="width:100%" :loading="state.obs.loading" :dark="localStore().darkTheme"></Obs>
     </Modal>
   </div>
 </template>

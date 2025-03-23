@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {onBeforeMount, ref} from "vue";
 import {
   apiNormalGostClientP2PDelete,
   apiNormalGostClientP2PEnable,
@@ -21,11 +21,6 @@ import Online from "../../../icon/online.vue";
 import {configExpText} from "../gost_client_host/index.js";
 import {copyToClipboard} from "../../../utils/copy.js";
 import {NButton, NSpace} from "naive-ui";
-import {flowFormat} from "../../../utils/flow.js";
-import {goToUrl} from "../../../utils/browser.js";
-import moment from "moment/moment.js";
-import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
-import Obs from "../../../components/Obs.vue";
 
 const state = ref({
   table: {
@@ -56,13 +51,6 @@ const state = ref({
   look: {
     open: false,
     key: '',
-  },
-  obs: {
-    open: false,
-    code: '',
-    loading: false,
-    data: [],
-    dataRange: 1,
   },
 })
 
@@ -165,43 +153,6 @@ const copyFunc = () => {
   })
   state.value.look.open = false
 }
-
-const openObsModal = (row) => {
-  state.value.obs.code = row.code
-  obsFunc()
-  state.value.obs.open = true
-}
-
-const closeObsModal = () => {
-  state.value.obs.open = false
-}
-
-const obsFunc = async () => {
-  try {
-    state.value.obs.loading = false
-    state.value.obsLoading = true
-    let data = {
-      start: moment().add(-29, 'days').format('yyyy-MM-DD'),
-      end: moment().format('yyyy-MM-DD'),
-      code: state.value.obs.code,
-    }
-    if (state.value.obs.dataRange === 1) {
-      data = {
-        start: moment().add(-6, 'days').format('yyyy-MM-DD'),
-        end: moment().format('yyyy-MM-DD'),
-        code: state.value.obs.code,
-      }
-    }
-    let res = await apiNormalGostObsTunnelMonth(data)
-    state.value.obs.data = res.data || []
-  } finally {
-    state.value.obs.loading = false
-  }
-}
-
-watch(() => ({type: state.value.obs.dataRange}), () => {
-  obsFunc()
-})
 
 onBeforeMount(() => {
   pageFunc()
@@ -327,9 +278,6 @@ onBeforeMount(() => {
                 </template>
                 确认续费吗？
               </n-popconfirm>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
-                流量
-              </n-button>
               <n-button size="tiny" :focusable="false" quaternary type="info" @click="openLookFunc(row.vKey)">
                 访问密钥
               </n-button>
@@ -402,24 +350,6 @@ onBeforeMount(() => {
           <n-input v-model:value="state.update.data.targetPort" placeholder="80"></n-input>
         </n-form-item>
       </n-form>
-    </Modal>
-
-    <Modal
-        title="流量情况"
-        :show="state.obs.open"
-        confirm-text=""
-        cancel-text="关闭"
-        @on-cancel="closeObsModal"
-        mask-close
-    >
-      <n-space justify="space-between">
-        <n-h4 style="font-weight: bold">最近{{ state.obs.dataRange === 1 ? '7' : '30' }}天流量使用趋势</n-h4>
-        <n-radio-group size="small" v-model:value="state.obs.dataRange">
-          <n-radio-button :value="1">最近7天</n-radio-button>
-          <n-radio-button :value="2">最近30天</n-radio-button>
-        </n-radio-group>
-      </n-space>
-      <Obs :data="state.obs.data" :loading="state.obs.loading"></Obs>
     </Modal>
   </div>
 </template>

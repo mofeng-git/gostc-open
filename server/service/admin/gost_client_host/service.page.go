@@ -12,8 +12,10 @@ import (
 
 type PageReq struct {
 	bean.PageParam
-	Account string `json:"account"`
-	Enable  int    `json:"enable"`
+	Name       string `json:"name"`
+	Account    string `json:"account"`
+	ClientName string `json:"clientName"`
+	Enable     int    `json:"enable"`
 }
 
 type Item struct {
@@ -66,9 +68,16 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
 		where = append(where, db.GostClientHost.UserCode.In(userCodes...))
 	}
-
 	if req.Enable > 0 {
 		where = append(where, db.GostClientHost.Enable.Eq(req.Enable))
+	}
+	if req.Name != "" {
+		where = append(where, db.GostClientHost.Name.Like("%"+req.Name+"%"))
+	}
+	if req.ClientName != "" {
+		var clientCodes []string
+		_ = db.GostClient.Where(db.GostClient.Name.Like("%"+req.ClientName+"%")).Pluck(db.GostClient.Code, &clientCodes)
+		where = append(where, db.GostClientHost.ClientCode.In(clientCodes...))
 	}
 
 	hosts, total, _ := db.GostClientHost.Preload(

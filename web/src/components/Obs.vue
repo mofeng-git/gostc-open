@@ -8,6 +8,10 @@ const props = defineProps({
     default: false,
     type: Boolean,
   },
+  dark:{
+    default: false,
+    type: Boolean,
+  },
   data: {
     required: false,
     type: Array,
@@ -62,10 +66,24 @@ onUpdated(() => {
     },
     xAxis: {
       categories: dates,
+      labels: {
+        style: {
+          color: props.dark ?'rgb(240, 240, 240)':'rgb(51, 51, 51)'
+        }
+      }
     },
     yAxis: {
       title: {
-        text: '流量(MB)' // Y轴标题
+        text: null,
+        // text: '流量(MB)' // Y轴标题
+      },
+      labels: {
+        style: {
+          color: props.dark ?'rgb(240, 240, 240)':'rgb(51, 51, 51)'
+        },
+        formatter: function() {
+          return this.value +'M'
+        }
       }
     },
     tooltip: {
@@ -120,7 +138,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <AppCard :show-border="false" :loading="props.loading">
+  <AppCard :show-border="false" :loading="props.loading" style="margin: 12px 0 !important">
     <div ref="chartRef"></div>
   </AppCard>
 </template>

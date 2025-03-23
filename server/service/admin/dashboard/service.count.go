@@ -13,6 +13,8 @@ type CountResp struct {
 	Host    int64 `json:"host"`
 	Forward int64 `json:"forward"`
 	Tunnel  int64 `json:"tunnel"`
+	Proxy   int64 `json:"proxy"`
+	P2P     int64 `json:"p2p"`
 
 	Node       int64 `json:"node"`
 	NodeOnline int64 `json:"nodeOnline"`
@@ -49,6 +51,8 @@ func (service *service) Count() (result CountResp) {
 	result.Host, _ = db.GostClientHost.Count()
 	result.Forward, _ = db.GostClientForward.Count()
 	result.Tunnel, _ = db.GostClientTunnel.Count()
+	result.Proxy, _ = db.GostClientProxy.Count()
+	result.P2P, _ = db.GostClientP2P.Count()
 
 	result.User, _ = db.SystemUser.Count()
 	return result
