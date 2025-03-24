@@ -76,8 +76,8 @@ func (n GostNode) CheckDomainPrefix(prefix string) bool {
 	return true
 }
 
-func (n GostNode) GetPorts(excludePort []string) (result []string) {
-	var list []string
+func (n GostNode) GetPorts(excludePort []string) (result map[string]bool) {
+	result = make(map[string]bool)
 	var excludePortMap = make(map[string]bool)
 	for _, port := range excludePort {
 		excludePortMap[port] = true
@@ -87,7 +87,8 @@ func (n GostNode) GetPorts(excludePort []string) (result []string) {
 			continue
 		}
 		if _, err := strconv.Atoi(v1); err == nil {
-			list = append(list, v1)
+			result[v1] = true
+			continue
 		}
 		portGroup := strings.Split(v1, "-")
 		if len(portGroup) != 2 {
@@ -108,15 +109,12 @@ func (n GostNode) GetPorts(excludePort []string) (result []string) {
 			if start > end {
 				break
 			}
-			list = append(list, strconv.Itoa(start))
+			result[strconv.Itoa(start)] = true
 			start++
 		}
 	}
-	for _, item := range list {
-		if excludePortMap[item] {
-			continue
-		}
-		result = append(result, item)
+	for k, _ := range excludePortMap {
+		delete(result, k)
 	}
 	return result
 }

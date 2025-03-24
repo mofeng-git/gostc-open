@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var ports = make(map[string][]string)
+var ports = make(map[string]map[string]bool)
 var lock = &sync.Mutex{}
 
 func Run(db *query.Query) {
@@ -27,16 +27,27 @@ func GetPort(nodeCode string) (string, error) {
 	if len(nodePorts) == 0 {
 		return "", errors.New("端口资源不足")
 	}
-	var newPorts = make([]string, len(nodePorts)-1)
-	copy(newPorts, nodePorts[1:])
-	ports[nodeCode] = newPorts
-	return nodePorts[0], nil
+	for port, _ := range nodePorts {
+		delete(ports[nodeCode], port)
+		return port, nil
+	}
+	return "", errors.New("端口资源不足")
+}
+
+func ValidPort(nodeCode, port string, remove bool) bool {
+	lock.Lock()
+	defer lock.Unlock()
+	var flag = ports[nodeCode][port]
+	if flag && remove {
+		delete(ports[nodeCode], port)
+	}
+	return flag
 }
 
 func ReleasePort(nodeCode string, port string) {
 	lock.Lock()
 	defer lock.Unlock()
-	ports[nodeCode] = append(ports[nodeCode], port)
+	ports[nodeCode][port] = true
 }
 
 func arrange(db *query.Query) {

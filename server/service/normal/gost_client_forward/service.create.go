@@ -20,9 +20,29 @@ type CreateReq struct {
 	TargetIp      string `binding:"required" json:"targetIp" label:"内网IP"`
 	TargetPort    string `binding:"required" json:"targetPort" label:"内网端口"`
 	ProxyProtocol int    `json:"proxyProtocol"`
+	Port          string `json:"port"`
 	ClientCode    string `binding:"required" json:"clientCode" label:"客户端编号"`
 	NodeCode      string `binding:"required" json:"nodeCode" label:"节点编号"`
 	ConfigCode    string `binding:"required" json:"configCode" label:"套餐配置"`
+}
+
+// available 可用则返回true
+func validPortAvailable(tx *query.Query, nodeCode string, port string) (available bool) {
+	gost_engine.NodePortCheck(tx, nodeCode, port)
+	var retry int
+	for {
+		time.Sleep(time.Millisecond * 200)
+		retry++
+		use, ok := cache.GetNodePortUse(nodeCode, port)
+		if ok {
+			available = !use
+			break
+		}
+		if retry > 5*5 {
+			break
+		}
+	}
+	return available
 }
 
 func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
@@ -36,27 +56,8 @@ func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
 		}
 		version := cache.GetNodeVersion(node.Code)
 		if version >= "v1.1.7" {
-			gost_engine.NodePortCheck(tx, node.Code, port)
-			var available bool // 是否可用
-			var retry int
-			for {
-				time.Sleep(time.Millisecond * 200)
-				retry++
-				use, ok := cache.GetNodePortUse(node.Code, port)
-				if ok {
-					if use {
-						available = false
-					} else {
-						available = true
-					}
-					break
-				}
-				if retry > 5*5 {
-					break
-				}
-			}
 			// 可用，则结束获取端口
-			if available {
+			if validPortAvailable(tx, node.Code, port) {
 				break
 			}
 		} else {
@@ -66,13 +67,16 @@ func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
 	return port, nil
 }
 
-func (service *service) Create(claims jwt.Claims, req CreateReq) error {
+func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 	db, _, log := repository.Get("")
 	if !utils.ValidateLocalIP(req.TargetIp) {
 		return errors.New("内网IP格式错误")
 	}
 	if !utils.ValidatePort(req.TargetPort) {
 		return errors.New("内网端口格式错误")
+	}
+	if req.Port != "" && !utils.ValidatePort(req.TargetPort) {
+		return errors.New("远程端口格式错误")
 	}
 
 	return db.Transaction(func(tx *query.Query) error {
@@ -137,18 +141,19 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			}
 		}
 
-		port, err := GetPort(tx, *node)
-		if err != nil {
-			return err
-		}
-
-		if err = tx.GostNodePort.Create(&model.GostNodePort{
-			Port:     port,
-			NodeCode: node.Code,
-		}); err != nil {
-			node_port.ReleasePort(node.Code, port)
-			log.Error("端口转发，端口冲突", zap.Error(err))
-			return errors.New("操作失败")
+		var port = req.Port
+		if port == "" {
+			port, err = GetPort(tx, *node)
+			if err != nil {
+				return err
+			}
+		} else {
+			if !node_port.ValidPort(node.Code, req.Port, true) {
+				return errors.New("端口未开放或已被占用")
+			}
+			if !validPortAvailable(tx, node.Code, req.Port) {
+				return errors.New("端口已被占用")
+			}
 		}
 
 		var forward = model.GostClientForward{
