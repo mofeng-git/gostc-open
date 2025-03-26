@@ -14,7 +14,7 @@ var ServiceCmd = cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		global.Init()
 		if len(args) == 0 {
-			fmt.Println(`./server service install/uninstall/start/stop/restart <"--log-level debug -d">`)
+			fmt.Println(`./server service install/uninstall/start/stop/restart ["--log-level debug -d"]`)
 			os.Exit(1)
 		}
 
