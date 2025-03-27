@@ -228,6 +228,14 @@ watch(() => ({type: state.value.obs.dataRange}), () => {
 onBeforeMount(() => {
   pageFunc()
 })
+
+const generateCmdString = () => {
+  let tls = ' --tls=false'
+  if (window.location.protocol.indexOf('https') > 0) {
+    tls = ''
+  }
+  return './gostc' + tls + ' -addr ' + window.location.host + ' -key xxxxxx'
+}
 </script>
 
 <template>
@@ -235,7 +243,7 @@ onBeforeMount(() => {
     <AppCard :show-border="false">
       <n-alert type="info">
         客户端运行命令：
-        <div>./gostc -key xxxxxx</div>
+        <div>{{ generateCmdString() }}</div>
         <div>将xxxxxx修改为你的客户端密钥</div>
 
         <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>

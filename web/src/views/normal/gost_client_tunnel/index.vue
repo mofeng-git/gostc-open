@@ -208,6 +208,13 @@ onBeforeMount(() => {
   pageFunc()
 })
 
+const generateCmdString = () => {
+  let tls = ' --tls=false'
+  if (window.location.protocol.indexOf('https') > 0) {
+    tls = ''
+  }
+  return './gostc' + tls + ' -addr ' + window.location.host + ' -v -vts aaaaaa:8080,bbbbbb:8081'
+}
 </script>
 
 <template>
@@ -215,7 +222,7 @@ onBeforeMount(() => {
     <AppCard :show-border="false">
       <n-alert type="info">
         访客端运行命令：
-        <div>./gostc -v -vts aaaaaa:8080,bbbbbb:8081</div>
+        <div>{{ generateCmdString() }}</div>
         <div>含义：当前有两条私有隧道，他们的访问密钥分别为aaaaaa、bbbbbb，访客端运行后，会把aaaaaa密钥的隧道配置的内网服务在访客端设备开启监听8080端口，访问8080端口就相当于访问隧道指向的内网服务，bbbbbb密钥的隧道同理</div>
         <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>

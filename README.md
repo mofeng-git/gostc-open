@@ -1,10 +1,14 @@
 # 介绍
 
-基于GOST开发的内网穿透管理平台，支持多用户、多节点，支持速率、连接数限制，中心化配置，通过网页修改配置，实时生效
+基于GOST开发的内网穿透管理平台，支持多用户、多节点，支持速率、连接数限制，中心化配置，通过网页修改配置，实时生效。
+
+(为了弥补GOST不支持的P2P，采用了FRP的STCP和XTCP方案)
 
 **(此版本为开源版，去除了用户绑定QQ，客户端归属地区功能)**
 
 [GOST开源地址](https://github.com/go-gost/gost)
+
+[FRP开源地址](https://github.com/fatedier/frp)
 
 如果想快速体验，可直接使用我提供的服务
 
@@ -83,8 +87,6 @@ gostc install --tls=false -addr 127.0.0.1:8080 -s -key ****** # 重新注册
 
 **注意：由于服务名称重复，无法同时运行多个客户端/节点，如需启动多个客户端和节点，请将程序通过pm2、supervisor类似的进程管理工具启动**
 
-
-
 ## 目录结构
 ```text
 -- /
@@ -132,10 +134,10 @@ goreleaser release --snapshot --clean
 ## 客户端和节点如何指定服务端地址
 ```shell
 # 节点
-./gostc -tls=false -addr 127.0.0.1:8080 -s -key ******
+./gostc --tls=false -addr 127.0.0.1:8080 -s -key ******
 
 # 客户端
-./gostc -tls=false -addr 127.0.0.1:8080 -key ******
+./gostc --tls=false -addr 127.0.0.1:8080 -key ******
 ```
 
 如果后台管理服务不启用SSL，需要设置-tls=false
