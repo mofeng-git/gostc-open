@@ -160,7 +160,7 @@ onBeforeMount(() => {
 
 const generateCmdString = () => {
   let tls = ' --tls=false'
-  if (window.location.protocol.indexOf('https') > 0) {
+  if (window.location.protocol.indexOf('https') > -1) {
     tls = ''
   }
   return './gostc' + tls + ' -addr ' + window.location.host + ' -p2p -vts aaaaaa:8080,bbbbbb:8081'

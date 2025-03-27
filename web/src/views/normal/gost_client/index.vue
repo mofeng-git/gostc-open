@@ -231,7 +231,7 @@ onBeforeMount(() => {
 
 const generateCmdString = () => {
   let tls = ' --tls=false'
-  if (window.location.protocol.indexOf('https') > 0) {
+  if (window.location.protocol.indexOf('https') > -1) {
     tls = ''
   }
   return './gostc' + tls + ' -addr ' + window.location.host + ' -key xxxxxx'
