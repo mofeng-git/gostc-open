@@ -24,6 +24,7 @@ type CreateReq struct {
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
 	DenyDomainPrefix      string   `json:"denyDomainPrefix"`
+	UrlTpl                string   `json:"urlTpl"`
 	TunnelConnPort        string   `json:"tunnelConnPort"`
 	TunnelInPort          string   `json:"tunnelInPort"`
 	TunnelMetadata        string   `json:"tunnelMetadata"`
@@ -56,6 +57,7 @@ func (service *service) Create(req CreateReq) error {
 		Domain:                req.Domain,
 		DenyDomainPrefix:      req.DenyDomainPrefix,
 		Address:               req.Address,
+		UrlTpl:                req.UrlTpl,
 		TunnelConnPort:        req.TunnelConnPort,
 		TunnelInPort:          req.TunnelInPort,
 		TunnelMetadata:        req.TunnelMetadata,

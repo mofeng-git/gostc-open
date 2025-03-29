@@ -22,6 +22,7 @@ type GostNode struct {
 	P2P                   int              `gorm:"column:p2p;size:1;default:2;comment:P2P隧道功能"`
 	Domain                string           `gorm:"column:domain;comment:基础域名"`
 	DenyDomainPrefix      string           `gorm:"column:deny_domain_prefix;comment:不允许的域名前缀"`
+	UrlTpl                string           `gorm:"column:url_tpl;comment:URL模板"`
 	Address               string           `gorm:"column:address;comment:服务地址"`
 	Protocol              string           `gorm:"column:protocol;comment:协议"`
 	TunnelConnPort        string           `gorm:"column:tunnel_conn_port;comment:隧道连接端口"`
@@ -36,6 +37,13 @@ type GostNode struct {
 	Rules                 string           `gorm:"column:rules;comment:规则限制"`
 	Tags                  string           `gorm:"column:tags;comment:标签"`
 	Configs               []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
+}
+
+func (n GostNode) GetDomainFull(domainPrefix string) string {
+	if n.UrlTpl != "" {
+		return strings.ReplaceAll(n.UrlTpl, "{{DOMAIN}}", domainPrefix+"."+n.Domain)
+	}
+	return domainPrefix + "." + n.Domain
 }
 
 func (n GostNode) GetRules() (result []string) {

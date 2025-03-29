@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/lxzan/gws"
+	cache2 "github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
 	"server/global"
 	"server/model"
@@ -141,7 +142,20 @@ func (event *NodeEvent) OnMessage(socket *gws.Conn, message *gws.Message) {
 			Content:   logMsg,
 			CreatedAt: time.Now().Unix(),
 		})
+	case "port_check":
+		var data NodePortCheckResult
+		_ = msg.GetContent(&data)
+		if data.Code == "" {
+			return
+		}
+		cache.SetNodePortUse(data.Code, data.Port, data.Use, cache2.NoExpiration)
 	}
+}
+
+type NodePortCheckResult struct {
+	Code string `json:"code"` // 节点编号
+	Use  bool   `json:"use"`  // 1=被占用
+	Port string `json:"port"` // 端口
 }
 
 func (event *NodeEvent) WriteAny(socket *gws.Conn, data any) {

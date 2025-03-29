@@ -24,6 +24,7 @@ type UpdateReq struct {
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
 	DenyDomainPrefix      string   `json:"denyDomainPrefix"`
+	UrlTpl                string   `json:"urlTpl"`
 	TunnelConnPort        string   `json:"tunnelConnPort"`
 	TunnelInPort          string   `json:"tunnelInPort"`
 	TunnelMetadata        string   `json:"tunnelMetadata"`
@@ -61,6 +62,7 @@ func (service *service) Update(req UpdateReq) error {
 	node.P2P = req.P2P
 	node.Domain = req.Domain
 	node.DenyDomainPrefix = req.DenyDomainPrefix
+	node.UrlTpl = req.UrlTpl
 	node.Address = req.Address
 	node.Protocol = req.Protocol
 	node.TunnelConnPort = req.TunnelConnPort

@@ -249,7 +249,7 @@ onBeforeMount(() => {
                   row.client.name
                 }}</span><br>
               <span>内网目标：{{ row.targetIp + ':' + row.targetPort }}</span><br>
-              <span>访问地址：{{ row.domainPrefix + '.' + row.node.domain }}</span><br>
+              <span>访问地址：{{ row.domainFull }}</span><br>
               <span>速率：{{ limiterText(row.config.limiter) }}</span><br>
               <span>并发数：{{ rLimiterText(row.config.rLimiter) }}</span><br>
               <span>连接数：{{ cLimiterText(row.config.cLimiter) }}</span><br>

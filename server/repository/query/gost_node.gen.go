@@ -44,6 +44,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.P2P = field.NewInt(tableName, "p2p")
 	_gostNode.Domain = field.NewString(tableName, "domain")
 	_gostNode.DenyDomainPrefix = field.NewString(tableName, "deny_domain_prefix")
+	_gostNode.UrlTpl = field.NewString(tableName, "url_tpl")
 	_gostNode.Address = field.NewString(tableName, "address")
 	_gostNode.Protocol = field.NewString(tableName, "protocol")
 	_gostNode.TunnelConnPort = field.NewString(tableName, "tunnel_conn_port")
@@ -102,6 +103,7 @@ type gostNode struct {
 	P2P                   field.Int
 	Domain                field.String
 	DenyDomainPrefix      field.String
+	UrlTpl                field.String
 	Address               field.String
 	Protocol              field.String
 	TunnelConnPort        field.String
@@ -149,6 +151,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.P2P = field.NewInt(table, "p2p")
 	g.Domain = field.NewString(table, "domain")
 	g.DenyDomainPrefix = field.NewString(table, "deny_domain_prefix")
+	g.UrlTpl = field.NewString(table, "url_tpl")
 	g.Address = field.NewString(table, "address")
 	g.Protocol = field.NewString(table, "protocol")
 	g.TunnelConnPort = field.NewString(table, "tunnel_conn_port")
@@ -178,7 +181,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 31)
+	g.fieldMap = make(map[string]field.Expr, 32)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -196,6 +199,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["p2p"] = g.P2P
 	g.fieldMap["domain"] = g.Domain
 	g.fieldMap["deny_domain_prefix"] = g.DenyDomainPrefix
+	g.fieldMap["url_tpl"] = g.UrlTpl
 	g.fieldMap["address"] = g.Address
 	g.fieldMap["protocol"] = g.Protocol
 	g.fieldMap["tunnel_conn_port"] = g.TunnelConnPort

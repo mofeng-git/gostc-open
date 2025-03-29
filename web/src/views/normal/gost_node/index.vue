@@ -49,6 +49,7 @@ const state = ref({
       denyDomainPrefix: '',
       address: '',
       protocol: protocols[0].value,
+      urlTpl: '',
       tunnelConnPort: '',
       tunnelInPort: '',
       tunnelMetadata: '',
@@ -83,6 +84,7 @@ const state = ref({
       denyDomainPrefix: '',
       address: '',
       protocol: protocols[0].value,
+      urlTpl: '',
       tunnelConnPort: '',
       tunnelInPort: '',
       tunnelMetadata: '',
@@ -144,6 +146,7 @@ const openCreate = () => {
     denyDomainPrefix: '',
     address: '',
     protocol: protocols[0].value,
+    urlTpl: '',
     tunnelConnPort: '',
     tunnelInPort: '',
     tunnelMetadata: '',
@@ -501,6 +504,9 @@ onBeforeMount(() => {
             <n-form-item path="domain" label="基础域名">
               <n-input v-model:value.trim="state.create.data.domain" placeholder="example.com"></n-input>
             </n-form-item>
+            <n-form-item path="urlTpl" label="域名模板(展示域名解析访问地址)">
+              <n-input v-model:value.trim="state.create.data.urlTpl" placeholder="https://{{DOMAIN}}:443"></n-input>
+            </n-form-item>
             <n-form-item path="denyDomainPrefix" label="不允许的域名前缀">
               <n-input
                   type="textarea"
@@ -669,6 +675,9 @@ onBeforeMount(() => {
             </n-form-item>
             <n-form-item path="domain" label="基础域名">
               <n-input v-model:value.trim="state.update.data.domain" placeholder="example.com"></n-input>
+            </n-form-item>
+            <n-form-item path="urlTpl" label="域名模板(展示域名解析访问地址)">
+              <n-input v-model:value.trim="state.update.data.urlTpl" placeholder="https://{{DOMAIN}}:443"></n-input>
             </n-form-item>
             <n-form-item path="denyDomainPrefix" label="不允许的域名前缀">
               <n-input

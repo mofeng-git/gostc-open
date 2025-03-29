@@ -1,7 +1,6 @@
 package common
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,7 +21,6 @@ import (
 	v1 "gostc-sub/p2p/pkg/config/v1"
 	registry2 "gostc-sub/p2p/registry"
 	"gostc-sub/pkg/utils"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -358,23 +356,20 @@ func (e *Event) OnMessage(socket *gws.Conn, message *gws.Message) {
 	case "port_check":
 		var data = make(map[string]string)
 		_ = msg.GetContent(&data)
-		url := data["callback"]
 		port, _ := strconv.Atoi(data["port"])
+		var result = PortCheckResp{
+			Code: data["code"],
+			Use:  true,
+			Port: data["port"],
+		}
 		if port != 0 {
-			marshal, _ := json.Marshal(PortCheckResp{
+			result = PortCheckResp{
 				Code: data["code"],
 				Use:  utils.IsUse(port),
 				Port: data["port"],
-			})
-			req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(marshal))
-			response, err := http.DefaultClient.Do(req)
-			if err == nil {
-				_ = response.Body.Close()
 			}
 		}
-		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, map[string]any{
-			"result": "success",
-		}))
+		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, result))
 	default:
 		e.WriteAny(socket, NewMessage(msg.OperationId, msg.OperationType, nil))
 	}

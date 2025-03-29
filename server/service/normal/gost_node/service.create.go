@@ -26,6 +26,7 @@ type CreateReq struct {
 	Protocol              string   `binding:"required" json:"protocol"`
 	Domain                string   `json:"domain"`
 	DenyDomainPrefix      string   `json:"denyDomainPrefix"`
+	UrlTpl                string   `json:"urlTpl"`
 	TunnelConnPort        string   `json:"tunnelConnPort"`
 	TunnelInPort          string   `json:"tunnelInPort"`
 	TunnelMetadata        string   `json:"tunnelMetadata"`
@@ -58,6 +59,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			P2P:                   req.P2P,
 			Domain:                req.Domain,
 			DenyDomainPrefix:      req.DenyDomainPrefix,
+			UrlTpl:                req.UrlTpl,
 			Address:               req.Address,
 			TunnelConnPort:        req.TunnelConnPort,
 			TunnelInPort:          req.TunnelInPort,

@@ -30,6 +30,7 @@ type Item struct {
 
 	Domain           string `json:"domain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
+	UrlTpl           string `json:"urlTpl"`
 	Address          string `json:"address"`
 	Protocol         string `json:"protocol"`
 	TunnelConnPort   string `json:"tunnelConnPort"`
@@ -99,6 +100,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			P2P:                   node.P2P,
 			Domain:                node.Domain,
 			DenyDomainPrefix:      node.DenyDomainPrefix,
+			UrlTpl:                node.UrlTpl,
 			Address:               node.Address,
 			Protocol:              node.Protocol,
 			TunnelConnPort:        node.TunnelConnPort,
