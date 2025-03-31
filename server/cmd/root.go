@@ -28,12 +28,14 @@ func init() {
 	RootCmd.AddCommand(&ServiceCmd)
 	RootCmd.AddCommand(&ResetPasswdCmd)
 	RootCmd.AddCommand(&CloseTotp)
+	RootCmd.AddCommand(&MigrateCmd)
 	for _, cmd := range []*cobra.Command{
 		&RootCmd,
 		&VersionCmd,
 		&ServiceCmd,
 		&ResetPasswdCmd,
 		&CloseTotp,
+		&MigrateCmd,
 	} {
 		cmd.Flags().StringVarP(&global.BASE_PATH, "path", "p", "", "app run dir")
 		cmd.Flags().StringVarP(&global.LOGGER_LEVEL, "log-level", "", "warn", "log level debug|info|warn|error|fatal")
