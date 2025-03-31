@@ -16,6 +16,7 @@ var CloseTotp = cobra.Command{
 		bootstrap.InitConfig()
 		bootstrap.InitJwt()
 		bootstrap.InitPersistence()
+		defer bootstrap.Release()
 
 		if len(args) == 0 {
 			fmt.Println(`./server close-totp <account>`)
@@ -39,6 +40,5 @@ var CloseTotp = cobra.Command{
 		}
 		fmt.Println("account:", args[0])
 		fmt.Println("close totp success")
-		defer bootstrap.Release()
 	},
 }
