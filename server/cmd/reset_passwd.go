@@ -17,6 +17,7 @@ var ResetPasswdCmd = cobra.Command{
 		bootstrap.InitConfig()
 		bootstrap.InitJwt()
 		bootstrap.InitPersistence()
+		defer bootstrap.Release()
 
 		if len(args) == 0 {
 			fmt.Println(`./server reset-pwd <account>`)
@@ -38,6 +39,5 @@ var ResetPasswdCmd = cobra.Command{
 		fmt.Println("account:", args[0])
 		fmt.Println("new password:", newPwd)
 		fmt.Println("reset password success")
-		defer bootstrap.Release()
 	},
 }
