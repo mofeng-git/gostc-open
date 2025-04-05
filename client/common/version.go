@@ -1,7 +1,7 @@
 package common
 
 var (
-	CLIENT_VERSION = "v1.2.0" // 客户端版本
-	SERVER_VERSION = "v1.2.0" // 服务端版本
-	HUSK_VERSION   = "v1.2.0" // 壳版本
+	CLIENT_VERSION = "v1.2.1" // 客户端版本
+	SERVER_VERSION = "v1.2.1" // 服务端版本
+	HUSK_VERSION   = "v1.2.1" // 壳版本
 )

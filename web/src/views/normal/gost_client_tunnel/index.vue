@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {onBeforeMount, ref, watch, h} from "vue";
 import {
   apiNormalGostClientTunnelDelete,
   apiNormalGostClientTunnelEnable,
@@ -145,9 +145,9 @@ const deleteFunc = async (row) => {
 }
 
 
-const openLookFunc = (key) => {
+const openLookFunc = (row) => {
   state.value.look.open = true
-  state.value.look.key = key
+  state.value.look.key = row.vKey
 }
 
 const copyFunc = () => {
@@ -215,6 +215,41 @@ const generateCmdString = () => {
   }
   return './gostc' + tls + ' -addr ' + window.location.host + ' -v -vts aaaaaa:8080,bbbbbb:8081'
 }
+
+
+const operatorOptions = [
+  {
+    label: '流量',
+    key: 'obs',
+    disabled: false,
+    func:openObsModal,
+  },
+  {
+    label: '访问密钥',
+    key: 'look',
+    disabled: false,
+    func:openLookFunc,
+  },
+]
+const operatorSelect = (key,row)=>{
+  for (let i=0;i<operatorOptions.length;i++){
+    if (operatorOptions[i].key===key){
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option)=>{
+  return h(NButton,{
+    text:true,
+    size:"tiny",
+    focusable:false,
+    type:"info",
+  },{
+    default:()=> option.label,
+  })
+}
 </script>
 
 <template>
@@ -223,7 +258,9 @@ const generateCmdString = () => {
       <n-alert type="info">
         访客端运行命令：
         <div>{{ generateCmdString() }}</div>
-        <div>含义：当前有两条私有隧道，他们的访问密钥分别为aaaaaa、bbbbbb，访客端运行后，会把aaaaaa密钥的隧道配置的内网服务在访客端设备开启监听8080端口，访问8080端口就相当于访问隧道指向的内网服务，bbbbbb密钥的隧道同理</div>
+        <div>
+          含义：当前有两条私有隧道，他们的访问密钥分别为aaaaaa、bbbbbb，访客端运行后，会把aaaaaa密钥的隧道配置的内网服务在访客端设备开启监听8080端口，访问8080端口就相当于访问隧道指向的内网服务，bbbbbb密钥的隧道同理
+        </div>
         <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
@@ -315,6 +352,10 @@ const generateCmdString = () => {
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-popconfirm
                   v-if="row.config.chargingType===2"
                   @positive-click="renewFunc(row)"
@@ -331,12 +372,6 @@ const generateCmdString = () => {
                 </template>
                 确认续费吗？
               </n-popconfirm>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
-                流量
-              </n-button>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openLookFunc(row.vKey)">
-                访问密钥
-              </n-button>
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                 编辑
               </n-button>

@@ -2,7 +2,8 @@
 /server/data
 /server/dist
 /client/dist
-/data
+/proxy/dist
+/proxy/data
 /web/dist
 /web/node_modules
 *.aar

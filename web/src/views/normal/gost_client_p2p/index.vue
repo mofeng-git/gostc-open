@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, ref, h} from "vue";
 import {
   apiNormalGostClientP2PDelete,
   apiNormalGostClientP2PEnable,
@@ -132,9 +132,9 @@ const deleteFunc = async (row) => {
 }
 
 
-const openLookFunc = (key) => {
+const openLookFunc = (row) => {
   state.value.look.open = true
-  state.value.look.key = key
+  state.value.look.key = row.vKey
 }
 
 const copyFunc = () => {
@@ -164,6 +164,34 @@ const generateCmdString = () => {
     tls = ''
   }
   return './gostc' + tls + ' -addr ' + window.location.host + ' -p2p -vts aaaaaa:8080,bbbbbb:8081'
+}
+
+const operatorOptions = [
+  {
+    label: '访问密钥',
+    key: 'look',
+    disabled: false,
+    func:openLookFunc,
+  },
+]
+const operatorSelect = (key,row)=>{
+  for (let i=0;i<operatorOptions.length;i++){
+    if (operatorOptions[i].key===key){
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option)=>{
+  return h(NButton,{
+    text:true,
+    size:"tiny",
+    focusable:false,
+    type:"info",
+  },{
+    default:()=> option.label,
+  })
 }
 </script>
 
@@ -213,12 +241,12 @@ const generateCmdString = () => {
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
-<!--          <n-button-->
-<!--              :focusable="false"-->
-<!--              type="warning"-->
-<!--              @click="goToUrl('https://docs.sian.one/gostc/tunnel')">-->
-<!--            使用教程-->
-<!--          </n-button>-->
+          <n-button
+              :focusable="false"
+              type="warning"
+              @click="goToUrl('https://docs.sian.one/gostc/p2p')">
+            使用教程
+          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>
@@ -269,6 +297,10 @@ const generateCmdString = () => {
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-popconfirm
                   v-if="row.config.chargingType===2"
                   @positive-click="renewFunc(row)"
@@ -285,9 +317,7 @@ const generateCmdString = () => {
                 </template>
                 确认续费吗？
               </n-popconfirm>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openLookFunc(row.vKey)">
-                访问密钥
-              </n-button>
+
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                 编辑
               </n-button>

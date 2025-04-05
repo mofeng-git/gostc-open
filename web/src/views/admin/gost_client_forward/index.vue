@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {onBeforeMount, ref, watch, h} from "vue";
 import {
   apiAdminGostClientForwardConfig,
   apiAdminGostClientForwardDelete,
@@ -186,6 +186,45 @@ onBeforeMount(() => {
   pageFunc()
 })
 
+
+onBeforeMount(() => {
+  pageFunc()
+})
+
+const operatorOptions = [
+  {
+    label: '流量',
+    key: 'obs',
+    disabled: false,
+    func:openObsModal,
+  },
+  {
+    label: '规则匹配',
+    key: 'matcher',
+    disabled: false,
+    func:openMatcher,
+  },
+]
+const operatorSelect = (key,row)=>{
+  for (let i=0;i<operatorOptions.length;i++){
+    if (operatorOptions[i].key===key){
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option)=>{
+  return h(NButton,{
+    text:true,
+    size:"tiny",
+    focusable:false,
+    type:"info",
+  },{
+    default:()=> option.label,
+  })
+}
+
 </script>
 
 <template>
@@ -281,21 +320,14 @@ onBeforeMount(() => {
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
-                流量
-              </n-button>
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openConfig(row)">
                 套餐
               </n-button>
-              <n-button
-                  size="tiny"
-                  v-if="row?.matcherEnable===1"
-                  :focusable="false"
-                  quaternary
-                  type="success"
-                  @click="openMatcher(row)">
-                规则匹配
-              </n-button>
+
               <n-popconfirm
                   @positive-click="deleteFunc(row)"
                   :positive-button-props="{loading:row.deleteLoading}"

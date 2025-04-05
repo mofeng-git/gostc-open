@@ -25,11 +25,12 @@ type ListItem struct {
 	P2P          int    `json:"p2p"`
 	ForwardPorts string `json:"forwardPorts"`
 
-	Rules     []string         `json:"rules"`
-	RuleNames []string         `json:"ruleNames"`
-	Tags      []string         `json:"tags"`
-	Configs   []ListItemConfig `json:"configs"`
-	Online    int              `json:"online"`
+	Rules        []string         `json:"rules"`
+	RuleNames    []string         `json:"ruleNames"`
+	Tags         []string         `json:"tags"`
+	Configs      []ListItemConfig `json:"configs"`
+	Online       int              `json:"online"`
+	CustomDomain int              `json:"customDomain"`
 }
 
 type ListItemConfig struct {
@@ -100,6 +101,7 @@ func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 			Tags:         node.GetTags(),
 			Configs:      configs,
 			Online:       utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
+			CustomDomain: utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
 		})
 	}
 	return list

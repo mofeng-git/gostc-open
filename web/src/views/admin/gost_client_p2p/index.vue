@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {onBeforeMount, ref, watch, h} from "vue";
 import {
   apiAdminGostClientP2PConfig,
   apiAdminGostClientP2PDelete,
@@ -17,10 +17,6 @@ import {configExpText} from "../gost_client_host/index.js";
 import {copyToClipboard} from "../../../utils/copy.js";
 import {NButton, NSpace} from "naive-ui";
 import moment from "moment/moment.js";
-import {flowFormat} from "../../../utils/flow.js";
-import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
-import Obs from "../../../components/Obs.vue";
-import {localStore} from "../../../store/local.js";
 
 const state = ref({
   table: {
@@ -123,9 +119,9 @@ const deleteFunc = async (row) => {
 }
 
 
-const openLookFunc = (key) => {
+const openLookFunc = (row) => {
   state.value.look.open = true
-  state.value.look.key = key
+  state.value.look.key = row.vKey
 }
 
 const copyFunc = () => {
@@ -149,6 +145,33 @@ onBeforeMount(() => {
   pageFunc()
 })
 
+const operatorOptions = [
+  {
+    label: '访问密钥',
+    key: 'look',
+    disabled: false,
+    func:openLookFunc,
+  },
+]
+const operatorSelect = (key,row)=>{
+  for (let i=0;i<operatorOptions.length;i++){
+    if (operatorOptions[i].key===key){
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option)=>{
+  return h(NButton,{
+    text:true,
+    size:"tiny",
+    focusable:false,
+    type:"info",
+  },{
+    default:()=> option.label,
+  })
+}
 </script>
 
 <template>
@@ -242,9 +265,10 @@ onBeforeMount(() => {
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openLookFunc(row.vKey)">
-                访问密钥
-              </n-button>
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openConfig(row)">
                 套餐
               </n-button>

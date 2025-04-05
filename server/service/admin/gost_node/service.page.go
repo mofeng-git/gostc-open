@@ -29,6 +29,7 @@ type Item struct {
 	P2P     int `json:"p2p"`
 
 	Domain           string `json:"domain"`
+	CustomDomain     int    `json:"customDomain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
 	UrlTpl           string `json:"urlTpl"`
 	Address          string `json:"address"`
@@ -99,6 +100,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Proxy:                 node.Proxy,
 			P2P:                   node.P2P,
 			Domain:                node.Domain,
+			CustomDomain:          utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
 			DenyDomainPrefix:      node.DenyDomainPrefix,
 			UrlTpl:                node.UrlTpl,
 			Address:               node.Address,

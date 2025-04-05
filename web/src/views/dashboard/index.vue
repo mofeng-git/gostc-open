@@ -50,6 +50,7 @@ const state = ref({
   closeOtp: {
     loading: false,
   },
+  checkinLoading: false,
   obsDataRange: 1,
   obsLoading: false,
   obsData: []

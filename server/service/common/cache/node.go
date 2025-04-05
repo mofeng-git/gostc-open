@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	node_online_key   = "node:online:"
-	node_version_key  = "node:version:"
-	node_port_use_key = "node:port:"
+	node_online_key        = "node:online:"
+	node_version_key       = "node:version:"
+	node_port_use_key      = "node:port:"
+	node_custom_domain_key = "node:custom:domain:"
 )
 
 func SetNodeOnline(code string, online bool, duration time.Duration) {
@@ -24,6 +25,19 @@ func SetNodeOnline(code string, online bool, duration time.Duration) {
 
 func GetNodeOnline(code string) bool {
 	return global.Cache.GetString(node_online_key+code) == "1"
+}
+
+func SetNodeCustomDomain(code string, enable bool) {
+	global.Cache.SetString(node_custom_domain_key+code, func(enable bool) string {
+		if enable {
+			return "1"
+		}
+		return "2"
+	}(enable), cache.NoExpiration)
+}
+
+func GetNodeCustomDomain(code string) bool {
+	return global.Cache.GetString(node_custom_domain_key+code) == "1"
 }
 
 func SetNodeVersion(code string, version string) {

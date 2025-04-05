@@ -156,6 +156,15 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 			}
 		}
 
+		if err = tx.GostNodePort.Create(&model.GostNodePort{
+			Port:     port,
+			NodeCode: node.Code,
+		}); err != nil {
+			node_port.ReleasePort(node.Code, port)
+			log.Error("端口转发，端口冲突", zap.Error(err))
+			return errors.New("操作失败")
+		}
+
 		var forward = model.GostClientForward{
 			Name:          req.Name,
 			TargetIp:      req.TargetIp,

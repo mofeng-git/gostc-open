@@ -24,6 +24,15 @@ export const apiNormalGostClientHostCreate = (data) => {
         data
     })
 }
+
+export const apiNormalGostClientHostDomain = (data) => {
+    return request.request({
+        url: `${baseUrl}/domain`,
+        method: 'POST',
+        data
+    })
+}
+
 export const apiNormalGostClientHostRenew = (data) => {
     return request.request({
         url: `${baseUrl}/renew`,

@@ -12,6 +12,9 @@ type GostClientHost struct {
 	TargetIp     string     `gorm:"column:target_ip;index;comment:内网IP"`
 	TargetPort   string     `gorm:"column:target_port;index;comment:内网端口"`
 	DomainPrefix string     `gorm:"column:domain_prefix;index;comment:域名前缀"`
+	CustomDomain string     `gorm:"column:custom_domain;index;comment:自定义域名"`
+	CustomCert   string     `gorm:"column:custom_cert;comment:自定义证书"`
+	CustomKey    string     `gorm:"column:custom_key;comment:自定义证书"`
 	NodeCode     string     `gorm:"column:node_code;index;comment:节点编号"`
 	Node         GostNode   `gorm:"foreignKey:NodeCode;references:Code"`
 	ClientCode   string     `gorm:"column:client_code;index;comment:客户端编号"`

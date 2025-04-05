@@ -16,28 +16,29 @@ import (
 )
 
 var (
-	Q                   = new(Query)
-	GostAuth            *gostAuth
-	GostClient          *gostClient
-	GostClientAdmission *gostClientAdmission
-	GostClientConfig    *gostClientConfig
-	GostClientForward   *gostClientForward
-	GostClientHost      *gostClientHost
-	GostClientLogger    *gostClientLogger
-	GostClientP2P       *gostClientP2P
-	GostClientProxy     *gostClientProxy
-	GostClientTunnel    *gostClientTunnel
-	GostNode            *gostNode
-	GostNodeBind        *gostNodeBind
-	GostNodeConfig      *gostNodeConfig
-	GostNodeDomain      *gostNodeDomain
-	GostNodeLogger      *gostNodeLogger
-	GostNodePort        *gostNodePort
-	GostObs             *gostObs
-	SystemConfig        *systemConfig
-	SystemNotice        *systemNotice
-	SystemUser          *systemUser
-	SystemUserCheckin   *systemUserCheckin
+	Q                    = new(Query)
+	GostAuth             *gostAuth
+	GostClient           *gostClient
+	GostClientAdmission  *gostClientAdmission
+	GostClientConfig     *gostClientConfig
+	GostClientForward    *gostClientForward
+	GostClientHost       *gostClientHost
+	GostClientHostDomain *gostClientHostDomain
+	GostClientLogger     *gostClientLogger
+	GostClientP2P        *gostClientP2P
+	GostClientProxy      *gostClientProxy
+	GostClientTunnel     *gostClientTunnel
+	GostNode             *gostNode
+	GostNodeBind         *gostNodeBind
+	GostNodeConfig       *gostNodeConfig
+	GostNodeDomain       *gostNodeDomain
+	GostNodeLogger       *gostNodeLogger
+	GostNodePort         *gostNodePort
+	GostObs              *gostObs
+	SystemConfig         *systemConfig
+	SystemNotice         *systemNotice
+	SystemUser           *systemUser
+	SystemUserCheckin    *systemUserCheckin
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -48,6 +49,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	GostClientConfig = &Q.GostClientConfig
 	GostClientForward = &Q.GostClientForward
 	GostClientHost = &Q.GostClientHost
+	GostClientHostDomain = &Q.GostClientHostDomain
 	GostClientLogger = &Q.GostClientLogger
 	GostClientP2P = &Q.GostClientP2P
 	GostClientProxy = &Q.GostClientProxy
@@ -67,83 +69,86 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:                  db,
-		GostAuth:            newGostAuth(db, opts...),
-		GostClient:          newGostClient(db, opts...),
-		GostClientAdmission: newGostClientAdmission(db, opts...),
-		GostClientConfig:    newGostClientConfig(db, opts...),
-		GostClientForward:   newGostClientForward(db, opts...),
-		GostClientHost:      newGostClientHost(db, opts...),
-		GostClientLogger:    newGostClientLogger(db, opts...),
-		GostClientP2P:       newGostClientP2P(db, opts...),
-		GostClientProxy:     newGostClientProxy(db, opts...),
-		GostClientTunnel:    newGostClientTunnel(db, opts...),
-		GostNode:            newGostNode(db, opts...),
-		GostNodeBind:        newGostNodeBind(db, opts...),
-		GostNodeConfig:      newGostNodeConfig(db, opts...),
-		GostNodeDomain:      newGostNodeDomain(db, opts...),
-		GostNodeLogger:      newGostNodeLogger(db, opts...),
-		GostNodePort:        newGostNodePort(db, opts...),
-		GostObs:             newGostObs(db, opts...),
-		SystemConfig:        newSystemConfig(db, opts...),
-		SystemNotice:        newSystemNotice(db, opts...),
-		SystemUser:          newSystemUser(db, opts...),
-		SystemUserCheckin:   newSystemUserCheckin(db, opts...),
+		db:                   db,
+		GostAuth:             newGostAuth(db, opts...),
+		GostClient:           newGostClient(db, opts...),
+		GostClientAdmission:  newGostClientAdmission(db, opts...),
+		GostClientConfig:     newGostClientConfig(db, opts...),
+		GostClientForward:    newGostClientForward(db, opts...),
+		GostClientHost:       newGostClientHost(db, opts...),
+		GostClientHostDomain: newGostClientHostDomain(db, opts...),
+		GostClientLogger:     newGostClientLogger(db, opts...),
+		GostClientP2P:        newGostClientP2P(db, opts...),
+		GostClientProxy:      newGostClientProxy(db, opts...),
+		GostClientTunnel:     newGostClientTunnel(db, opts...),
+		GostNode:             newGostNode(db, opts...),
+		GostNodeBind:         newGostNodeBind(db, opts...),
+		GostNodeConfig:       newGostNodeConfig(db, opts...),
+		GostNodeDomain:       newGostNodeDomain(db, opts...),
+		GostNodeLogger:       newGostNodeLogger(db, opts...),
+		GostNodePort:         newGostNodePort(db, opts...),
+		GostObs:              newGostObs(db, opts...),
+		SystemConfig:         newSystemConfig(db, opts...),
+		SystemNotice:         newSystemNotice(db, opts...),
+		SystemUser:           newSystemUser(db, opts...),
+		SystemUserCheckin:    newSystemUserCheckin(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	GostAuth            gostAuth
-	GostClient          gostClient
-	GostClientAdmission gostClientAdmission
-	GostClientConfig    gostClientConfig
-	GostClientForward   gostClientForward
-	GostClientHost      gostClientHost
-	GostClientLogger    gostClientLogger
-	GostClientP2P       gostClientP2P
-	GostClientProxy     gostClientProxy
-	GostClientTunnel    gostClientTunnel
-	GostNode            gostNode
-	GostNodeBind        gostNodeBind
-	GostNodeConfig      gostNodeConfig
-	GostNodeDomain      gostNodeDomain
-	GostNodeLogger      gostNodeLogger
-	GostNodePort        gostNodePort
-	GostObs             gostObs
-	SystemConfig        systemConfig
-	SystemNotice        systemNotice
-	SystemUser          systemUser
-	SystemUserCheckin   systemUserCheckin
+	GostAuth             gostAuth
+	GostClient           gostClient
+	GostClientAdmission  gostClientAdmission
+	GostClientConfig     gostClientConfig
+	GostClientForward    gostClientForward
+	GostClientHost       gostClientHost
+	GostClientHostDomain gostClientHostDomain
+	GostClientLogger     gostClientLogger
+	GostClientP2P        gostClientP2P
+	GostClientProxy      gostClientProxy
+	GostClientTunnel     gostClientTunnel
+	GostNode             gostNode
+	GostNodeBind         gostNodeBind
+	GostNodeConfig       gostNodeConfig
+	GostNodeDomain       gostNodeDomain
+	GostNodeLogger       gostNodeLogger
+	GostNodePort         gostNodePort
+	GostObs              gostObs
+	SystemConfig         systemConfig
+	SystemNotice         systemNotice
+	SystemUser           systemUser
+	SystemUserCheckin    systemUserCheckin
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                  db,
-		GostAuth:            q.GostAuth.clone(db),
-		GostClient:          q.GostClient.clone(db),
-		GostClientAdmission: q.GostClientAdmission.clone(db),
-		GostClientConfig:    q.GostClientConfig.clone(db),
-		GostClientForward:   q.GostClientForward.clone(db),
-		GostClientHost:      q.GostClientHost.clone(db),
-		GostClientLogger:    q.GostClientLogger.clone(db),
-		GostClientP2P:       q.GostClientP2P.clone(db),
-		GostClientProxy:     q.GostClientProxy.clone(db),
-		GostClientTunnel:    q.GostClientTunnel.clone(db),
-		GostNode:            q.GostNode.clone(db),
-		GostNodeBind:        q.GostNodeBind.clone(db),
-		GostNodeConfig:      q.GostNodeConfig.clone(db),
-		GostNodeDomain:      q.GostNodeDomain.clone(db),
-		GostNodeLogger:      q.GostNodeLogger.clone(db),
-		GostNodePort:        q.GostNodePort.clone(db),
-		GostObs:             q.GostObs.clone(db),
-		SystemConfig:        q.SystemConfig.clone(db),
-		SystemNotice:        q.SystemNotice.clone(db),
-		SystemUser:          q.SystemUser.clone(db),
-		SystemUserCheckin:   q.SystemUserCheckin.clone(db),
+		db:                   db,
+		GostAuth:             q.GostAuth.clone(db),
+		GostClient:           q.GostClient.clone(db),
+		GostClientAdmission:  q.GostClientAdmission.clone(db),
+		GostClientConfig:     q.GostClientConfig.clone(db),
+		GostClientForward:    q.GostClientForward.clone(db),
+		GostClientHost:       q.GostClientHost.clone(db),
+		GostClientHostDomain: q.GostClientHostDomain.clone(db),
+		GostClientLogger:     q.GostClientLogger.clone(db),
+		GostClientP2P:        q.GostClientP2P.clone(db),
+		GostClientProxy:      q.GostClientProxy.clone(db),
+		GostClientTunnel:     q.GostClientTunnel.clone(db),
+		GostNode:             q.GostNode.clone(db),
+		GostNodeBind:         q.GostNodeBind.clone(db),
+		GostNodeConfig:       q.GostNodeConfig.clone(db),
+		GostNodeDomain:       q.GostNodeDomain.clone(db),
+		GostNodeLogger:       q.GostNodeLogger.clone(db),
+		GostNodePort:         q.GostNodePort.clone(db),
+		GostObs:              q.GostObs.clone(db),
+		SystemConfig:         q.SystemConfig.clone(db),
+		SystemNotice:         q.SystemNotice.clone(db),
+		SystemUser:           q.SystemUser.clone(db),
+		SystemUserCheckin:    q.SystemUserCheckin.clone(db),
 	}
 }
 
@@ -157,78 +162,81 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:                  db,
-		GostAuth:            q.GostAuth.replaceDB(db),
-		GostClient:          q.GostClient.replaceDB(db),
-		GostClientAdmission: q.GostClientAdmission.replaceDB(db),
-		GostClientConfig:    q.GostClientConfig.replaceDB(db),
-		GostClientForward:   q.GostClientForward.replaceDB(db),
-		GostClientHost:      q.GostClientHost.replaceDB(db),
-		GostClientLogger:    q.GostClientLogger.replaceDB(db),
-		GostClientP2P:       q.GostClientP2P.replaceDB(db),
-		GostClientProxy:     q.GostClientProxy.replaceDB(db),
-		GostClientTunnel:    q.GostClientTunnel.replaceDB(db),
-		GostNode:            q.GostNode.replaceDB(db),
-		GostNodeBind:        q.GostNodeBind.replaceDB(db),
-		GostNodeConfig:      q.GostNodeConfig.replaceDB(db),
-		GostNodeDomain:      q.GostNodeDomain.replaceDB(db),
-		GostNodeLogger:      q.GostNodeLogger.replaceDB(db),
-		GostNodePort:        q.GostNodePort.replaceDB(db),
-		GostObs:             q.GostObs.replaceDB(db),
-		SystemConfig:        q.SystemConfig.replaceDB(db),
-		SystemNotice:        q.SystemNotice.replaceDB(db),
-		SystemUser:          q.SystemUser.replaceDB(db),
-		SystemUserCheckin:   q.SystemUserCheckin.replaceDB(db),
+		db:                   db,
+		GostAuth:             q.GostAuth.replaceDB(db),
+		GostClient:           q.GostClient.replaceDB(db),
+		GostClientAdmission:  q.GostClientAdmission.replaceDB(db),
+		GostClientConfig:     q.GostClientConfig.replaceDB(db),
+		GostClientForward:    q.GostClientForward.replaceDB(db),
+		GostClientHost:       q.GostClientHost.replaceDB(db),
+		GostClientHostDomain: q.GostClientHostDomain.replaceDB(db),
+		GostClientLogger:     q.GostClientLogger.replaceDB(db),
+		GostClientP2P:        q.GostClientP2P.replaceDB(db),
+		GostClientProxy:      q.GostClientProxy.replaceDB(db),
+		GostClientTunnel:     q.GostClientTunnel.replaceDB(db),
+		GostNode:             q.GostNode.replaceDB(db),
+		GostNodeBind:         q.GostNodeBind.replaceDB(db),
+		GostNodeConfig:       q.GostNodeConfig.replaceDB(db),
+		GostNodeDomain:       q.GostNodeDomain.replaceDB(db),
+		GostNodeLogger:       q.GostNodeLogger.replaceDB(db),
+		GostNodePort:         q.GostNodePort.replaceDB(db),
+		GostObs:              q.GostObs.replaceDB(db),
+		SystemConfig:         q.SystemConfig.replaceDB(db),
+		SystemNotice:         q.SystemNotice.replaceDB(db),
+		SystemUser:           q.SystemUser.replaceDB(db),
+		SystemUserCheckin:    q.SystemUserCheckin.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	GostAuth            IGostAuthDo
-	GostClient          IGostClientDo
-	GostClientAdmission IGostClientAdmissionDo
-	GostClientConfig    IGostClientConfigDo
-	GostClientForward   IGostClientForwardDo
-	GostClientHost      IGostClientHostDo
-	GostClientLogger    IGostClientLoggerDo
-	GostClientP2P       IGostClientP2PDo
-	GostClientProxy     IGostClientProxyDo
-	GostClientTunnel    IGostClientTunnelDo
-	GostNode            IGostNodeDo
-	GostNodeBind        IGostNodeBindDo
-	GostNodeConfig      IGostNodeConfigDo
-	GostNodeDomain      IGostNodeDomainDo
-	GostNodeLogger      IGostNodeLoggerDo
-	GostNodePort        IGostNodePortDo
-	GostObs             IGostObsDo
-	SystemConfig        ISystemConfigDo
-	SystemNotice        ISystemNoticeDo
-	SystemUser          ISystemUserDo
-	SystemUserCheckin   ISystemUserCheckinDo
+	GostAuth             IGostAuthDo
+	GostClient           IGostClientDo
+	GostClientAdmission  IGostClientAdmissionDo
+	GostClientConfig     IGostClientConfigDo
+	GostClientForward    IGostClientForwardDo
+	GostClientHost       IGostClientHostDo
+	GostClientHostDomain IGostClientHostDomainDo
+	GostClientLogger     IGostClientLoggerDo
+	GostClientP2P        IGostClientP2PDo
+	GostClientProxy      IGostClientProxyDo
+	GostClientTunnel     IGostClientTunnelDo
+	GostNode             IGostNodeDo
+	GostNodeBind         IGostNodeBindDo
+	GostNodeConfig       IGostNodeConfigDo
+	GostNodeDomain       IGostNodeDomainDo
+	GostNodeLogger       IGostNodeLoggerDo
+	GostNodePort         IGostNodePortDo
+	GostObs              IGostObsDo
+	SystemConfig         ISystemConfigDo
+	SystemNotice         ISystemNoticeDo
+	SystemUser           ISystemUserDo
+	SystemUserCheckin    ISystemUserCheckinDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		GostAuth:            q.GostAuth.WithContext(ctx),
-		GostClient:          q.GostClient.WithContext(ctx),
-		GostClientAdmission: q.GostClientAdmission.WithContext(ctx),
-		GostClientConfig:    q.GostClientConfig.WithContext(ctx),
-		GostClientForward:   q.GostClientForward.WithContext(ctx),
-		GostClientHost:      q.GostClientHost.WithContext(ctx),
-		GostClientLogger:    q.GostClientLogger.WithContext(ctx),
-		GostClientP2P:       q.GostClientP2P.WithContext(ctx),
-		GostClientProxy:     q.GostClientProxy.WithContext(ctx),
-		GostClientTunnel:    q.GostClientTunnel.WithContext(ctx),
-		GostNode:            q.GostNode.WithContext(ctx),
-		GostNodeBind:        q.GostNodeBind.WithContext(ctx),
-		GostNodeConfig:      q.GostNodeConfig.WithContext(ctx),
-		GostNodeDomain:      q.GostNodeDomain.WithContext(ctx),
-		GostNodeLogger:      q.GostNodeLogger.WithContext(ctx),
-		GostNodePort:        q.GostNodePort.WithContext(ctx),
-		GostObs:             q.GostObs.WithContext(ctx),
-		SystemConfig:        q.SystemConfig.WithContext(ctx),
-		SystemNotice:        q.SystemNotice.WithContext(ctx),
-		SystemUser:          q.SystemUser.WithContext(ctx),
-		SystemUserCheckin:   q.SystemUserCheckin.WithContext(ctx),
+		GostAuth:             q.GostAuth.WithContext(ctx),
+		GostClient:           q.GostClient.WithContext(ctx),
+		GostClientAdmission:  q.GostClientAdmission.WithContext(ctx),
+		GostClientConfig:     q.GostClientConfig.WithContext(ctx),
+		GostClientForward:    q.GostClientForward.WithContext(ctx),
+		GostClientHost:       q.GostClientHost.WithContext(ctx),
+		GostClientHostDomain: q.GostClientHostDomain.WithContext(ctx),
+		GostClientLogger:     q.GostClientLogger.WithContext(ctx),
+		GostClientP2P:        q.GostClientP2P.WithContext(ctx),
+		GostClientProxy:      q.GostClientProxy.WithContext(ctx),
+		GostClientTunnel:     q.GostClientTunnel.WithContext(ctx),
+		GostNode:             q.GostNode.WithContext(ctx),
+		GostNodeBind:         q.GostNodeBind.WithContext(ctx),
+		GostNodeConfig:       q.GostNodeConfig.WithContext(ctx),
+		GostNodeDomain:       q.GostNodeDomain.WithContext(ctx),
+		GostNodeLogger:       q.GostNodeLogger.WithContext(ctx),
+		GostNodePort:         q.GostNodePort.WithContext(ctx),
+		GostObs:              q.GostObs.WithContext(ctx),
+		SystemConfig:         q.SystemConfig.WithContext(ctx),
+		SystemNotice:         q.SystemNotice.WithContext(ctx),
+		SystemUser:           q.SystemUser.WithContext(ctx),
+		SystemUserCheckin:    q.SystemUserCheckin.WithContext(ctx),
 	}
 }
 

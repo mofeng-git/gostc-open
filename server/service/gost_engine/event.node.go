@@ -20,6 +20,7 @@ type NodeEvent struct {
 	isRunning       bool
 	sendAtomic      atomic.Int32
 	sendOperationId string
+	isRegister      bool
 }
 
 func NewNodeEvent(code string, log *zap.Logger) *NodeEvent {
@@ -42,9 +43,7 @@ func (event *NodeEvent) OnOpen(socket *gws.Conn) {
 		}
 	}()
 	go event.sendLoop(socket)
-
-	db, _, _ := repository.Get("")
-	NodeConfig(db, event.code)
+	go event.checkRegister()
 }
 
 func (event *NodeEvent) sendLoop(socket *gws.Conn) {
@@ -91,6 +90,24 @@ func (event *NodeEvent) sendLoop(socket *gws.Conn) {
 	}
 }
 
+func (event *NodeEvent) register() {
+	event.isRegister = true
+	db, _, _ := repository.Get("")
+	NodeConfig(db, event.code)
+}
+
+func (event *NodeEvent) checkRegister() {
+	time.Sleep(time.Second * 10)
+	if event.isRegister {
+		return
+	}
+	if !event.isRunning {
+		return
+	}
+	event.log.Warn("节点连接注册超时，关闭连接", zap.String("type", "node"), zap.String("code", event.code))
+	NodeStop(event.code, "节点连接注册超时")
+}
+
 func (event *NodeEvent) OnClose(socket *gws.Conn, err error) {
 	if !event.isRunning {
 		return
@@ -124,6 +141,11 @@ func (event *NodeEvent) OnMessage(socket *gws.Conn, message *gws.Message) {
 		var data = make(map[string]any)
 		_ = msg.GetContent(&data)
 		cache.SetNodeVersion(event.code, data["version"].(string))
+
+		_, customDomain := data["custom_domain"]
+		cache.SetNodeCustomDomain(event.code, customDomain)
+
+		event.register()
 	case "logger":
 		var cfg model.SystemConfigGost
 		cache.GetSystemConfigGost(&cfg)

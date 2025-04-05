@@ -1,8 +1,9 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {h, onBeforeMount, ref, watch} from "vue";
 import {
   apiNormalGostClientHostAdmission,
   apiNormalGostClientHostDelete,
+  apiNormalGostClientHostDomain,
   apiNormalGostClientHostEnable,
   apiNormalGostClientHostPage,
   apiNormalGostClientHostRenew,
@@ -20,7 +21,6 @@ import Alert from "../../../icon/alert.vue";
 import Online from "../../../icon/online.vue";
 import {cLimiterText, configExpText, configText, limiterText, rLimiterText} from "./index.js";
 import {flowFormat} from "../../../utils/flow.js";
-import {apiNormalGostClientForwardAdmission} from "../../../api/normal/gost_client_forward.js";
 import {NButton, NSpace} from "naive-ui";
 import {goToUrl} from "../../../utils/browser.js";
 import moment from "moment/moment.js";
@@ -74,6 +74,18 @@ const state = ref({
     loading: false,
     data: [],
     dataRange: 1,
+  },
+  domain: {
+    open: false,
+    loading: false,
+    data: {
+      code: '',
+      customDomain: '',
+      customCert: '',
+      customKey: '',
+    },
+    nodeAddress: '',
+    customEnable: 2,
   },
 })
 
@@ -162,10 +174,10 @@ const openAdmission = (row) => {
     white: [],
     black: []
   }
-  if (row.whiteList){
+  if (row.whiteList) {
     state.value.admission.white = row?.whiteList.join('\n')
   }
-  if (row.blackList){
+  if (row.blackList) {
     state.value.admission.black = row?.blackList.join('\n')
   }
   state.value.admission.open = true
@@ -187,6 +199,36 @@ const admissionFunc = async () => {
     state.value.admission.loading = false
   }
 }
+
+
+const openDomainModal = (row) => {
+  state.value.domain.code = row.code
+  state.value.domain.nodeAddress = row.node.address
+  state.value.domain.customEnable = row.customEnable
+  state.value.domain.data = {
+    code: row.code,
+    customDomain: row.customDomain,
+    customCert: row.customCert,
+    customKey: row.customKey,
+  }
+  state.value.domain.open = true
+}
+
+const closeDomainModal = () => {
+  state.value.domain.open = false
+}
+
+const domainFunc = async () => {
+  try {
+    state.value.domain.loading = true
+    await apiNormalGostClientHostDomain(state.value.domain.data)
+    closeDomainModal()
+    refreshTable()
+  } finally {
+    state.value.domain.loading = false
+  }
+}
+
 
 const openObsModal = (row) => {
   state.value.obs.code = row.code
@@ -228,6 +270,46 @@ watch(() => ({type: state.value.obs.dataRange}), () => {
 onBeforeMount(() => {
   pageFunc()
 })
+
+const operatorOptions = [
+  {
+    label: '流量',
+    key: 'obs',
+    disabled: false,
+    func: openObsModal,
+  },
+  {
+    label: '黑/白名单',
+    key: 'admission',
+    disabled: false,
+    func: openAdmission,
+  },
+  {
+    label: '自定义域名',
+    key: 'domain',
+    disabled: false,
+    func: openDomainModal,
+  },
+]
+const operatorSelect = (key, row) => {
+  for (let i = 0; i < operatorOptions.length; i++) {
+    if (operatorOptions[i].key === key) {
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option) => {
+  return h(NButton, {
+    text: true,
+    size: "tiny",
+    focusable: false,
+    type: "info",
+  }, {
+    default: () => option.label,
+  })
+}
 
 </script>
 
@@ -322,6 +404,11 @@ onBeforeMount(() => {
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions"
+                          @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-popconfirm
                   v-if="row.config.chargingType===2"
                   @positive-click="renewFunc(row)"
@@ -338,12 +425,7 @@ onBeforeMount(() => {
                 </template>
                 确认续费吗？
               </n-popconfirm>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
-                流量
-              </n-button>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openAdmission(row)">
-                白/黑名单
-              </n-button>
+
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                 编辑
               </n-button>
@@ -425,26 +507,65 @@ onBeforeMount(() => {
             白名单：只允许配置的地址访问服务
           </n-alert>
           <p></p>
-          <n-switch v-model:value="state.admission.data.whiteEnable" :checked-value="1" :unchecked-value="2" :round="false">
+          <n-switch v-model:value="state.admission.data.whiteEnable" :checked-value="1" :unchecked-value="2"
+                    :round="false">
             <template #checked>开启白名单</template>
             <template #unchecked>关闭白名单</template>
           </n-switch>
           <p></p>
-          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.white" :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
+          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.white"
+                   :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
         </n-tab-pane>
         <n-tab-pane name="black" tab="黑名单">
           <n-alert type="info">
             黑名单：不允许配置的地址访问服务
           </n-alert>
           <p></p>
-          <n-switch v-model:value="state.admission.data.blackEnable" :checked-value="1" :unchecked-value="2" :round="false">
+          <n-switch v-model:value="state.admission.data.blackEnable" :checked-value="1" :unchecked-value="2"
+                    :round="false">
             <template #checked>开启黑名单</template>
             <template #unchecked>关闭黑名单</template>
           </n-switch>
           <p></p>
-          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.black" :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
+          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.black"
+                   :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
         </n-tab-pane>
       </n-tabs>
+    </Modal>
+
+    <Modal
+        title="自定义域名"
+        :show="state.domain.open"
+        @on-confirm="domainFunc"
+        @on-cancel="closeDomainModal"
+        :confirm-loading="state.domain.loading"
+    >
+      <n-form
+          ref="updateRef"
+          :model="state.update.data"
+          :rules="state.update.dataRules"
+          :show-label="true"
+          size="medium"
+      >
+        <n-alert type="info" v-if="state.domain.customEnable===1">
+          请将域名解析到{{ state.domain.nodeAddress }}
+        </n-alert>
+        <n-alert type="warning" v-else>
+          此隧道使用的节点不支持自定义域名
+        </n-alert>
+        <p></p>
+        <n-form-item path="customDomain" label="域名(空则移除自定义域名)">
+          <n-input v-model:value="state.domain.data.customDomain" placeholder="www.example.com"></n-input>
+        </n-form-item>
+        <n-form-item path="customCert" label="证书(PEM，不设置，则使用默认TLS)">
+          <n-input type="textarea" :autosize="{minRows:3,maxRows:6}" v-model:value="state.domain.data.customCert"
+                   placeholder="-----BEGIN CERTIFICATE-----"></n-input>
+        </n-form-item>
+        <n-form-item path="customKey" label="私钥(KEY，不设置，则使用默认TLS)">
+          <n-input type="textarea" :autosize="{minRows:3,maxRows:6}" v-model:value="state.domain.data.customKey"
+                   placeholder="-----BEGIN EC PRIVATE KEY-----"></n-input>
+        </n-form-item>
+      </n-form>
     </Modal>
 
     <Modal

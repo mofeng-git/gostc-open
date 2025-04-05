@@ -84,7 +84,7 @@ func RunClient(useTls string, address string, key string) string {
 			if !svrRunTag {
 				return
 			}
-			socket, _, err = gws.NewClient(common.NewEvent(key, false), &gws.ClientOption{
+			socket, _, err = gws.NewClient(common.NewEvent(key, "", false), &gws.ClientOption{
 				Addr:          wsurl + "/api/v1/public/gost/client/ws",
 				TlsConfig:     &tls.Config{InsecureSkipVerify: true},
 				RequestHeader: http.Header{"key": []string{key}},

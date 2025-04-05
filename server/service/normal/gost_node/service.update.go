@@ -69,9 +69,9 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	node.P2P = req.P2P
 	node.Domain = req.Domain
 	node.DenyDomainPrefix = req.DenyDomainPrefix
-	node.UrlTpl = req.UrlTpl
 	node.Address = req.Address
 	node.Protocol = req.Protocol
+	node.UrlTpl = req.UrlTpl
 	node.TunnelConnPort = req.TunnelConnPort
 	node.TunnelInPort = req.TunnelInPort
 	node.TunnelMetadata = req.TunnelMetadata

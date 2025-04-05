@@ -27,6 +27,7 @@ func main() {
 		model.GostClientConfig{},
 		model.GostClientForward{},
 		model.GostClientHost{},
+		model.GostClientHostDomain{},
 		model.GostClientLogger{},
 		model.GostClientTunnel{},
 		model.GostClientProxy{},

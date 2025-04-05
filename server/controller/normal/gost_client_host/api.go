@@ -22,6 +22,19 @@ func Create(c *gin.Context) {
 	bean.Response.Ok(c)
 }
 
+func Domain(c *gin.Context) {
+	var req service.DomainReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.Domain(middleware.GetClaims(c), req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
 func Admission(c *gin.Context) {
 	var req service.AdmissionReq
 	if err := c.ShouldBindJSON(&req); err != nil {

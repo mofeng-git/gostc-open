@@ -39,7 +39,10 @@ type GostNode struct {
 	Configs               []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
 }
 
-func (n GostNode) GetDomainFull(domainPrefix string) string {
+func (n GostNode) GetDomainFull(domainPrefix string, customDomain string, enableCustom bool) string {
+	if enableCustom && customDomain != "" {
+		return strings.ReplaceAll(n.UrlTpl, "{{DOMAIN}}", customDomain)
+	}
 	if n.UrlTpl != "" {
 		return strings.ReplaceAll(n.UrlTpl, "{{DOMAIN}}", domainPrefix+"."+n.Domain)
 	}
@@ -184,11 +187,15 @@ func (n GostNode) GenerateForwardServiceConfig(limiter, auther, obs string) (con
 	}, true
 }
 
-func (n GostNode) GenerateIngress(hosts []*GostClientHost, tunnels []*GostClientTunnel) config.IngressConfig {
+func (n GostNode) GenerateIngress(hosts []*GostClientHost, tunnels []*GostClientTunnel, enableCustom bool) config.IngressConfig {
 	var rules []*config.IngressRuleConfig
 	for _, host := range hosts {
+		hostname := host.DomainPrefix + "." + n.Domain
+		if host.CustomDomain != "" && enableCustom {
+			hostname = host.CustomDomain
+		}
 		rules = append(rules, &config.IngressRuleConfig{
-			Hostname: host.DomainPrefix + "." + n.Domain,
+			Hostname: hostname,
 			Endpoint: host.Code,
 		})
 	}

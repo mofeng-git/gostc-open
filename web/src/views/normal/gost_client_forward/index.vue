@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch} from "vue";
+import {onBeforeMount, ref, watch, h} from "vue";
 import {
   apiNormalGostClientForwardAdmission,
   apiNormalGostClientForwardDelete,
@@ -271,6 +271,46 @@ onBeforeMount(() => {
   pageFunc()
 })
 
+const operatorOptions = [
+  {
+    label: '流量',
+    key: 'obs',
+    disabled: false,
+    func:openObsModal,
+  },
+  {
+    label: '黑/白名单',
+    key: 'admission',
+    disabled: false,
+    func:openAdmission,
+  },
+  {
+    label: '规则匹配',
+    key: 'matcher',
+    disabled: false,
+    func:openMatcher,
+  },
+]
+const operatorSelect = (key,row)=>{
+  for (let i=0;i<operatorOptions.length;i++){
+    if (operatorOptions[i].key===key){
+      operatorOptions[i].func(row)
+      return
+    }
+  }
+}
+
+const operatorRenderLabel = (option)=>{
+  return h(NButton,{
+    text:true,
+    size:"tiny",
+    focusable:false,
+    type:"info",
+  },{
+    default:()=> option.label,
+  })
+}
+
 </script>
 
 <template>
@@ -364,6 +404,10 @@ onBeforeMount(() => {
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+                <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
+              </n-dropdown>
+
               <n-popconfirm
                   v-if="row.config.chargingType===2"
                   @positive-click="renewFunc(row)"
@@ -380,15 +424,7 @@ onBeforeMount(() => {
                 </template>
                 确认续费吗？
               </n-popconfirm>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
-                流量
-              </n-button>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openAdmission(row)">
-                白/黑名单
-              </n-button>
-              <n-button size="tiny" :focusable="false" quaternary type="info" @click="openMatcher(row)">
-                规则匹配
-              </n-button>
+
               <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                 编辑
               </n-button>

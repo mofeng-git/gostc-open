@@ -32,10 +32,8 @@ LOGGER_LEVEL: %s
 `, MODE, VERSION, BASE_PATH, LOGGER_FILE_PATH, LOGGER_LEVEL)
 }
 
-var ()
-
 var (
-	VERSION   = "v1.2.0" // 版本
+	VERSION   = "v1.2.1" // 版本
 	BASE_PATH = ""       // 基础目录
 	/*
 		prod:生产模式，程序运行根路径和程序的所在目录保持一致

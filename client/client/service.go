@@ -30,6 +30,7 @@ func (p *program) run() {
 	var key string
 	var tlsEnable bool
 	var address string
+	var proxyBaseUrl string
 	var visit bool
 	var p2p bool
 	var vTunnels string
@@ -38,6 +39,7 @@ func (p *program) run() {
 	var console bool
 	var server bool
 	flag.StringVar(&address, "addr", "gost.sian.one", "server address")
+	flag.StringVar(&proxyBaseUrl, "proxy-base-url", "", "proxy server api url")
 	flag.StringVar(&key, "key", "", "client key")
 	flag.BoolVar(&server, "s", false, "server mode")
 	flag.BoolVar(&tlsEnable, "tls", true, "enable tls")
@@ -107,7 +109,7 @@ func (p *program) run() {
 	}
 
 	for {
-		socket, _, err := gws.NewClient(common.NewEvent(key, server), &gws.ClientOption{
+		socket, _, err := gws.NewClient(common.NewEvent(key, proxyBaseUrl, server), &gws.ClientOption{
 			Addr:      fullWsUrl,
 			TlsConfig: &tls.Config{InsecureSkipVerify: true},
 			NewDialer: func() (gws.Dialer, error) {

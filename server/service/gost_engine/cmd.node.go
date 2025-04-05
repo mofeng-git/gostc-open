@@ -1,6 +1,7 @@
 package gost_engine
 
 import (
+	"fmt"
 	"github.com/go-gost/x/config"
 	"github.com/google/uuid"
 	"server/model"
@@ -50,7 +51,8 @@ func NodeIngress(tx *query.Query, code string) {
 		newTunnels = append(newTunnels, tunnel)
 	}
 	var data NodeConfigData
-	data.Ingress = node.GenerateIngress(newHosts, newTunnels)
+
+	data.Ingress = node.GenerateIngress(newHosts, newTunnels, cache.GetNodeCustomDomain(code))
 	WriteMessage(code, NewMessage(uuid.NewString(), "config", data))
 }
 
@@ -67,7 +69,7 @@ func NodeConfig(tx *query.Query, code string) {
 	auther := node.GenerateAuther(baseConfig.BaseUrl)
 	hosts, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Find()
 	tunnels, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Find()
-	ingress := node.GenerateIngress(hosts, tunnels)
+	ingress := node.GenerateIngress(hosts, tunnels, cache.GetNodeCustomDomain(code))
 	limiter := node.GenerateLimiter(baseConfig.BaseUrl)
 	p2pCfg := node.GenerateP2PServiceConfig(baseConfig.BaseUrl)
 	obs := node.GenerateObs(baseConfig.BaseUrl)
@@ -103,4 +105,25 @@ func NodePortCheck(tx *query.Query, code string, port string) {
 	cache.GetSystemConfigBase(&baseConfig)
 	data := node.GenerateNodePortCheck(baseConfig.BaseUrl, port)
 	WriteMessage(code, NewMessage(uuid.NewString(), "port_check", data))
+}
+
+type HttpsDomainData struct {
+	Domain string
+	Target string
+	Cert   string
+	Key    string
+}
+
+func NodeAddDomain(tx *query.Query, code, domain, cert, key string) {
+	node, err := tx.GostNode.Where(tx.GostNode.Code.Eq(code)).First()
+	if err != nil {
+		return
+	}
+
+	WriteMessage(code, NewMessage(uuid.NewString(), "https_domain", HttpsDomainData{
+		Domain: domain,
+		Target: fmt.Sprintf("http://127.0.0.1:%s", node.TunnelInPort),
+		Cert:   cert,
+		Key:    key,
+	}))
 }

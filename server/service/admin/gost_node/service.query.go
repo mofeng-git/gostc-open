@@ -2,7 +2,9 @@ package service
 
 import (
 	"errors"
+	"server/pkg/utils"
 	"server/repository"
+	"server/service/common/cache"
 	"server/service/common/node_rule"
 )
 
@@ -23,6 +25,7 @@ type QueryResp struct {
 	P2P     int `json:"p2p"`
 
 	Domain           string `json:"domain"`
+	CustomDomain     int    `json:"customDomain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
 	Address          string `json:"address"`
 	Protocol         string `json:"protocol"`
@@ -66,6 +69,7 @@ func (service *service) Query(req QueryReq) (QueryResp, error) {
 		Proxy:                 node.Proxy,
 		P2P:                   node.P2P,
 		Domain:                node.Domain,
+		CustomDomain:          utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
 		DenyDomainPrefix:      node.DenyDomainPrefix,
 		Address:               node.Address,
 		Protocol:              node.Protocol,

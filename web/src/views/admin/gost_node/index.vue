@@ -411,19 +411,20 @@ onBeforeMount(() => {
               <span>标签：{{ row.tags.join('、') }}</span><br>
               <span>规则：{{ row.ruleNames.join('、') }}</span><br>
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
+              <span>自定义域名：{{ row.customDomain === 1 ? '支持' : '不支持' }}</span><br>
               <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
                 <n-tab-pane name="web" tab="域名解析">
+                  <span>访问端口：{{ row.tunnelInPort }}</span><br>
                   <span>基础域名：{{ row.domain }}</span><br>
                   <span>不允许的域名前缀：{{ row.denyDomainPrefix || '暂无' }}</span><br>
+                </n-tab-pane>
+                <n-tab-pane name="tunnel" tab="私有隧道">
+                  <span>连接端口：{{ row.tunnelConnPort }}</span><br>
                 </n-tab-pane>
                 <n-tab-pane name="forward" tab="端口转发">
                   <span>连接端口：{{ row.forwardConnPort }}</span><br>
                   <span>开放端口：{{ row.forwardPorts }}</span><br>
-                </n-tab-pane>
-                <n-tab-pane name="tunnel" tab="私有隧道">
-                  <span>连接端口：{{ row.tunnelConnPort }}</span><br>
-                  <span>访问端口：{{ row.tunnelInPort }}</span><br>
                 </n-tab-pane>
                 <n-tab-pane name="p2p" tab="P2P隧道">
                   <span>连接端口：{{ row.p2pPort }}</span><br>
@@ -542,14 +543,6 @@ onBeforeMount(() => {
             >域名解析
             </n-checkbox>
             <n-checkbox
-                v-model:checked="state.create.data.forward"
-                :focusable="false"
-                :checked-value="1"
-                :unchecked-value="2"
-                :on-update-checked="value=>{state.create.data.forward = value}"
-            >端口转发
-            </n-checkbox>
-            <n-checkbox
                 v-model:checked="state.create.data.tunnel"
                 :focusable="false"
                 :checked-value="1"
@@ -558,12 +551,12 @@ onBeforeMount(() => {
             >私有隧道
             </n-checkbox>
             <n-checkbox
-                v-model:checked="state.create.data.p2p"
+                v-model:checked="state.create.data.forward"
                 :focusable="false"
                 :checked-value="1"
                 :unchecked-value="2"
-                :on-update-checked="value=>{state.create.data.p2p = value}"
-            >P2P隧道
+                :on-update-checked="value=>{state.create.data.forward = value}"
+            >端口转发
             </n-checkbox>
             <n-checkbox
                 v-model:checked="state.create.data.proxy"
@@ -572,6 +565,14 @@ onBeforeMount(() => {
                 :unchecked-value="2"
                 :on-update-checked="value=>{state.create.data.proxy = value}"
             >代理隧道
+            </n-checkbox>
+            <n-checkbox
+                v-model:checked="state.create.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.create.data.p2p = value}"
+            >P2P隧道
             </n-checkbox>
           </n-space>
         </n-form-item>
@@ -608,6 +609,28 @@ onBeforeMount(() => {
               ></n-input>
             </n-form-item>
           </n-tab-pane>
+          <n-tab-pane name="tunnel" tab="私有隧道">
+            <div v-show="state.create.data.tunnel!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用私有隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="tunnelConnPort" label="连接端口">
+              <n-input v-model:value="state.create.data.tunnelConnPort" placeholder="2096"></n-input>
+            </n-form-item>
+            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
+              <n-input v-model:value="state.create.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
+            </n-form-item>
+            <n-form-item path="tunnelMetadata" label="METADATA">
+              <n-input
+                  type="textarea"
+                  v-model:value.trim="state.create.data.tunnelMetadata"
+                  placeholder="JSON格式"
+              ></n-input>
+            </n-form-item>
+          </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">
             <div v-show="state.create.data.forward!==1">
               <n-alert type="warning" :show-icon="false">
@@ -629,28 +652,6 @@ onBeforeMount(() => {
               <n-input
                   type="textarea"
                   v-model:value.trim="state.create.data.forwardMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
-            </n-form-item>
-          </n-tab-pane>
-          <n-tab-pane name="tunnel" tab="私有隧道">
-            <div v-show="state.create.data.tunnel!==1">
-              <n-alert type="warning" :show-icon="false">
-                未启用私有隧道
-              </n-alert>
-              <br>
-            </div>
-            <n-form-item path="tunnelConnPort" label="连接端口">
-              <n-input v-model:value="state.create.data.tunnelConnPort" placeholder="2096"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.tunnelReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.create.data.tunnelMetadata"
                   placeholder="JSON格式"
               ></n-input>
             </n-form-item>
@@ -733,14 +734,6 @@ onBeforeMount(() => {
             >域名解析
             </n-checkbox>
             <n-checkbox
-                v-model:checked="state.update.data.forward"
-                :focusable="false"
-                :checked-value="1"
-                :unchecked-value="2"
-                :on-update-checked="value=>{state.update.data.forward = value}"
-            >端口转发
-            </n-checkbox>
-            <n-checkbox
                 v-model:checked="state.update.data.tunnel"
                 :focusable="false"
                 :checked-value="1"
@@ -749,12 +742,12 @@ onBeforeMount(() => {
             >私有隧道
             </n-checkbox>
             <n-checkbox
-                v-model:checked="state.update.data.p2p"
+                v-model:checked="state.update.data.forward"
                 :focusable="false"
                 :checked-value="1"
                 :unchecked-value="2"
-                :on-update-checked="value=>{state.update.data.p2p = value}"
-            >P2P隧道
+                :on-update-checked="value=>{state.update.data.forward = value}"
+            >端口转发
             </n-checkbox>
             <n-checkbox
                 v-model:checked="state.update.data.proxy"
@@ -763,6 +756,14 @@ onBeforeMount(() => {
                 :unchecked-value="2"
                 :on-update-checked="value=>{state.update.data.proxy = value}"
             >代理隧道
+            </n-checkbox>
+            <n-checkbox
+                v-model:checked="state.update.data.p2p"
+                :focusable="false"
+                :checked-value="1"
+                :unchecked-value="2"
+                :on-update-checked="value=>{state.update.data.p2p = value}"
+            >P2P隧道
             </n-checkbox>
           </n-space>
         </n-form-item>
@@ -799,6 +800,28 @@ onBeforeMount(() => {
               ></n-input>
             </n-form-item>
           </n-tab-pane>
+          <n-tab-pane name="tunnel" tab="私有隧道">
+            <div v-show="state.update.data.tunnel!==1">
+              <n-alert type="warning" :show-icon="false">
+                未启用私有隧道
+              </n-alert>
+              <br>
+            </div>
+            <n-form-item path="tunnelConnPort" label="连接端口">
+              <n-input v-model:value="state.update.data.tunnelConnPort" placeholder="2096"></n-input>
+            </n-form-item>
+            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
+              <n-input v-model:value="state.update.data.tunnelReplaceAddress"
+                       placeholder="grpc://1.1.1.1:8080"></n-input>
+            </n-form-item>
+            <n-form-item path="tunnelMetadata" label="METADATA">
+              <n-input
+                  type="textarea"
+                  v-model:value.trim="state.update.data.tunnelMetadata"
+                  placeholder="JSON格式"
+              ></n-input>
+            </n-form-item>
+          </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">
             <div v-show="state.update.data.forward!==1">
               <n-alert type="warning" :show-icon="false">
@@ -820,28 +843,6 @@ onBeforeMount(() => {
               <n-input
                   type="textarea"
                   v-model:value.trim="state.update.data.forwardMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
-            </n-form-item>
-          </n-tab-pane>
-          <n-tab-pane name="tunnel" tab="私有隧道">
-            <div v-show="state.update.data.tunnel!==1">
-              <n-alert type="warning" :show-icon="false">
-                未启用私有隧道
-              </n-alert>
-              <br>
-            </div>
-            <n-form-item path="tunnelConnPort" label="连接端口">
-              <n-input v-model:value="state.update.data.tunnelConnPort" placeholder="2096"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.tunnelReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.update.data.tunnelMetadata"
                   placeholder="JSON格式"
               ></n-input>
             </n-form-item>

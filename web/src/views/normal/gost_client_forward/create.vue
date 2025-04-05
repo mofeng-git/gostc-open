@@ -80,7 +80,7 @@ const nodeListFunc = async () => {
     state.value.loading = true
     let res = await apiNormalGostNodeList(state.value.search)
     state.value.nodes = res.data || []
-    state.value.nodes = state.value.nodes.filter(item=>{
+    state.value.nodes = state.value.nodes.filter(item => {
       return item.forward === 1
     })
 

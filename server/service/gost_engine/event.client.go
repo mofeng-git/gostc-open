@@ -21,6 +21,7 @@ type ClientEvent struct {
 	isRunning       bool
 	sendAtomic      atomic.Int32
 	sendOperationId string
+	isRegister      bool
 }
 
 func NewClientEvent(code string, ip string, log *zap.Logger) *ClientEvent {
@@ -44,8 +45,25 @@ func (event *ClientEvent) OnOpen(socket *gws.Conn) {
 	cache.SetClientOnline(event.code, true, time.Second*30)
 	cache.SetClientLastTime(event.code)
 	cache.SetClientIp(event.code, event.ip)
-	go event.sendLoop(socket)
 
+	go event.sendLoop(socket)
+	go event.checkRegister()
+}
+
+func (event *ClientEvent) checkRegister() {
+	time.Sleep(time.Second * 10)
+	if event.isRegister {
+		return
+	}
+	if !event.isRunning {
+		return
+	}
+	event.log.Warn("客户端连接注册超时，关闭连接", zap.String("type", "client"), zap.String("code", event.code))
+	ClientStop(event.code, "客户端连接注册超时")
+}
+
+func (event *ClientEvent) register() {
+	event.isRegister = true
 	db, _, _ := repository.Get("")
 	var hostCodes []string
 	_ = db.GostClientHost.Where(db.GostClientHost.ClientCode.Eq(event.code)).Pluck(db.GostClientHost.Code, &hostCodes)
@@ -155,6 +173,7 @@ func (event *ClientEvent) OnMessage(socket *gws.Conn, message *gws.Message) {
 		var data = make(map[string]any)
 		_ = msg.GetContent(&data)
 		cache.SetClientVersion(event.code, data["version"].(string))
+		event.register()
 	case "logger":
 		var cfg model.SystemConfigGost
 		cache.GetSystemConfigGost(&cfg)

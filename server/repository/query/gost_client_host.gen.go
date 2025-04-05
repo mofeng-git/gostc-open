@@ -37,6 +37,9 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.TargetIp = field.NewString(tableName, "target_ip")
 	_gostClientHost.TargetPort = field.NewString(tableName, "target_port")
 	_gostClientHost.DomainPrefix = field.NewString(tableName, "domain_prefix")
+	_gostClientHost.CustomDomain = field.NewString(tableName, "custom_domain")
+	_gostClientHost.CustomCert = field.NewString(tableName, "custom_cert")
+	_gostClientHost.CustomKey = field.NewString(tableName, "custom_key")
 	_gostClientHost.NodeCode = field.NewString(tableName, "node_code")
 	_gostClientHost.ClientCode = field.NewString(tableName, "client_code")
 	_gostClientHost.UserCode = field.NewString(tableName, "user_code")
@@ -109,6 +112,9 @@ type gostClientHost struct {
 	TargetIp     field.String
 	TargetPort   field.String
 	DomainPrefix field.String
+	CustomDomain field.String
+	CustomCert   field.String
+	CustomKey    field.String
 	NodeCode     field.String
 	ClientCode   field.String
 	UserCode     field.String
@@ -157,6 +163,9 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.TargetIp = field.NewString(table, "target_ip")
 	g.TargetPort = field.NewString(table, "target_port")
 	g.DomainPrefix = field.NewString(table, "domain_prefix")
+	g.CustomDomain = field.NewString(table, "custom_domain")
+	g.CustomCert = field.NewString(table, "custom_cert")
+	g.CustomKey = field.NewString(table, "custom_key")
 	g.NodeCode = field.NewString(table, "node_code")
 	g.ClientCode = field.NewString(table, "client_code")
 	g.UserCode = field.NewString(table, "user_code")
@@ -190,7 +199,7 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 30)
+	g.fieldMap = make(map[string]field.Expr, 33)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -201,6 +210,9 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["target_ip"] = g.TargetIp
 	g.fieldMap["target_port"] = g.TargetPort
 	g.fieldMap["domain_prefix"] = g.DomainPrefix
+	g.fieldMap["custom_domain"] = g.CustomDomain
+	g.fieldMap["custom_cert"] = g.CustomCert
+	g.fieldMap["custom_key"] = g.CustomKey
 	g.fieldMap["node_code"] = g.NodeCode
 	g.fieldMap["client_code"] = g.ClientCode
 	g.fieldMap["user_code"] = g.UserCode

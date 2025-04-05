@@ -24,6 +24,10 @@ type Item struct {
 	TargetPort   string     `json:"targetPort"`
 	DomainPrefix string     `json:"domainPrefix"`
 	DomainFull   string     `json:"domainFull"`
+	CustomDomain string     `json:"customDomain"`
+	CustomCert   string     `json:"customCert"`
+	CustomKey    string     `json:"customKey"`
+	CustomEnable int        `json:"customEnable"`
 	Node         ItemNode   `json:"node"`
 	Client       ItemClient `json:"client"`
 	Config       ItemConfig `json:"config"`
@@ -45,11 +49,12 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
-	Domain  string `json:"domain"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Address      string `json:"address"`
+	Online       int    `json:"online"`
+	Domain       string `json:"domain"`
+	CustomDomain int    `json:"customDomain"`
 }
 
 type ItemConfig struct {
@@ -87,13 +92,18 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			TargetIp:     host.TargetIp,
 			TargetPort:   host.TargetPort,
 			DomainPrefix: host.DomainPrefix,
-			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix),
+			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+			CustomDomain: host.CustomDomain,
+			CustomCert:   host.CustomCert,
+			CustomKey:    host.CustomKey,
+			CustomEnable: utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			Node: ItemNode{
-				Code:    host.NodeCode,
-				Name:    host.Node.Name,
-				Address: host.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
-				Domain:  host.Node.Domain,
+				Code:         host.NodeCode,
+				Name:         host.Node.Name,
+				Address:      host.Node.Address,
+				Online:       utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
+				Domain:       host.Node.Domain,
+				CustomDomain: utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,

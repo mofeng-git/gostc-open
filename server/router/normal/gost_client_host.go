@@ -10,6 +10,7 @@ import (
 func InitGostClientHost(group *gin.RouterGroup) {
 	g := group.Group("gost/client/host", middleware.Auth(global.Jwt))
 	g.POST("create", gost_client_host.Create)
+	g.POST("domain", gost_client_host.Domain)
 	g.POST("admission", gost_client_host.Admission)
 	g.POST("renew", gost_client_host.Renew)
 	g.POST("update", gost_client_host.Update)
