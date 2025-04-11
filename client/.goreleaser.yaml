@@ -30,7 +30,7 @@ builds:
       - -w
     binary: >-
       gostc
-    main: ./client/
+    main: ./cli/
 archives:
   - format: tar.gz
     name_template: "gostc_{{ .Os }}_{{ .Arch }}"

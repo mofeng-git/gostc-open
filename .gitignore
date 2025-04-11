@@ -8,3 +8,6 @@
 /web/node_modules
 *.aar
 *.jar
+/client/webui/node_modules
+/client/webui/dist
+/client/webui/dist.zip

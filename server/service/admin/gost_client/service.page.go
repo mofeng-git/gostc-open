@@ -11,6 +11,7 @@ import (
 
 type PageReq struct {
 	bean.PageParam
+	Name    string `json:"name"`
 	Account string `json:"account"`
 }
 
@@ -37,7 +38,11 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 	if req.Account != "" {
 		var userCodes []string
 		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
-		where = append(where, db.SystemUser.Code.In(userCodes...))
+		where = append(where, db.GostClient.UserCode.In(userCodes...))
+	}
+
+	if req.Name != "" {
+		where = append(where, db.GostClient.Name.Like("%"+req.Name+"%"))
 	}
 
 	clients, total, _ := db.GostClient.

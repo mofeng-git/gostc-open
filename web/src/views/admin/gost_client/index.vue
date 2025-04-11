@@ -28,6 +28,7 @@ const state = ref({
       page: 1,
       size: 12,
       account: '',
+      name: '',
     },
     list: [],
     total: 0,
@@ -211,6 +212,13 @@ onBeforeMount(() => {
 <template>
   <div>
     <SearchCard :show-border="false" space>
+      <SearchItem
+          type="input"
+          :label-width="70"
+          clearable
+          label="名称"
+          @onChange="value => state.table.search.name=value"
+      ></SearchItem>
       <SearchItem
           type="input"
           :label-width="70"
