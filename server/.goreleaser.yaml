@@ -24,7 +24,7 @@ builds:
     main: ./main.go
 archives:
   - format: tar.gz
-    name_template: "server_{{ .Os }}_{{ .Arch }}"
+    name_template: "server_{{ .Target }}"
     format_overrides:
       - goos: windows
         format: zip
