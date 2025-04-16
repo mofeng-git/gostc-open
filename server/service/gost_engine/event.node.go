@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/lxzan/gws"
-	cache2 "github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
 	"server/global"
 	"server/model"
@@ -21,10 +20,20 @@ type NodeEvent struct {
 	sendAtomic      atomic.Int32
 	sendOperationId string
 	isRegister      bool
+
+	maxRetries    int // 最大重试次数
+	retryInterval time.Duration
+	checkInterval time.Duration // 循环检查消息等待间隔
 }
 
 func NewNodeEvent(code string, log *zap.Logger) *NodeEvent {
-	return &NodeEvent{code: code, log: log}
+	return &NodeEvent{
+		code:          code,
+		log:           log,
+		maxRetries:    10,
+		retryInterval: time.Second,
+		checkInterval: time.Second,
+	}
 }
 
 func (event *NodeEvent) OnOpen(socket *gws.Conn) {
@@ -47,46 +56,52 @@ func (event *NodeEvent) OnOpen(socket *gws.Conn) {
 }
 
 func (event *NodeEvent) sendLoop(socket *gws.Conn) {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(event.checkInterval)
 	defer func() {
-		event.log.Info("stop sendLoop", zap.String("type", "node"), zap.String("code", event.code))
+		event.log.Info("stop sendLoop",
+			zap.String("type", "client"),
+			zap.String("code", event.code))
 		ticker.Stop()
 	}()
-	for {
-		if !event.isRunning {
-			return
-		}
+
+	for event.isRunning {
+		// Skip if sending is blocked
 		if event.sendAtomic.Load() == 1 {
-			time.Sleep(time.Second)
+			time.Sleep(event.retryInterval)
 			continue
 		}
+
 		msgChan, err := msgRegistry.PullMessage(event.code)
 		if err != nil {
-			time.Sleep(time.Second)
+			time.Sleep(event.retryInterval)
 			continue
 		}
-		ticker.Reset(time.Second)
+
 		select {
 		case req := <-msgChan:
-			event.sendAtomic.Store(1)
-			event.sendOperationId = req.OperationId
-			event.WriteAny(socket, req)
-			sleep := 0
-			for {
-				if event.sendAtomic.Load() == 0 {
-					break
-				} else {
-					sleep++
-					if sleep <= 10 {
-						time.Sleep(time.Second)
-						continue
-					}
-				}
-				sleep = 0
-				event.WriteAny(socket, req)
-			}
+			event.handleMessage(socket, req)
 		case <-ticker.C:
+			// Continue loop
 		}
+	}
+}
+
+func (event *NodeEvent) handleMessage(socket *gws.Conn, req MessageData) {
+	event.sendAtomic.Store(1)
+	event.sendOperationId = req.OperationId
+	event.WriteAny(socket, req)
+
+	for retry := 0; retry < event.maxRetries && event.isRunning; retry++ {
+		if event.sendAtomic.Load() == 0 {
+			return
+		}
+
+		time.Sleep(event.retryInterval)
+	}
+
+	// Final attempt if still needed
+	if event.isRunning && event.sendAtomic.Load() == 1 {
+		event.WriteAny(socket, req)
 	}
 }
 
@@ -170,7 +185,7 @@ func (event *NodeEvent) OnMessage(socket *gws.Conn, message *gws.Message) {
 		if data.Code == "" {
 			return
 		}
-		cache.SetNodePortUse(data.Code, data.Port, data.Use, cache2.NoExpiration)
+		cache.SetNodePortUse(data.Code, data.Port, data.Use, time.Minute)
 	}
 }
 

@@ -22,10 +22,22 @@ type ClientEvent struct {
 	sendAtomic      atomic.Int32
 	sendOperationId string
 	isRegister      bool
+
+	maxRetries    int // 最大重试次数
+	retryInterval time.Duration
+	checkInterval time.Duration // 循环检查消息等待间隔
 }
 
 func NewClientEvent(code string, ip string, log *zap.Logger) *ClientEvent {
-	return &ClientEvent{code: code, log: log, ip: ip}
+	return &ClientEvent{
+		ip:            ip,
+		code:          code,
+		log:           log,
+		sendAtomic:    atomic.Int32{},
+		maxRetries:    10,
+		retryInterval: time.Second,
+		checkInterval: time.Second,
+	}
 }
 
 func (event *ClientEvent) OnOpen(socket *gws.Conn) {
@@ -93,49 +105,52 @@ func (event *ClientEvent) register() {
 }
 
 func (event *ClientEvent) sendLoop(socket *gws.Conn) {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(event.checkInterval)
 	defer func() {
-		event.log.Info("stop sendLoop", zap.String("type", "client"), zap.String("code", event.code))
+		event.log.Info("stop sendLoop",
+			zap.String("type", "client"),
+			zap.String("code", event.code))
 		ticker.Stop()
 	}()
-	for {
-		if !event.isRunning {
-			return
-		}
+
+	for event.isRunning {
+		// Skip if sending is blocked
 		if event.sendAtomic.Load() == 1 {
-			time.Sleep(time.Second)
+			time.Sleep(event.retryInterval)
 			continue
 		}
 
 		msgChan, err := msgRegistry.PullMessage(event.code)
 		if err != nil {
-			time.Sleep(time.Second)
+			time.Sleep(event.retryInterval)
 			continue
 		}
+
 		select {
 		case req := <-msgChan:
-			event.sendAtomic.Store(1)
-			event.sendOperationId = req.OperationId
-			event.WriteAny(socket, req)
-			sleep := 0
-			for {
-				if !event.isRunning {
-					return
-				}
-				if event.sendAtomic.Load() == 0 {
-					break
-				} else {
-					sleep++
-					if sleep <= 10 {
-						time.Sleep(time.Second)
-						continue
-					}
-				}
-				sleep = 0
-				event.WriteAny(socket, req)
-			}
+			event.handleMessage(socket, req)
 		case <-ticker.C:
+			// Continue loop
 		}
+	}
+}
+
+func (event *ClientEvent) handleMessage(socket *gws.Conn, req MessageData) {
+	event.sendAtomic.Store(1)
+	event.sendOperationId = req.OperationId
+	event.WriteAny(socket, req)
+
+	for retry := 0; retry < event.maxRetries && event.isRunning; retry++ {
+		if event.sendAtomic.Load() == 0 {
+			return
+		}
+
+		time.Sleep(event.retryInterval)
+	}
+
+	// Final attempt if still needed
+	if event.isRunning && event.sendAtomic.Load() == 1 {
+		event.WriteAny(socket, req)
 	}
 }
 

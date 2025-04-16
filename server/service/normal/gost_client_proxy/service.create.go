@@ -23,37 +23,6 @@ type CreateReq struct {
 	ConfigCode string `binding:"required" json:"configCode" label:"套餐配置"`
 }
 
-func CheckPort(tx *query.Query, client model.GostClient, port string) (err error) {
-	if !cache.GetClientOnline(client.Code) {
-		return nil
-	}
-	gost_engine.ClientPortCheck(tx, client.Code, port)
-	var available bool // 是否可用
-	var retry int
-	for {
-		time.Sleep(time.Millisecond * 200)
-		retry++
-		use, ok := cache.GetClientPortUse(client.Code, port)
-		if ok {
-			if use {
-				available = false
-			} else {
-				available = true
-			}
-			break
-		}
-		if retry > 5*5 {
-			return errors.New("验证端口超时")
-		}
-	}
-	// 可用，则结束获取端口
-	if available {
-		return nil
-	} else {
-		return errors.New("端口已被占用")
-	}
-}
-
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	db, _, log := repository.Get("")
 	if !utils.ValidatePort(req.Port) {
@@ -172,4 +141,28 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		})
 		return nil
 	})
+}
+
+const (
+	checkInterval = 200 * time.Millisecond
+	maxRetries    = 25 // 5 seconds total (200ms * 25)
+)
+
+func CheckPort(tx *query.Query, client model.GostClient, port string) error {
+	// 判断客户端状态，离线则不检测端口
+	if !cache.GetClientOnline(client.Code) {
+		return nil
+	}
+	// 发送端口检测消息
+	gost_engine.ClientPortCheck(tx, client.Code, port)
+	for retry := 0; retry < maxRetries; retry++ {
+		time.Sleep(checkInterval)
+		if use, ok := cache.GetClientPortUse(client.Code, port); ok {
+			if !use {
+				return nil
+			}
+			return errors.New("端口已被占用")
+		}
+	}
+	return errors.New("验证端口超时")
 }

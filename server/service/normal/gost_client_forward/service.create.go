@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"server/model"
 	"server/pkg/jwt"
@@ -24,47 +25,6 @@ type CreateReq struct {
 	ClientCode    string `binding:"required" json:"clientCode" label:"客户端编号"`
 	NodeCode      string `binding:"required" json:"nodeCode" label:"节点编号"`
 	ConfigCode    string `binding:"required" json:"configCode" label:"套餐配置"`
-}
-
-// available 可用则返回true
-func validPortAvailable(tx *query.Query, nodeCode string, port string) (available bool) {
-	gost_engine.NodePortCheck(tx, nodeCode, port)
-	var retry int
-	for {
-		time.Sleep(time.Millisecond * 200)
-		retry++
-		use, ok := cache.GetNodePortUse(nodeCode, port)
-		if ok {
-			available = !use
-			break
-		}
-		if retry > 5*5 {
-			break
-		}
-	}
-	return available
-}
-
-func GetPort(tx *query.Query, node model.GostNode) (port string, err error) {
-	for {
-		port, err = node_port.GetPort(node.Code)
-		if err != nil {
-			return "", err
-		}
-		if !cache.GetNodeOnline(node.Code) {
-			return port, err
-		}
-		version := cache.GetNodeVersion(node.Code)
-		if version >= "v1.1.7" {
-			// 可用，则结束获取端口
-			if validPortAvailable(tx, node.Code, port) {
-				break
-			}
-		} else {
-			return port, err
-		}
-	}
-	return port, nil
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
@@ -215,4 +175,38 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 		})
 		return nil
 	})
+}
+
+const (
+	portCheckRetryInterval = 200 * time.Millisecond
+	maxPortCheckRetries    = 25 // 5*5
+)
+
+func validPortAvailable(tx *query.Query, nodeCode string, port string) bool {
+	gost_engine.NodePortCheck(tx, nodeCode, port)
+	for retry := 0; retry < maxPortCheckRetries; retry++ {
+		time.Sleep(portCheckRetryInterval)
+		inUse, exists := cache.GetNodePortUse(nodeCode, port)
+		if exists {
+			return !inUse
+		}
+	}
+	return false
+}
+func GetPort(tx *query.Query, node model.GostNode) (string, error) {
+	for {
+		port, err := node_port.GetPort(node.Code)
+		if err != nil {
+			return "", fmt.Errorf("failed to get port: %w", err)
+		}
+		// 判断版本，对离线节点，不检查端口
+		if !cache.GetNodeOnline(node.Code) || cache.GetNodeVersion(node.Code) < "v1.1.7" {
+			return port, nil
+		}
+		// 检测端口
+		if validPortAvailable(tx, node.Code, port) {
+			return port, nil
+		}
+		// 如果端口不可用，则继续循环
+	}
 }

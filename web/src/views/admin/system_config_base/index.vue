@@ -57,12 +57,6 @@ onBeforeMount(async () => {
         <n-form-item label="基础URL">
           <n-input v-model:value="state.data.baseUrl"></n-input>
         </n-form-item>
-        <n-form-item label="APIKEY(空表示不启用密钥)">
-          <n-input-group>
-            <n-button type="info" @click="generateApiKeyFunc">随机生成</n-button>
-            <n-input v-model:value="state.data.apiKey"></n-input>
-          </n-input-group>
-        </n-form-item>
         <n-form-item label="注册">
           <n-switch
               :round="false"

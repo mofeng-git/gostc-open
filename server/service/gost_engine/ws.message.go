@@ -2,7 +2,7 @@ package gost_engine
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -15,44 +15,47 @@ var messageLock = &sync.RWMutex{}
 func (msg Message) New(code string) {
 	messageLock.Lock()
 	defer messageLock.Unlock()
-	value := msg[code]
-	if value != nil {
-		close(value)
-		delete(msg, code)
+	if ch, exists := msg[code]; exists {
+		close(ch)
 	}
 	msg[code] = make(chan MessageData, 1000)
 }
 
-func (msg Message) PushMessage(code string, req MessageData) {
-	messageLock.Lock()
-	defer messageLock.Unlock()
-	value := msg[code]
-	if value == nil {
-		return
+func (msg Message) PushMessage(code string, req MessageData) error {
+	messageLock.RLock()
+	ch, exists := msg[code]
+	messageLock.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("channel for code %s does not exist", code)
 	}
-	value <- req
-	msg[code] = value
+
+	select {
+	case ch <- req:
+		return nil
+	default:
+		return fmt.Errorf("channel for code %s is full", code)
+	}
 }
 
 func (msg Message) PullMessage(code string) (<-chan MessageData, error) {
 	messageLock.RLock()
 	defer messageLock.RUnlock()
-	req := msg[code]
-	if req == nil {
-		return nil, errors.New("msg is nil")
+
+	if ch, exists := msg[code]; exists {
+		return ch, nil
 	}
-	return req, nil
+	return nil, fmt.Errorf("channel for code %s does not exist", code)
 }
 
 func (msg Message) CleanMessage(code string) {
 	messageLock.Lock()
 	defer messageLock.Unlock()
-	req := msg[code]
-	if req == nil {
-		return
+
+	if ch, exists := msg[code]; exists {
+		close(ch)
+		delete(msg, code)
 	}
-	close(req)
-	delete(msg, code)
 }
 
 type MessageData struct {
@@ -66,23 +69,22 @@ func (msg *MessageData) GetContent(data any) error {
 }
 
 func (msg *MessageData) SetContent(content any) {
-	data := ""
-	if content != nil {
-		marshal, _ := json.Marshal(content)
-		data = string(marshal)
+	if content == nil {
+		msg.Content = ""
+		return
 	}
-	msg.Content = data
+	marshal, err := json.Marshal(content)
+	if err != nil {
+		return
+	}
+	msg.Content = string(marshal)
 }
 
 func NewMessage(operationId, operationType string, content any) MessageData {
-	data := ""
-	if content != nil {
-		marshal, _ := json.Marshal(content)
-		data = string(marshal)
-	}
-	return MessageData{
+	msg := MessageData{
 		OperationId:   operationId,
 		OperationType: operationType,
-		Content:       data,
 	}
+	msg.SetContent(content)
+	return msg
 }
