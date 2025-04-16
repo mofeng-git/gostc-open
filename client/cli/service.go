@@ -26,7 +26,10 @@ var Program = &program{}
 type program struct {
 }
 
-func selectMode(isServer, isVisit, isP2P bool, webAddress string) string {
+func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string) string {
+	if cfgFile != "" {
+		return "cfg"
+	}
 	if isServer {
 		return "server"
 	}
@@ -45,7 +48,7 @@ func selectMode(isServer, isVisit, isP2P bool, webAddress string) string {
 func (p *program) run() {
 	// 管理端地址
 	var address string
-	flag.StringVar(&address, "addr", "gost.sian.one", "server address")
+	flag.StringVar(&address, "addr", "gost.sian.one", "server address,example: gost.sian.one")
 	var tlsEnable bool
 	flag.BoolVar(&tlsEnable, "tls", true, "enable tls")
 
@@ -61,20 +64,24 @@ func (p *program) run() {
 	var p2p bool
 	flag.BoolVar(&p2p, "p2p", false, "p2p client")
 	var wAddress string
-	flag.StringVar(&wAddress, "web-addr", "", "web ui address")
+	flag.StringVar(&wAddress, "web-addr", "", "web ui address,example: 0.0.0.0:18080")
 
 	var vTunnels string
 	flag.StringVar(&vTunnels, "vts", "", "visit tunnels,example: vkey1:8080,vkey2:8081,vkey3:8082")
 
+	var cfgFile string
+	flag.StringVar(&cfgFile, "cfg", "", "config file,example: /path/config.yaml")
+
 	// 其他参数
 	var proxyBaseUrl string
-	flag.StringVar(&proxyBaseUrl, "proxy-base-url", "", "proxy server api url")
-	//var logLevel string
-	//flag.StringVar(&logLevel, "log-level", "error", "log-level trace|debug|info|warn|error|fatal")
+	flag.StringVar(&proxyBaseUrl, "proxy-base-url", "", "proxy server api url,example: http://127.0.0.1:8080")
 	var version bool
 	flag.BoolVar(&version, "version", false, "client version")
+	var cfgExample bool
+	flag.BoolVar(&cfgExample, "cfg-example", false, "show config example")
 	var console bool
 	flag.BoolVar(&console, "console", false, "log to stdout")
+
 	flag.Parse()
 
 	common.Logger.Console(console)
@@ -84,14 +91,22 @@ func (p *program) run() {
 		os.Exit(0)
 	}
 
+	if cfgExample {
+		configExample()
+		os.Exit(0)
+	}
+
 	var wsurl = common.GenerateWsUrl(tlsEnable, address)
 	var apiurl = common.GenerateHttpUrl(tlsEnable, address)
-	fmt.Println("WS_URL：", wsurl)
-	fmt.Println("API_URL：", apiurl)
 
-	var mode = selectMode(server, visit, p2p, wAddress)
+	var mode = selectMode(cfgFile, server, visit, p2p, wAddress)
 
 	switch mode {
+	case "cfg":
+		if err := loadConfig(cfgFile); err != nil {
+			log.Fatalln(err)
+		}
+		startForConfig()
 	case "ui":
 		basePath, _ := os.Executable()
 		basePath = filepath.Dir(basePath)
@@ -114,6 +129,8 @@ func (p *program) run() {
 			fmt.Println("please enter key")
 			os.Exit(1)
 		}
+		fmt.Println("WS_URL：", wsurl)
+		fmt.Println("API_URL：", apiurl)
 		var svc service.Service
 		switch mode {
 		case "server":
