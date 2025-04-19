@@ -10,6 +10,7 @@ import (
 
 type Tunnel struct {
 	VKey string
+	Bind string
 	Port string
 }
 
@@ -20,32 +21,41 @@ func runTunnels(mode string, vTunnels string, apiurl string) {
 	tunnels := strings.Split(vTunnels, ",")
 	for _, tunnel := range tunnels {
 		kp := strings.Split(tunnel, ":")
-		if len(kp) != 2 {
+		switch len(kp) {
+		case 2:
+			tunnelList = append(tunnelList, Tunnel{
+				VKey: kp[0],
+				Bind: "0.0.0.0",
+				Port: kp[1],
+			})
+		case 3:
+			tunnelList = append(tunnelList, Tunnel{
+				VKey: kp[0],
+				Bind: kp[1],
+				Port: kp[2],
+			})
+		default:
 			continue
 		}
-		tunnelList = append(tunnelList, Tunnel{
-			VKey: kp[0],
-			Port: kp[1],
-		})
 	}
 
 	for _, tunnel := range tunnelList {
 		switch mode {
 		case "visit":
-			svc := service2.NewTunnel(apiurl, tunnel.VKey, tunnel.Port)
+			svc := service2.NewTunnel(apiurl, tunnel.VKey, tunnel.Bind, tunnel.Port)
 			if err := svc.Start(); err != nil {
-				fmt.Println("私有隧道启动失败", tunnel.VKey, "0.0.0.0:"+tunnel.Port, err)
+				fmt.Println("私有隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
-			fmt.Println("私有隧道启动成功", tunnel.VKey, "0.0.0.0:"+tunnel.Port)
+			fmt.Println("私有隧道启动成功", tunnel.VKey, tunnel.Bind+":"+tunnel.Port)
 			tunnelMap.Store(tunnel.VKey, svc)
 		case "p2p":
-			svc := service2.NewP2P(apiurl, tunnel.VKey, tunnel.Port)
+			svc := service2.NewP2P(apiurl, tunnel.VKey, tunnel.Bind, tunnel.Port)
 			if err := svc.Start(); err != nil {
-				fmt.Println("P2P隧道启动失败", tunnel.VKey, "0.0.0.0:"+tunnel.Port, err)
+				fmt.Println("P2P隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
-			fmt.Println("P2P隧道启动成功", tunnel.VKey, "0.0.0.0:"+tunnel.Port)
+			fmt.Println("P2P隧道启动成功", tunnel.VKey, tunnel.Bind+":"+tunnel.Port)
 			tunnelMap.Store(tunnel.VKey, svc)
 		}
 	}

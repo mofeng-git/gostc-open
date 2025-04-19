@@ -25,7 +25,7 @@ func (*service) Status(req StatusReq) error {
 
 	svc, ok := global.TunnelMap.Load(req.Key)
 	if !ok {
-		svc = service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), req.Key, tunnel.Port)
+		svc = service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, tunnel.Port)
 		global.TunnelMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {

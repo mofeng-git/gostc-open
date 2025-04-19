@@ -27,7 +27,7 @@ func init() {
 			return strings.Contains(c.Request.RequestURI, "api/v")
 		}))
 
-		InitStatic(engine)
+		_ = InitStatic(engine)
 
 		adminGroup := engine.Group("api/v1/admin")
 		admin.InitGostClient(adminGroup)

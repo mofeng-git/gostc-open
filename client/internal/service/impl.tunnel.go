@@ -15,14 +15,16 @@ import (
 type Tunnel struct {
 	key      string
 	httpUrl  string
+	bind     string
 	port     string
 	svcNames []string
 }
 
-func NewTunnel(httpUrl, key, port string) *Tunnel {
+func NewTunnel(httpUrl, key, bind, port string) *Tunnel {
 	return &Tunnel{
 		key:     key,
 		httpUrl: httpUrl,
+		bind:    bind,
 		port:    port,
 	}
 }
@@ -35,7 +37,7 @@ func (svc *Tunnel) Start() (err error) {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(port) {
+	if utils.IsUse(svc.bind, port) {
 		return errors.New("本地端口已被占用")
 	}
 	if common.State.Get(svc.key) {
@@ -80,7 +82,7 @@ func (svc *Tunnel) run() (err error) {
 	rateLimiter := limiter.ParseRateLimiter(&data.RLimiter)
 	_ = registry.RateLimiterRegistry().Register(data.RLimiter.Name, rateLimiter)
 	for _, svcCfg := range data.SvcList {
-		svcCfg.Addr = ":" + svc.port
+		svcCfg.Addr = svc.bind + ":" + svc.port
 		parseService, _ := service.ParseService(&svcCfg)
 		svc.svcNames = append(svc.svcNames, svcCfg.Name)
 		go parseService.Serve()

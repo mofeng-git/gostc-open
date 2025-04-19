@@ -12,10 +12,11 @@ import (
 
 type UpdateReq struct {
 	Name      string `binding:"required" json:"name"`
-	Address   string `binding:"required" json:"address"`
+	Key       string `binding:"required" json:"key"`
+	Bind      string `json:"bind"`
 	Port      string `binding:"required" json:"port"`
 	Tls       int    `binding:"required" json:"tls"`
-	Key       string `binding:"required" json:"key"`
+	Address   string `binding:"required" json:"address"`
 	AutoStart int    `json:"autoStart"`
 }
 
@@ -27,7 +28,7 @@ func (*service) Update(req UpdateReq) error {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(port) {
+	if utils.IsUse(req.Bind, port) {
 		return errors.New("本地端口已被占用")
 	}
 	if common.State.Get(req.Key) {
@@ -36,6 +37,7 @@ func (*service) Update(req UpdateReq) error {
 	if err := global.TunnelFS.Update(req.Key, model.Tunnel{
 		Key:       req.Key,
 		Name:      req.Name,
+		Bind:      req.Bind,
 		Port:      req.Port,
 		Address:   req.Address,
 		Tls:       req.Tls,
@@ -43,7 +45,7 @@ func (*service) Update(req UpdateReq) error {
 	}); err != nil {
 		return err
 	}
-	tunnel := service2.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Port)
+	tunnel := service2.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, req.Port)
 	global.TunnelMap.Store(req.Key, tunnel)
 	return nil
 }

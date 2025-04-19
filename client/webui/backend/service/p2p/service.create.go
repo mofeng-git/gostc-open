@@ -13,6 +13,7 @@ import (
 type CreateReq struct {
 	Name      string `binding:"required" json:"name"`
 	Key       string `binding:"required" json:"key"`
+	Bind      string `json:"bind"`
 	Port      string `binding:"required" json:"port"`
 	Address   string `binding:"required" json:"address"`
 	Tls       int    `binding:"required" json:"tls"`
@@ -27,13 +28,14 @@ func (*service) Create(req CreateReq) error {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(port) {
+	if utils.IsUse(req.Bind, port) {
 		return errors.New("本地端口已被占用")
 	}
 
 	if err := global.P2PFS.Insert(req.Key, model.P2P{
 		Key:       req.Key,
 		Name:      req.Name,
+		Bind:      req.Bind,
 		Port:      req.Port,
 		Address:   req.Address,
 		Tls:       req.Tls,
@@ -41,7 +43,7 @@ func (*service) Create(req CreateReq) error {
 	}); err != nil {
 		return err
 	}
-	p2p := service2.NewP2P(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Port)
+	p2p := service2.NewP2P(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Bind, req.Key, req.Port)
 	global.P2PMap.Store(req.Key, p2p)
 	return nil
 }

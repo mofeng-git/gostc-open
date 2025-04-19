@@ -11,6 +11,7 @@ import (
 type Item struct {
 	Key       string `json:"key"`
 	Name      string `json:"name"`
+	Bind      string `json:"bind"`
 	Port      string `json:"port"`
 	Address   string `json:"address"`
 	Tls       int    `json:"tls"`
@@ -30,6 +31,7 @@ func (*service) List() (result []Item) {
 		result = append(result, Item{
 			Key:       tunnel.Key,
 			Name:      tunnel.Name,
+			Bind:      tunnel.Bind,
 			Port:      tunnel.Port,
 			Address:   tunnel.Address,
 			Tls:       tunnel.Tls,

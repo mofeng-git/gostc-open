@@ -13,13 +13,15 @@ import (
 type P2P struct {
 	key     string
 	httpUrl string
+	bind    string
 	port    string
 }
 
-func NewP2P(httpUrl, key, port string) *P2P {
+func NewP2P(httpUrl, key, bind, port string) *P2P {
 	return &P2P{
 		key:     key,
 		httpUrl: httpUrl,
+		bind:    bind,
 		port:    port,
 	}
 }
@@ -32,7 +34,7 @@ func (svc *P2P) Start() (err error) {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(port) {
+	if utils.IsUse(svc.bind, port) {
 		return errors.New("本地端口已被占用")
 	}
 	if common.State.Get(svc.key) {
@@ -63,6 +65,7 @@ func (svc *P2P) run() (err error) {
 		common.Logger.AddLog("p2p", svc.key+"获取配置失败，err:"+err.Error())
 		return err
 	}
+	data.XTCPCfg.BindAddr = svc.bind
 	data.XTCPCfg.BindPort, _ = strconv.Atoi(svc.port)
 
 	registry.Del(svc.key)

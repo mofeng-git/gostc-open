@@ -10,6 +10,7 @@ const state = ref({
     data: {
       key: '',
       name: '',
+      bind: '',
       port: '',
       tls: 1,
       address: 'gost.sian.one',
@@ -27,6 +28,7 @@ const state = ref({
     data: {
       key: '',
       name: '',
+      bind: '',
       port: '',
       tls: 1,
       address: 'gost.sian.one',
@@ -55,6 +57,7 @@ const openCreateModal = () => {
   state.value.create.data = {
     key: '',
     name: '',
+    bind: '',
     port: '',
     tls: 1,
     address: 'gost.sian.one',
@@ -211,7 +214,7 @@ const generateServerString = (address, tls) => {
 
     <Modal
         :show="state.create.open"
-        title="新增客户端"
+        title="新增P2P隧道"
         width="600px"
         confirm-text="保存"
         cancel-text="取消"
@@ -226,8 +229,11 @@ const generateServerString = (address, tls) => {
         <n-form-item path="key" label="密钥">
           <n-input v-model:value.trim="state.create.data.key"></n-input>
         </n-form-item>
+        <n-form-item path="bind" label="本地地址">
+          <n-input v-model:value.trim="state.create.data.bind" placeholder="0.0.0.0"></n-input>
+        </n-form-item>
         <n-form-item path="port" label="本地端口">
-          <n-input v-model:value.trim="state.create.data.port"></n-input>
+          <n-input v-model:value.trim="state.create.data.port" placeholder="8080"></n-input>
         </n-form-item>
         <n-form-item path="address" label="服务器">
           <n-input-group>
@@ -249,7 +255,7 @@ const generateServerString = (address, tls) => {
 
     <Modal
         :show="state.update.open"
-        title="修改客户端"
+        title="修改P2P隧道"
         width="600px"
         confirm-text="保存"
         cancel-text="取消"
@@ -264,8 +270,11 @@ const generateServerString = (address, tls) => {
         <n-form-item path="key" label="密钥">
           <n-input v-model:value.trim="state.update.data.key" disabled></n-input>
         </n-form-item>
+        <n-form-item path="port" label="本地地址">
+          <n-input v-model:value.trim="state.update.data.bind" placeholder="0.0.0.0"></n-input>
+        </n-form-item>
         <n-form-item path="port" label="本地端口">
-          <n-input v-model:value.trim="state.update.data.port"></n-input>
+          <n-input v-model:value.trim="state.update.data.port" placeholder="8080"></n-input>
         </n-form-item>
         <n-form-item path="address" label="服务器">
           <n-input-group>

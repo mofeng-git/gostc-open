@@ -29,6 +29,7 @@ type ClientCfg struct {
 
 type TunnelCfg struct {
 	Key     string `yaml:"key"`
+	Bind    string `yaml:"bind"`
 	Port    int    `yaml:"port"`
 	Remark  string `yaml:"remark"`
 	Tls     bool   `yaml:"tls"`
@@ -36,6 +37,7 @@ type TunnelCfg struct {
 }
 type P2PCfg struct {
 	Key     string `yaml:"key"`
+	Bind    string `yaml:"bind"`
 	Port    int    `yaml:"port"`
 	Remark  string `yaml:"remark"`
 	Tls     bool   `yaml:"tls"`
@@ -59,10 +61,10 @@ func configExample() {
 			{Key: uuid.NewString(), Remark: "客户端1", Tls: true, Address: "gost.sian.one"},
 		},
 		Tunnels: []TunnelCfg{
-			{Key: uuid.NewString(), Port: 8080, Remark: "私有隧道1", Tls: true, Address: "gost.sian.one"},
+			{Key: uuid.NewString(), Bind: "127.0.0.1", Port: 8080, Remark: "私有隧道1", Tls: true, Address: "gost.sian.one"},
 		},
 		P2Ps: []P2PCfg{
-			{Key: uuid.NewString(), Port: 8081, Remark: "P2P隧道1", Tls: true, Address: "gost.sian.one"},
+			{Key: uuid.NewString(), Bind: "0.0.0.0", Port: 8081, Remark: "P2P隧道1", Tls: true, Address: "gost.sian.one"},
 		},
 	}
 	marshal, _ := yaml.Marshal(cfg)
@@ -81,20 +83,20 @@ func startForConfig() {
 		go loop(wg, svc)
 	}
 	for _, tunnel := range Cfg.Tunnels {
-		svc := service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls, tunnel.Address), tunnel.Key, strconv.Itoa(tunnel.Port))
+		svc := service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls, tunnel.Address), tunnel.Key, tunnel.Bind, strconv.Itoa(tunnel.Port))
 		if err := svc.Start(); err != nil {
 			fmt.Println(tunnel.Key, tunnel.Remark, "启动失败", err)
 		}
-		fmt.Println(tunnel.Key, tunnel.Remark, "私有隧道启动成功", "127.0.0.1:"+strconv.Itoa(tunnel.Port))
+		fmt.Println(tunnel.Key, tunnel.Remark, "私有隧道启动成功", tunnel.Bind+":"+strconv.Itoa(tunnel.Port))
 		wg.Add(1)
 		go loop(wg, svc)
 	}
 	for _, p2p := range Cfg.P2Ps {
-		svc := service2.NewP2P(common.GenerateHttpUrl(p2p.Tls, p2p.Address), p2p.Key, strconv.Itoa(p2p.Port))
+		svc := service2.NewP2P(common.GenerateHttpUrl(p2p.Tls, p2p.Address), p2p.Key, p2p.Bind, strconv.Itoa(p2p.Port))
 		if err := svc.Start(); err != nil {
 			fmt.Println(p2p.Key, p2p.Remark, "启动失败", err)
 		}
-		fmt.Println(p2p.Key, p2p.Remark, "P2P隧道启动成功", "127.0.0.1:"+strconv.Itoa(p2p.Port))
+		fmt.Println(p2p.Key, p2p.Remark, "P2P隧道启动成功", p2p.Bind+":"+strconv.Itoa(p2p.Port))
 		wg.Add(1)
 		go loop(wg, svc)
 	}
