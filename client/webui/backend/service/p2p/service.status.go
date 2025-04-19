@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
 	"gostc-sub/webui/backend/global"
@@ -23,8 +22,6 @@ func (*service) Status(req StatusReq) error {
 	var p2p model.P2P
 	marshal, _ := json.Marshal(value)
 	_ = json.Unmarshal(marshal, &p2p)
-
-	fmt.Println(string(marshal))
 
 	svc, ok := global.P2PMap.Load(req.Key)
 	if !ok {

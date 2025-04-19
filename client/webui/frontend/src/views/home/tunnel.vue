@@ -270,7 +270,7 @@ const generateServerString = (address, tls) => {
         <n-form-item path="key" label="密钥">
           <n-input v-model:value.trim="state.update.data.key" disabled></n-input>
         </n-form-item>
-        <n-form-item path="port" label="本地地址">
+        <n-form-item path="bind" label="本地地址">
           <n-input v-model:value.trim="state.update.data.bind" placeholder="0.0.0.0"></n-input>
         </n-form-item>
         <n-form-item path="port" label="本地端口">
