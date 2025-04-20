@@ -144,6 +144,11 @@ func configureTransport(proxy *httputil.ReverseProxy) {
 		if forwardedHost := r.Header.Get("X-Forwarded-Host"); forwardedHost != "" {
 			r.Host = forwardedHost
 		}
+		if r.TLS != nil {
+			r.Header.Set("X-Forwarded-Proto", "https")
+		} else {
+			r.Header.Set("X-Forwarded-Proto", "http")
+		}
 		// 确保Upgrade头传递
 		if r.Header.Get("Upgrade") == "websocket" {
 			r.Header.Set("Connection", "Upgrade")
@@ -164,21 +169,27 @@ func handleRedirectLocation(resp *http.Response) {
 	if err != nil || location == nil {
 		return
 	}
-
-	// 获取原始请求的协议和Host
 	req := resp.Request
+	originalHost := req.Host
+	// 如果Location已经是相对路径或Host与原始请求相同，不需要修改
+	if location.Host == "" || location.Host == originalHost {
+		return
+	}
+	// 获取原始请求的协议
 	scheme := "http"
-	if req.TLS != nil {
+	if req.TLS != nil || req.Header.Get("X-Forwarded-Proto") == "https" {
 		scheme = "https"
 	}
-	originalHost := req.Host
 
-	// 修正Location为代理地址
-	if location.Host != originalHost {
-		location.Scheme = scheme
-		location.Host = originalHost
-		resp.Header.Set("Location", location.String())
+	// 创建新的URL，保留路径和查询参数
+	newLocation := &url.URL{
+		Scheme:   scheme,
+		Host:     location.Host,
+		Path:     location.Path,
+		RawQuery: location.RawQuery,
+		Fragment: location.Fragment,
 	}
+	resp.Header.Set("Location", newLocation.String())
 }
 
 func (server *Server) StartHTTPServer() error {
@@ -345,14 +356,14 @@ func (server *Server) httpsProxyHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	target, err := server.findTarget(domain)
-	if err != nil {
-		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
-		return
-	}
+	//target, err := server.findTarget(domain)
+	//if err != nil {
+	//	http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
+	//	return
+	//}
 
 	r.Header.Set("X-Forwarded-Host", r.Host)
-	r.Header.Set("X-Origin-Host", target.Host)
+	r.Header.Set("X-Origin-Host", r.Host)
 	r.Host = domain
 	proxy.ServeHTTP(w, r)
 }
