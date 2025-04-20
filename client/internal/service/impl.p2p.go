@@ -34,8 +34,8 @@ func (svc *P2P) Start() (err error) {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(svc.bind, port) {
-		return errors.New("本地端口已被占用")
+	if err := utils.IsUse(svc.bind, port); err != nil {
+		return err
 	}
 	if common.State.Get(svc.key) {
 		return errors.New("P2P隧道已在运行中")

@@ -21,7 +21,7 @@ func (e *Event) WsPortCheck(data map[string]string) PortCheckResp {
 	if port != 0 {
 		result = PortCheckResp{
 			Code: data["code"],
-			Use:  utils.IsUse("0.0.0.0", port),
+			Use:  utils.TrinaryOperation(utils.IsUse("0.0.0.0", port) == nil, true, false),
 			Port: data["port"],
 		}
 	}

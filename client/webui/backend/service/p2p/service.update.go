@@ -28,8 +28,8 @@ func (*service) Update(req UpdateReq) error {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(req.Bind, port) {
-		return errors.New("本地端口已被占用")
+	if err := utils.IsUse(req.Bind, port); err != nil {
+		return err
 	}
 	if common.State.Get(req.Key) {
 		return errors.New("P2P隧道正在运行中，请停止运行后修改")

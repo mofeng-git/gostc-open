@@ -28,8 +28,8 @@ func (*service) Create(req CreateReq) error {
 	if err != nil {
 		return errors.New("端口格式错误")
 	}
-	if utils.IsUse(req.Bind, port) {
-		return errors.New("本地端口已被占用")
+	if err := utils.IsUse(req.Bind, port); err != nil {
+		return err
 	}
 	if err := global.TunnelFS.Insert(req.Key, model.Tunnel{
 		Key:       req.Key,

@@ -136,8 +136,14 @@ onBeforeMount(() => {
   listFunc()
 })
 
-const generateAddressString = (port) => {
-  return window.location.hostname+':'+port
+const generateBindAddressString = (bind,port) => {
+  let address = ''
+  if (bind === '' || bind === '0.0.0.0'){
+    address = window.location.hostname
+  }else {
+    address = bind
+  }
+  return address+':'+port
 }
 const generateServerString = (address, tls) => {
   return tls === 1 ? `wss://${address}` : `ws://${address}`
@@ -179,7 +185,8 @@ const generateServerString = (address, tls) => {
           <div>
             <span>服务器：{{ generateServerString(row.address, row.tls) }}</span><br>
             <span>密钥：{{ row.key }}</span><br>
-            <span>地址：{{ generateAddressString(row.port) }}</span><br>
+            <span>地址1：{{ generateBindAddressString(row.bind,row.port) }}</span><br>
+            <span>地址2：{{ generateBindAddressString('',row.port) }}</span><br>
             <span>自启动：{{ row.autoStart===1?'是':'否' }}</span><br>
           </div>
           <n-space justify="end" style="width: 100%">
