@@ -245,8 +245,6 @@ const generateCmdString = () => {
         客户端运行命令：
         <div>{{ generateCmdString() }}</div>
         <div>将xxxxxx修改为你的客户端密钥</div>
-
-        <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
 
@@ -266,12 +264,6 @@ const generateCmdString = () => {
         </n-button>
         <n-button type="info" :focusable="false" @click="openCreate">
           新增
-        </n-button>
-        <n-button
-            :focusable="false"
-            type="warning"
-            @click="goToUrl('https://docs.sian.one/gostc/client')">
-          使用教程
         </n-button>
       </n-space>
     </AppCard>

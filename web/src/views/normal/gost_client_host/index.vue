@@ -346,12 +346,6 @@ const operatorRenderLabel = (option) => {
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
-          <n-button
-              :focusable="false"
-              type="warning"
-              @click="goToUrl('https://docs.sian.one/gostc/host')">
-            使用教程
-          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>

@@ -258,10 +258,6 @@ const operatorRenderLabel = (option)=>{
       <n-alert type="info">
         访客端运行命令：
         <div>{{ generateCmdString() }}</div>
-        <div>
-          含义：当前有两条私有隧道，他们的访问密钥分别为aaaaaa、bbbbbb，访客端运行后，会把aaaaaa密钥的隧道配置的内网服务在访客端设备开启监听8080端口，访问8080端口就相当于访问隧道指向的内网服务，bbbbbb密钥的隧道同理
-        </div>
-        <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
     <AppCard :show-border="false">
@@ -295,12 +291,6 @@ const operatorRenderLabel = (option)=>{
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
-          <n-button
-              :focusable="false"
-              type="warning"
-              @click="goToUrl('https://docs.sian.one/gostc/tunnel')">
-            使用教程
-          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>

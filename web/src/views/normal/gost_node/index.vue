@@ -298,8 +298,6 @@ const generateCmdString = () => {
         节点运行命令：
         <div>{{ generateCmdString() }}</div>
         <div>将xxxxxx修改为你的节点连接密钥</div>
-
-        <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
 
@@ -316,12 +314,6 @@ const generateCmdString = () => {
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
-          <n-button
-              :focusable="false"
-              type="warning"
-              @click="goToUrl('https://docs.sian.one/gostc/node')">
-            自建教程
-          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>
