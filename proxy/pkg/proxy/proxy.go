@@ -51,7 +51,7 @@ func NewServer(cfg Config, log *zap.Logger) *Server {
 			continue
 		}
 		proxy := httputil.NewSingleHostReverseProxy(target)
-		configureTransport(proxy)
+		server.configureTransport(proxy)
 		server.domainMap[domain] = proxy
 		server.targetMap[domain] = target
 		if domainConfig.Cert != "" && domainConfig.Key != "" {
@@ -73,7 +73,7 @@ func NewServer(cfg Config, log *zap.Logger) *Server {
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
-	configureTransport(proxy)
+	server.configureTransport(proxy)
 	server.defaultProxy = proxy
 	if cfg.Default.Cert != "" && cfg.Default.Key != "" {
 		cert, err := tls.LoadX509KeyPair(cfg.Default.Cert, cfg.Default.Key)
@@ -109,7 +109,7 @@ func (server *Server) UpdateDomain(domain, target, certFile, keyFile string) {
 	server.targetMap[domain] = targetUrl
 
 	proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-	configureTransport(proxy)
+	server.configureTransport(proxy)
 	server.domainMap[domain] = proxy
 
 	if certFile != "" && keyFile != "" {
@@ -122,7 +122,7 @@ func (server *Server) UpdateDomain(domain, target, certFile, keyFile string) {
 	}
 }
 
-func configureTransport(proxy *httputil.ReverseProxy) {
+func (server *Server) configureTransport(proxy *httputil.ReverseProxy) {
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
@@ -158,38 +158,40 @@ func configureTransport(proxy *httputil.ReverseProxy) {
 	// 处理重定向响应
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
-			handleRedirectLocation(resp)
+			server.handleRedirectLocation(resp)
 		}
 		return nil
 	}
 }
 
-func handleRedirectLocation(resp *http.Response) {
+func (server *Server) handleRedirectLocation(resp *http.Response) {
 	location, err := resp.Location()
 	if err != nil || location == nil {
 		return
 	}
 	req := resp.Request
-	originalHost := req.Host
-	// 如果Location已经是相对路径或Host与原始请求相同，不需要修改
-	if location.Host == "" || location.Host == originalHost {
+
+	target, err := server.findTarget(req.Host)
+	if err != nil {
 		return
 	}
-	// 获取原始请求的协议
-	scheme := "http"
-	if req.TLS != nil || req.Header.Get("X-Forwarded-Proto") == "https" {
-		scheme = "https"
+	// 仅修改内网地址一致的重定向
+	if target.Host == location.Host {
+		// 获取原始请求的协议
+		scheme := "http"
+		if req.TLS != nil || req.Header.Get("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		// 创建新的URL，保留路径和查询参数
+		newLocation := &url.URL{
+			Scheme:   scheme,
+			Host:     req.Host,
+			Path:     location.Path,
+			RawQuery: location.RawQuery,
+			Fragment: location.Fragment,
+		}
+		resp.Header.Set("Location", newLocation.String())
 	}
-
-	// 创建新的URL，保留路径和查询参数
-	newLocation := &url.URL{
-		Scheme:   scheme,
-		Host:     location.Host,
-		Path:     location.Path,
-		RawQuery: location.RawQuery,
-		Fragment: location.Fragment,
-	}
-	resp.Header.Set("Location", newLocation.String())
 }
 
 func (server *Server) StartHTTPServer() error {
@@ -356,14 +358,14 @@ func (server *Server) httpsProxyHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	//target, err := server.findTarget(domain)
-	//if err != nil {
-	//	http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
-	//	return
-	//}
+	target, err := server.findTarget(domain)
+	if err != nil {
+		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
+		return
+	}
 
 	r.Header.Set("X-Forwarded-Host", r.Host)
-	r.Header.Set("X-Origin-Host", r.Host)
+	r.Header.Set("X-Origin-Host", target.Host)
 	r.Host = domain
 	proxy.ServeHTTP(w, r)
 }
