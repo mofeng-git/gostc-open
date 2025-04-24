@@ -11,6 +11,7 @@ import (
 	"proxy/configs"
 	"proxy/global"
 	"proxy/pkg/middleware"
+	"proxy/pkg/proxy"
 	"time"
 )
 
@@ -72,7 +73,11 @@ func InitApi() {
 		}
 		marshal, _ := yaml.Marshal(global.Config)
 		_ = os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644)
-		server.UpdateDomain(req.Domain, req.Target, certFile, keyFile)
+		server.UpdateDomain(req.Domain, proxy.DomainConfig{
+			Target: req.Target,
+			Cert:   req.Cert,
+			Key:    req.Key,
+		})
 	})
 
 	svc := &http.Server{

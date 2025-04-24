@@ -1,5 +1,11 @@
 package proxy
 
+import (
+	"crypto/tls"
+	"net/http/httputil"
+	"net/url"
+)
+
 type Config struct {
 	HTTPAddr  string                  `yaml:"http-addr"`
 	HTTPSAddr string                  `yaml:"https-addr"`
@@ -11,4 +17,20 @@ type DomainConfig struct {
 	Target string `yaml:"target"`
 	Cert   string `yaml:"cert"`
 	Key    string `yaml:"key"`
+}
+
+func (cfg DomainConfig) Generate() (*url.URL, *httputil.ReverseProxy, *tls.Certificate) {
+	target, _ := url.Parse(cfg.Target)
+	if target == nil {
+		return nil, nil, nil
+	}
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	if cfg.Cert != "" && cfg.Key != "" {
+		cert, err := tls.LoadX509KeyPair(cfg.Cert, cfg.Key)
+		if err != nil {
+			return target, proxy, nil
+		}
+		return target, proxy, &cert
+	}
+	return target, proxy, nil
 }
