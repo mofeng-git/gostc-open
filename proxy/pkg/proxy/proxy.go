@@ -194,31 +194,11 @@ func (server *Server) StartHTTPSServer() error {
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 		GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			server.mu.RLock()
-			defer server.mu.RUnlock()
-			// 查找匹配的证书
-			var domain = hello.ServerName
-			cert, exists := server.certMap[domain]
-			if exists {
-				return cert, nil
+			cert, err := server.findCert(hello.ServerName)
+			if err != nil {
+				return nil, err
 			}
-
-			domain = "." + strings.Join(strings.Split(domain, ".")[1:], ".")
-			cert, exists = server.certMap[domain]
-			if exists {
-				return cert, nil
-			}
-			domain = "*." + strings.Join(strings.Split(domain, ".")[1:], ".")
-			cert, exists = server.certMap[domain]
-			if exists {
-				return cert, nil
-			}
-
-			if server.defaultCert == nil {
-				server.log.Warn("no match cert", zap.String("serverName", hello.ServerName))
-				return nil, errors.New("no match cert")
-			}
-			return server.defaultCert, nil
+			return cert, nil
 		},
 	}
 
