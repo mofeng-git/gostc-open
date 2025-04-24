@@ -67,7 +67,6 @@ func NewServer(cfg Config, log *zap.Logger) *Server {
 			}
 		}
 	}
-	//fmt.Println()
 	// 加载默认配置
 	target, err := url.Parse(cfg.Default.Target)
 	if err != nil {
