@@ -12,8 +12,6 @@
 2. 无用户绑定QQ功能
 3. 无资源缓存缓存功能
 
-
-
 [GOST开源地址](https://github.com/go-gost/gost)
 
 [FRP开源地址](https://github.com/fatedier/frp)
@@ -25,12 +23,28 @@
 ## License
 This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/gostc-open?tab=CC0-1.0-1-ov-file).
 
+## 预览
+
+![dashboard](https://raw.githubusercontent.com/SianHH/gostc-open/main/images/dashboard.png)
+
+![node](https://raw.githubusercontent.com/SianHH/gostc-open/main/images/node.png)
+
+![config](https://raw.githubusercontent.com/SianHH/gostc-open/main/images/config.png)
+
 ## 一键安装脚本
 
 ### 服务端安装
+
+国外网络环境
 ```shell
 curl -sSL https://raw.githubusercontent.com/SianHH/gostc-open/main/install.sh | bash -s -- server
 ```
+
+国内网络环境
+```shell
+curl -sSL https://alist.sian.one/direct/gostc/gostc-open/install.sh | bash -s -- server
+```
+
 
 install后，需要systemctl start gostc-admin启动服务
 
@@ -58,9 +72,17 @@ rm -rf /usr/local/gostc-admin/server
 
 
 ### 客户端/节点安装
+
+国外网络环境
 ```shell
 curl -sSL https://raw.githubusercontent.com/SianHH/gostc-open/main/install.sh | bash -s -- gostc
 ```
+
+国内网络环境
+```shell
+curl -sSL https://alist.sian.one/direct/gostc/gostc-open/install.sh | bash -s -- gostc
+```
+
 文件目录：**/usr/local/bin/gostc**
 
 ### 客户端/节点卸载
