@@ -145,7 +145,7 @@ go build -ldflags "-s -w" -o server main.go
 编译方式一(当前平台)：
 ```shell
 cd client
-go build -ldflags "-s -w" -o gostc ./client/
+go build -ldflags "-s -w" -o gostc ./cli/
 ```
 编译后的文件为server/gostc
 
@@ -155,6 +155,12 @@ cd client
 goreleaser release --snapshot --clean
 ```
 编译后的文件在server/dist目录中
+
+编译Windows GUI客户端：
+```shell
+cd client
+go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe ./gui/
+```
 
 ## 运行后台管理(服务端)
 ```shell
@@ -171,7 +177,7 @@ goreleaser release --snapshot --clean
 ./gostc --tls=false -addr 127.0.0.1:8080 -key ******
 ```
 
-如果后台管理服务不启用SSL，需要设置-tls=false
+如果后台管理服务不启用SSL，需要设置--tls=false
 
 -addr指定的127.0.0.1:8080修改为实际的后台管理
 
