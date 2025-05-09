@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	system_service "github.com/kardianos/service"
+	"gostc-sub/cli/service_option"
+	"gostc-sub/gui/global"
 	"gostc-sub/internal/common"
 	"gostc-sub/internal/service"
 	"gostc-sub/pkg/signal"
@@ -18,7 +20,7 @@ var SvcCfg = &system_service.Config{
 	Name:        "gostc",
 	DisplayName: "GOSTC",
 	Description: "基于GOST开发的内网穿透 客户端/节点",
-	Option:      make(system_service.KeyValue),
+	Option:      service_option.MakeOptions(),
 }
 
 var Program = &program{}
@@ -26,7 +28,10 @@ var Program = &program{}
 type program struct {
 }
 
-func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string) string {
+func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string, tun bool) string {
+	if tun {
+		return "tun"
+	}
 	if cfgFile != "" {
 		return "cfg"
 	}
@@ -63,6 +68,8 @@ func (p *program) run() {
 	flag.BoolVar(&visit, "v", false, "visit client")
 	var p2p bool
 	flag.BoolVar(&p2p, "p2p", false, "p2p client")
+	var tun bool
+	flag.BoolVar(&tun, "tun", false, "tun client")
 	var wAddress string
 	flag.StringVar(&wAddress, "web-addr", "", "web ui address,example: 0.0.0.0:18080")
 
@@ -75,6 +82,8 @@ func (p *program) run() {
 	// 其他参数
 	var proxyBaseUrl string
 	flag.StringVar(&proxyBaseUrl, "proxy-base-url", "", "proxy server api url,example: http://127.0.0.1:8080")
+	var cacheBaseUrl string
+	flag.StringVar(&cacheBaseUrl, "cache-base-url", "", "cache server api url,example: http://127.0.0.1:8080")
 	var version bool
 	flag.BoolVar(&version, "version", false, "client version")
 	var cfgExample bool
@@ -99,7 +108,7 @@ func (p *program) run() {
 	var wsurl = common.GenerateWsUrl(tlsEnable, address)
 	var apiurl = common.GenerateHttpUrl(tlsEnable, address)
 
-	var mode = selectMode(cfgFile, server, visit, p2p, wAddress)
+	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tun)
 
 	switch mode {
 	case "cfg":
@@ -124,8 +133,16 @@ func (p *program) run() {
 		bootstrap.Release()
 	case "visit", "p2p":
 		runTunnels(mode, vTunnels, apiurl)
-	case "client", "server":
+	case "client", "server", "tun":
 		if key == "" {
+			if mode == "client" {
+				fmt.Println("load configuration file", global.BasePath+"/config.yaml")
+				if err := loadConfig(cfgFile); err != nil {
+					log.Fatalln(err)
+				}
+				startForConfig()
+				return
+			}
 			fmt.Println("please enter key")
 			os.Exit(1)
 		}
