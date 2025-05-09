@@ -16,11 +16,10 @@ type Event struct {
 	key          string
 	proxyBaseUrl string
 	tp           string
-	cacheBaseUrl string
 	svcMap       *sync.Map
 }
 
-func NewEvent(key string, proxyBaseUrl, cacheBaseUrl string, server bool) *Event {
+func NewEvent(key string, proxyBaseUrl string, server bool) *Event {
 	tp := "client"
 	if server {
 		tp = "server"
@@ -29,7 +28,6 @@ func NewEvent(key string, proxyBaseUrl, cacheBaseUrl string, server bool) *Event
 		server:       server,
 		key:          key,
 		proxyBaseUrl: proxyBaseUrl,
-		cacheBaseUrl: cacheBaseUrl,
 		tp:           tp,
 		svcMap:       &sync.Map{},
 	}
@@ -51,9 +49,6 @@ func (e *Event) OnOpen(socket *gws.Conn) {
 	}
 	if e.proxyBaseUrl != "" {
 		regData["custom_domain"] = 1
-	}
-	if e.cacheBaseUrl != "" {
-		regData["cache"] = 1
 	}
 	e.WriteAny(socket, common.NewMessage(uuid.NewString(), "register", regData))
 }
