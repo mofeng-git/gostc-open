@@ -41,6 +41,9 @@ type GostNode struct {
 
 func (n GostNode) GetDomainFull(domainPrefix string, customDomain string, enableCustom bool) string {
 	if enableCustom && customDomain != "" {
+		if n.UrlTpl == "" {
+			return customDomain
+		}
 		return strings.ReplaceAll(n.UrlTpl, "{{DOMAIN}}", customDomain)
 	}
 	if n.UrlTpl != "" {
