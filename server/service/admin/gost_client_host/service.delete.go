@@ -20,7 +20,9 @@ func (service *service) Delete(req DeleteReq) error {
 		if host == nil {
 			return nil
 		}
-
+		if host.CustomDomain != "" {
+			_, _ = tx.GostClientHostDomain.Where(tx.GostClientHostDomain.Domain.Eq(host.CustomDomain)).Delete()
+		}
 		_, _ = tx.GostNodeDomain.Where(
 			tx.GostNodeDomain.Prefix.Eq(host.DomainPrefix),
 			tx.GostNodeDomain.NodeCode.Eq(host.NodeCode),

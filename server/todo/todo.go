@@ -15,5 +15,8 @@ func init() {
 		gostClientLogger()
 		gostNodeLogger()
 		gostNodePort()
+
+		// 修复一些之前的数据错误
+		fix()
 	}
 }
