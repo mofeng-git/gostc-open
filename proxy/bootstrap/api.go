@@ -56,15 +56,19 @@ func InitApi() {
 			return
 		}
 
-		if err := verifyCertificateAndKey(req.Cert, req.Key); err != nil {
-			global.Logger.Warn("cert valid fail", zap.Error(err))
-			return
-		}
-
 		var certFile = fmt.Sprintf("%s/data/certs/%s.pem", global.BASE_PATH, req.Domain)
 		var keyFile = fmt.Sprintf("%s/data/certs/%s.key", global.BASE_PATH, req.Domain)
-		_ = os.WriteFile(certFile, []byte(req.Cert), 0644)
-		_ = os.WriteFile(keyFile, []byte(req.Key), 0644)
+		if req.Cert != "" && req.Key != "" {
+			if err := verifyCertificateAndKey(req.Cert, req.Key); err != nil {
+				global.Logger.Warn("cert valid fail", zap.Error(err))
+				return
+			}
+			_ = os.WriteFile(certFile, []byte(req.Cert), 0644)
+			_ = os.WriteFile(keyFile, []byte(req.Key), 0644)
+		} else {
+			certFile = ""
+			keyFile = ""
+		}
 
 		global.Config.Domains[req.Domain] = configs.DomainConfig{
 			Target: req.Target,
@@ -72,7 +76,9 @@ func InitApi() {
 			Key:    keyFile,
 		}
 		marshal, _ := yaml.Marshal(global.Config)
-		_ = os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644)
+		if err := os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644); err != nil {
+			global.Logger.Error("save config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
+		}
 		server.UpdateDomain(req.Domain, proxy.DomainConfig{
 			Target: req.Target,
 			Cert:   req.Cert,
