@@ -187,6 +187,7 @@ go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe ./gui/
 ## 自建教程(视频)
 [B站视频](https://www.bilibili.com/video/BV1s19nY3EB5/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
 
-# 赞助
-<img style="width:300px" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/wx.png" alt=""/>
-<img style="width:300px" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/zfb.png" alt=""/>
+## 赞助
+<img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/zfb.png" alt=""/>
+<img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/wx.png" alt=""/>
+
