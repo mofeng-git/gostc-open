@@ -81,8 +81,8 @@ func InitApi() {
 		}
 		server.UpdateDomain(req.Domain, proxy.DomainConfig{
 			Target: req.Target,
-			Cert:   req.Cert,
-			Key:    req.Key,
+			Cert:   certFile,
+			Key:    keyFile,
 		})
 	})
 

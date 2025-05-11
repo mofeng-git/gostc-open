@@ -107,6 +107,8 @@ func (server *Server) UpdateDomain(domain string, cfg DomainConfig) {
 		}
 		if cert != nil {
 			server.certMap[domain] = cert
+		} else {
+			delete(server.certMap, domain)
 		}
 	}
 }
