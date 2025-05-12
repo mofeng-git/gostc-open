@@ -3,6 +3,7 @@ package program
 import (
 	"github.com/kardianos/service"
 	"server/bootstrap"
+	"server/cmd/program/service_option"
 	"time"
 )
 
@@ -10,7 +11,7 @@ var SvcCfg = &service.Config{
 	Name:        "gostc-admin",
 	DisplayName: "GOSTC-ADMIN",
 	Description: "基于GOST开发的内网穿透 后台管理",
-	Option:      make(service.KeyValue),
+	Option:      service_option.MakeOptions(),
 }
 
 var Program = &program{

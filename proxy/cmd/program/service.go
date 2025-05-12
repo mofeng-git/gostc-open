@@ -3,6 +3,7 @@ package program
 import (
 	"github.com/kardianos/service"
 	"proxy/bootstrap"
+	"proxy/cmd/program/service_option"
 	"time"
 )
 
@@ -10,7 +11,7 @@ var SvcCfg = &service.Config{
 	Name:        "gostc-proxy",
 	DisplayName: "GOSTC-PROXY",
 	Description: "GOSTC的代理网关，用于扩展自定义域名功能",
-	Option:      make(service.KeyValue),
+	Option:      service_option.MakeOptions(),
 }
 
 var Program = &program{
