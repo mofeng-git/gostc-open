@@ -8,7 +8,7 @@ RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/386" ]; then \
     elif [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
         cp /binary/server-amd64 /app/server; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-        cp /binary/server-s390x /app/server; \
+        cp /binary/server-arm64 /app/server; \
     else \
         echo "Unsupported architecture: $TARGETPLATFORM" && exit 1; \
     fi

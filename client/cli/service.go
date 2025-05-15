@@ -82,8 +82,6 @@ func (p *program) run() {
 	// 其他参数
 	var proxyBaseUrl string
 	flag.StringVar(&proxyBaseUrl, "proxy-base-url", "", "proxy server api url,example: http://127.0.0.1:8080")
-	var cacheBaseUrl string
-	flag.StringVar(&cacheBaseUrl, "cache-base-url", "", "cache server api url,example: http://127.0.0.1:8080")
 	var version bool
 	flag.BoolVar(&version, "version", false, "client version")
 	var cfgExample bool

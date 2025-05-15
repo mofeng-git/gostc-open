@@ -3,7 +3,6 @@
 package service_option
 
 import (
-	"fmt"
 	"github.com/kardianos/service"
 )
 
@@ -42,7 +41,6 @@ WantedBy=multi-user.target
 `
 
 func MakeOptions() service.KeyValue {
-	fmt.Println("is linux")
 	return service.KeyValue{
 		"SystemdScript": systemScriptTemplate,
 	}
