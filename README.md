@@ -166,6 +166,24 @@ services:
       - ****** # 替换为客户端密钥
 ```
 
+### 网关服务
+
+```yaml
+version: "3"
+services:
+  client1:
+    image: sianhh/gostc-proxy:latest
+    restart: always
+    network_mode: host # 推荐host，容器网络一定要与节点网络互通，确认节点可以访问到网关服务的API接口
+    container_name: gostc-proxy
+    volumes:
+      - ./data:/app/data # 数据目录，包含配置文件，日志文件
+    command:
+      - -d # 开发者模式，用于将日志输出到控制台
+      - --log-level # 日志级别
+      - info
+```
+
 **注意：由于服务名称重复，无法同时运行多个客户端/节点，如需启动多个客户端和节点，请将程序通过pm2、supervisor类似的进程管理工具启动**
 
 ## 目录结构
