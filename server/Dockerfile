@@ -1,6 +1,6 @@
 FROM alpine AS binary-selector
-COPY dist/server_linux_amd64_v1/server /binary/server-amd64
-COPY dist/server_linux_arm64_v8.0/server /binary/server-arm64
+COPY dist/gostc-open_linux_amd64_v1/server /binary/server-amd64
+COPY dist/gostc-open_linux_arm64_v8.0/server /binary/server-arm64
 
 ARG TARGETPLATFORM
 RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/386" ]; then \

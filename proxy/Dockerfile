@@ -1,10 +1,10 @@
 FROM alpine AS binary-selector
-COPY dist/proxy_linux_386_sse2/gostc-proxy /binary/gostc-proxy-386
-COPY dist/proxy_linux_amd64_v1/gostc-proxy /binary/gostc-proxy-amd64
-COPY dist/proxy_linux_arm_7/gostc-proxy /binary/gostc-proxy-armv7
-COPY dist/proxy_linux_arm64_v8.0/gostc-proxy /binary/gostc-proxy-arm64
-COPY dist/proxy_linux_mips64le_hardfloat/gostc-proxy /binary/gostc-proxy-mips64le
-COPY dist/proxy_linux_s390x/gostc-proxy /binary/gostc-proxy-s390x
+COPY dist/gostc-open_linux_386_sse2/gostc-proxy /binary/gostc-proxy-386
+COPY dist/gostc-open_linux_amd64_v1/gostc-proxy /binary/gostc-proxy-amd64
+COPY dist/gostc-open_linux_arm_7/gostc-proxy /binary/gostc-proxy-armv7
+COPY dist/gostc-open_linux_arm64_v8.0/gostc-proxy /binary/gostc-proxy-arm64
+COPY dist/gostc-open_linux_mips64le_hardfloat/gostc-proxy /binary/gostc-proxy-mips64le
+COPY dist/gostc-open_linux_s390x/gostc-proxy /binary/gostc-proxy-s390x
 
 ARG TARGETPLATFORM
 RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/386" ]; then \
