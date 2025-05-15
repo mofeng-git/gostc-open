@@ -11,7 +11,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Extract Tag
+        id: extract_tag
         run: |
+          # 提取标签名（去掉前面的v）
           TAG_NAME=$(echo ${{ github.ref }} | sed 's/refs\/tags\/v//')
           echo "DOCKER_TAG=$TAG_NAME" >> $GITHUB_ENV
 
