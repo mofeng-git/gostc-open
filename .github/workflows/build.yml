@@ -82,21 +82,21 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker buildx client
-      - run: |
+        run: |
           cd client
           docker buildx create --name gostc-builder --use
           docker buildx build --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/s390x -t sianhh/gostc:latest -t sianhh/gostc:${{ env.DOCKER_TAG }} --push .
           docker buildx rm gostc-builder
 
       - name: Docker buildx server
-      - run: |
+        run: |
           cd server
           docker buildx create --name gostc-admin-builder --use
           docker buildx build --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/s390x -t sianhh/gostc-admin:latest -t sianhh/gostc-admin:${{ env.DOCKER_TAG }} --push .
           docker buildx rm gostc-admin-builder
 
       - name: Docker buildx proxy
-      - run: |
+        run: |
           cd proxy
           docker buildx create --name gostc-proxy-builder --use
           docker buildx build --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/s390x -t sianhh/gostc-proxy:latest -t sianhh/gostc-proxy:${{ env.DOCKER_TAG }} --push .
