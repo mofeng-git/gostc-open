@@ -3,9 +3,7 @@ COPY dist/gostc-open_linux_amd64_v1/server /binary/server-amd64
 COPY dist/gostc-open_linux_arm64_v8.0/server /binary/server-arm64
 
 ARG TARGETPLATFORM
-RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/386" ]; then \
-        cp /binary/server-386 /app/server; \
-    elif [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
         cp /binary/server-amd64 /app/server; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
         cp /binary/server-arm64 /app/server; \
