@@ -4,6 +4,8 @@ go 1.23.0
 
 toolchain go1.23.4
 
+replace github.com/go-gost/x v0.5.3 => ./pkg/gost-x
+
 require (
 	gioui.org v0.8.0
 	github.com/coreos/go-oidc/v3 v3.13.0
