@@ -115,6 +115,57 @@ gostc uninstall
 gostc install --tls=false -addr 127.0.0.1:8080 -s -key ****** # 重新注册
 ```
 
+## Docker部署
+
+### 服务端
+
+```yaml
+version: "3"
+services:
+  client1:
+    image: sianhh/gostc-admin:latest
+    restart: always
+    network_mode: host # 服务端根据情况配置网络情况，默认端口8080，可以修改配置文件更改
+    container_name: gostc-admin
+    volumes:
+      - ./data:/app/data # 数据目录，包含配置文件，日志文件
+    command:
+      - -d # 开发者模式，用于将日志输出到控制台
+      - --log-level # 日志级别
+      - info
+```
+
+### 客户端/节点
+
+节点：
+```yaml
+version: "3"
+services:
+  client1:
+    image: sianhh/gostc:latest
+    restart: always
+    network_mode: host # 客户端推荐网络使用host模式
+    container_name: gostc
+    command:
+      - -s
+      - -key
+      - ****** # 替换为节点密钥
+```
+
+客户端：
+```yaml
+version: "3"
+services:
+  client1:
+    image: sianhh/gostc:latest
+    restart: always
+    network_mode: host # 客户端推荐网络使用host模式
+    container_name: gostc
+    command:
+      - -key
+      - ****** # 替换为客户端密钥
+```
+
 **注意：由于服务名称重复，无法同时运行多个客户端/节点，如需启动多个客户端和节点，请将程序通过pm2、supervisor类似的进程管理工具启动**
 
 ## 目录结构
