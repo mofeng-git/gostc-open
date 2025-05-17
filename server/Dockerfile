@@ -13,5 +13,6 @@ RUN mkdir /app && if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
 
 FROM alpine
 COPY --from=binary-selector /app/server /app/server
+RUN apk add --no-cache tzdata && ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 WORKDIR /app/
 ENTRYPOINT ["./server"]
