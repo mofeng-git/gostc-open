@@ -31,6 +31,7 @@ func newGostClientHostDomain(db *gorm.DB, opts ...gen.DOOption) gostClientHostDo
 	_gostClientHostDomain.Code = field.NewString(tableName, "code")
 	_gostClientHostDomain.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostClientHostDomain.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostClientHostDomain.Version = field.NewInt64(tableName, "version")
 	_gostClientHostDomain.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostClientHostDomain.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostClientHostDomain.Domain = field.NewString(tableName, "domain")
@@ -48,6 +49,7 @@ type gostClientHostDomain struct {
 	Code      field.String
 	AllowEdit field.Int
 	AllowDel  field.Int
+	Version   field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	Domain    field.String
@@ -71,6 +73,7 @@ func (g *gostClientHostDomain) updateTableName(table string) *gostClientHostDoma
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Domain = field.NewString(table, "domain")
@@ -90,11 +93,12 @@ func (g *gostClientHostDomain) GetFieldByName(fieldName string) (field.OrderExpr
 }
 
 func (g *gostClientHostDomain) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 7)
+	g.fieldMap = make(map[string]field.Expr, 8)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["domain"] = g.Domain

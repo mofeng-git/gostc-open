@@ -19,7 +19,6 @@ import {apiNormalGostNodeBindUpdate} from "../../../api/admin/gost_node_bind.js"
 import {flowFormat} from "../../../utils/flow.js";
 import {NButton, NPopconfirm, NSpace} from "naive-ui";
 import Empty from "../../../components/Empty.vue";
-import router from "../../../router/index.js";
 import moment from "moment/moment.js";
 import {apiNormalGostObsNodeMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
@@ -66,6 +65,9 @@ const state = ref({
       rules: [],
       tags: [],
       indexValue: 1000,
+      limitResetIndex: 0,
+      limitTotal: 1,
+      limitKind: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -101,6 +103,9 @@ const state = ref({
       rules: [],
       tags: [],
       indexValue: 1000,
+      limitResetIndex: 0,
+      limitTotal: 1,
+      limitKind: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -173,6 +178,9 @@ const openCreate = () => {
     rules: [],
     tags: [],
     indexValue: 1000,
+    limitResetIndex: 0,
+    limitTotal: 1,
+    limitKind: 0,
   }
   state.value.create.open = true
 }
@@ -340,6 +348,13 @@ const nodeCleanPortFunc = async (row) => {
   }
 }
 
+const nodeObsLimitFunc = (row) => {
+  if (row.limitResetIndex === 0 || row.limitUseTotal === -1) {
+    return '未配置'
+  }
+  return flowFormat(row.limitUseTotal) + " | " + row.limitTotal + 'GB'
+}
+
 onBeforeMount(() => {
   pageFunc()
   getRules()
@@ -410,7 +425,10 @@ onBeforeMount(() => {
               <span>介绍：{{ row.remark }}</span><br>
               <span>标签：{{ row.tags.join('、') }}</span><br>
               <span>规则：{{ row.ruleNames.join('、') }}</span><br>
-              <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
+              <span>流量循环：{{ nodeObsLimitFunc(row) }}</span><br>
+              <span>30天流量( IN | OUT )：{{
+                  flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes)
+                }}</span><br>
               <span>自定义域名：{{ row.customDomain === 1 ? '支持' : '不支持' }}</span><br>
               <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
@@ -432,10 +450,6 @@ onBeforeMount(() => {
               </n-tabs>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-button size="tiny" :focusable="false" quaternary type="info"
-                        @click="router.push({name: 'AdminGostNodeLogger', query: {nodeCode: row.code}})">
-                日志
-              </n-button>
               <n-button size="tiny" :focusable="false" quaternary type="info" @click="openObsModal(row)">
                 流量
               </n-button>
@@ -667,6 +681,27 @@ onBeforeMount(() => {
               <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
           </n-tab-pane>
+          <n-tab-pane name="limit" tab="流量循环">
+            <n-form-item path="limitResetIndex" label="重置日期(0表示流量不循环计算)">
+              <n-input-number
+                  :min="0" :max="31"
+                  v-model:value="state.create.data.limitResetIndex"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitTotal" label="预警流量(GB)">
+              <n-input-number
+                  :min="1"
+                  v-model:value="state.create.data.limitTotal"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitKind" label="计算方式">
+              <n-select
+                  v-model:value="state.create.data.limitKind"
+                  :default-value="state.create.data.limitKind"
+                  :options="[{label:'全部',value:0},{label:'上行',value:1},{label:'下行',value:2}]"
+              ></n-select>
+            </n-form-item>
+          </n-tab-pane>
         </n-tabs>
       </n-form>
     </Modal>
@@ -856,6 +891,27 @@ onBeforeMount(() => {
             </div>
             <n-form-item path="p2pPort" label="连接端口">
               <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
+            </n-form-item>
+          </n-tab-pane>
+          <n-tab-pane name="limit" tab="流量循环">
+            <n-form-item path="limitResetIndex" label="重置日期(0表示流量不循环计算)">
+              <n-input-number
+                  :min="0" :max="31"
+                  v-model:value="state.update.data.limitResetIndex"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitTotal" label="预警流量(GB)">
+              <n-input-number
+                  :min="1"
+                  v-model:value="state.update.data.limitTotal"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitKind" label="计算方式">
+              <n-select
+                  v-model:value="state.update.data.limitKind"
+                  :default-value="state.update.data.limitKind"
+                  :options="[{label:'全部',value:0},{label:'上行',value:1},{label:'下行',value:2}]"
+              ></n-select>
             </n-form-item>
           </n-tab-pane>
         </n-tabs>

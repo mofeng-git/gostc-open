@@ -21,6 +21,7 @@ import Online from "../../../icon/online.vue";
 import {configExpText} from "../gost_client_host/index.js";
 import {copyToClipboard} from "../../../utils/copy.js";
 import {NButton, NSpace} from "naive-ui";
+import {apiNormalGostClientList} from "../../../api/normal/gost_client.js";
 
 const state = ref({
   table: {
@@ -52,6 +53,7 @@ const state = ref({
     open: false,
     key: '',
   },
+  clients: [],
 })
 
 const refreshTable = () => {
@@ -154,8 +156,18 @@ const copyFunc = () => {
   state.value.look.open = false
 }
 
+const clientListFunc = async () => {
+  try {
+    let res = await apiNormalGostClientList()
+    state.value.clients = res.data || []
+  } finally {
+
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
+  clientListFunc()
 })
 
 const generateCmdString = () => {
@@ -221,6 +233,16 @@ const operatorRenderLabel = (option)=>{
           clearable
           label="名称"
           @onChange="value => state.table.search.name=value"
+      ></SearchItem>
+      <SearchItem
+          type="select"
+          :label-width="70"
+          label="客户端"
+          :default="null"
+          :options="state.clients"
+          :optionsKeyValue="{key: 'code',value: 'name'}"
+          @onChange="value => state.table.search.clientCode=value"
+          clearable
       ></SearchItem>
       <SearchItem
           type="select"

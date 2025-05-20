@@ -31,6 +31,7 @@ func newGostNodePort(db *gorm.DB, opts ...gen.DOOption) gostNodePort {
 	_gostNodePort.Code = field.NewString(tableName, "code")
 	_gostNodePort.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostNodePort.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostNodePort.Version = field.NewInt64(tableName, "version")
 	_gostNodePort.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostNodePort.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostNodePort.Port = field.NewString(tableName, "port")
@@ -49,6 +50,7 @@ type gostNodePort struct {
 	Code      field.String
 	AllowEdit field.Int
 	AllowDel  field.Int
+	Version   field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	Port      field.String
@@ -73,6 +75,7 @@ func (g *gostNodePort) updateTableName(table string) *gostNodePort {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Port = field.NewString(table, "port")
@@ -93,11 +96,12 @@ func (g *gostNodePort) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (g *gostNodePort) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 8)
+	g.fieldMap = make(map[string]field.Expr, 9)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["port"] = g.Port

@@ -35,7 +35,7 @@ func (service *service) Checkin(claims jwt.Claims) (err error) {
 			return errors.New("已签到")
 		}
 
-		amount := decimal.NewFromInt(int64(utils.RandNum(5) + 1))
+		amount := decimal.NewFromInt(int64(utils.RandNum(cfg.CheckInEnd-cfg.CheckInStart) + cfg.CheckInStart))
 		user.Amount = user.Amount.Add(amount)
 		if err := tx.SystemUser.Save(user); err != nil {
 			log.Error("签到失败", zap.Error(err))

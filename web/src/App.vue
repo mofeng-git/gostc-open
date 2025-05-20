@@ -43,7 +43,7 @@ const authRenewFunc = () => {
     return
   }
   let tokenExpAt = moment(localStore().auth.expAt)
-  if (moment().add(2, 'day').isAfter(tokenExpAt)) {
+  if (moment().add(2, 'day').isAfter(tokenExpAt*1000)) {
     apiAuthRenew().then(res => {
       localStore().auth.token = res.data.token
       localStore().auth.expAt = res.data.expAt

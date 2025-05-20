@@ -13,8 +13,9 @@ import (
 
 type PageReq struct {
 	bean.PageParam
-	Name   string `json:"name"`
-	Enable int    `json:"enable"`
+	Name       string `json:"name"`
+	Enable     int    `json:"enable"`
+	ClientCode string `json:"clientCode"`
 }
 
 type Item struct {
@@ -69,6 +70,9 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 	}
 	if req.Enable > 0 {
 		where = append(where, db.GostClientTunnel.Enable.Eq(req.Enable))
+	}
+	if req.ClientCode != "" {
+		where = append(where, db.GostClientTunnel.ClientCode.Eq(req.ClientCode))
 	}
 	tunnels, total, _ := db.GostClientTunnel.Preload(
 		db.GostClientTunnel.User,

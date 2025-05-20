@@ -31,6 +31,7 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.Code = field.NewString(tableName, "code")
 	_gostClientHost.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostClientHost.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostClientHost.Version = field.NewInt64(tableName, "version")
 	_gostClientHost.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostClientHost.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostClientHost.Name = field.NewString(tableName, "name")
@@ -106,6 +107,7 @@ type gostClientHost struct {
 	Code         field.String
 	AllowEdit    field.Int
 	AllowDel     field.Int
+	Version      field.Int64
 	CreatedAt    field.Time
 	UpdatedAt    field.Time
 	Name         field.String
@@ -157,6 +159,7 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Name = field.NewString(table, "name")
@@ -199,11 +202,12 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 33)
+	g.fieldMap = make(map[string]field.Expr, 34)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["name"] = g.Name

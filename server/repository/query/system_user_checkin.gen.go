@@ -31,6 +31,7 @@ func newSystemUserCheckin(db *gorm.DB, opts ...gen.DOOption) systemUserCheckin {
 	_systemUserCheckin.Code = field.NewString(tableName, "code")
 	_systemUserCheckin.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_systemUserCheckin.AllowDel = field.NewInt(tableName, "allow_del")
+	_systemUserCheckin.Version = field.NewInt64(tableName, "version")
 	_systemUserCheckin.CreatedAt = field.NewTime(tableName, "created_at")
 	_systemUserCheckin.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_systemUserCheckin.UserCode = field.NewString(tableName, "user_code")
@@ -51,6 +52,7 @@ type systemUserCheckin struct {
 	Code      field.String
 	AllowEdit field.Int
 	AllowDel  field.Int
+	Version   field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	UserCode  field.String
@@ -77,6 +79,7 @@ func (s *systemUserCheckin) updateTableName(table string) *systemUserCheckin {
 	s.Code = field.NewString(table, "code")
 	s.AllowEdit = field.NewInt(table, "allow_edit")
 	s.AllowDel = field.NewInt(table, "allow_del")
+	s.Version = field.NewInt64(table, "version")
 	s.CreatedAt = field.NewTime(table, "created_at")
 	s.UpdatedAt = field.NewTime(table, "updated_at")
 	s.UserCode = field.NewString(table, "user_code")
@@ -99,11 +102,12 @@ func (s *systemUserCheckin) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (s *systemUserCheckin) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 10)
+	s.fieldMap = make(map[string]field.Expr, 11)
 	s.fieldMap["id"] = s.Id
 	s.fieldMap["code"] = s.Code
 	s.fieldMap["allow_edit"] = s.AllowEdit
 	s.fieldMap["allow_del"] = s.AllowDel
+	s.fieldMap["version"] = s.Version
 	s.fieldMap["created_at"] = s.CreatedAt
 	s.fieldMap["updated_at"] = s.UpdatedAt
 	s.fieldMap["user_code"] = s.UserCode

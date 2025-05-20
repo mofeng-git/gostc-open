@@ -15,6 +15,7 @@ type PageReq struct {
 	Name       string `json:"name"`
 	Account    string `json:"account"`
 	ClientName string `json:"clientName"`
+	NodeName   string `json:"nodeName"`
 	Enable     int    `json:"enable"`
 }
 
@@ -66,6 +67,11 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		var userCodes []string
 		_ = db.SystemUser.Where(db.SystemUser.Account.Like("%"+req.Account+"%")).Pluck(db.SystemUser.Code, &userCodes)
 		where = append(where, db.GostClientTunnel.UserCode.In(userCodes...))
+	}
+	if req.NodeName != "" {
+		var codes []string
+		_ = db.GostNode.Where(db.GostNode.Name.Like("%"+req.NodeName+"%")).Pluck(db.GostNode.Code, &codes)
+		where = append(where, db.GostClientTunnel.NodeCode.In(codes...))
 	}
 	if req.Enable > 0 {
 		where = append(where, db.GostClientTunnel.Enable.Eq(req.Enable))

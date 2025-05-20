@@ -27,6 +27,7 @@ import moment from "moment/moment.js";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
 import {localStore} from "../../../store/local.js";
+import {apiNormalGostClientList} from "../../../api/normal/gost_client.js";
 
 const state = ref({
   table: {
@@ -87,6 +88,7 @@ const state = ref({
     nodeAddress: '',
     customEnable: 2,
   },
+  clients: [],
 })
 
 const refreshTable = () => {
@@ -267,8 +269,18 @@ watch(() => ({type: state.value.obs.dataRange}), () => {
   obsFunc()
 })
 
+const clientListFunc = async () => {
+  try {
+    let res = await apiNormalGostClientList()
+    state.value.clients = res.data || []
+  } finally {
+
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
+  clientListFunc()
 })
 
 const operatorOptions = [
@@ -328,6 +340,16 @@ const operatorRenderLabel = (option) => {
           clearable
           label="名称"
           @onChange="value => state.table.search.name=value"
+      ></SearchItem>
+      <SearchItem
+          type="select"
+          :label-width="70"
+          label="客户端"
+          :default="null"
+          :options="state.clients"
+          :optionsKeyValue="{key: 'code',value: 'name'}"
+          @onChange="value => state.table.search.clientCode=value"
+          clearable
       ></SearchItem>
       <SearchItem
           type="select"

@@ -199,6 +199,13 @@ const operatorRenderLabel = (option)=>{
           @onChange="value => state.table.search.clientName=value"
       ></SearchItem>
       <SearchItem
+          type="input"
+          :label-width="70"
+          clearable
+          label="节点"
+          @onChange="value => state.table.search.nodeName=value"
+      ></SearchItem>
+      <SearchItem
           type="select"
           :label-width="70"
           label="状态"

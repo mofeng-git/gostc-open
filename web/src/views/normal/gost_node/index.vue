@@ -62,6 +62,9 @@ const state = ref({
       rules: [],
       tags: [],
       indexValue: 1000,
+      limitResetIndex: 0,
+      limitTotal: 1,
+      limitKind: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -97,6 +100,9 @@ const state = ref({
       rules: [],
       tags: [],
       indexValue: 1000,
+      limitResetIndex: 0,
+      limitTotal: 1,
+      limitKind: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -159,6 +165,9 @@ const openCreate = () => {
     rules: [],
     tags: [],
     indexValue: 1000,
+    limitResetIndex: 0,
+    limitTotal: 1,
+    limitKind: 0,
   }
   state.value.create.open = true
 }
@@ -282,6 +291,13 @@ onBeforeMount(() => {
   pageFunc()
 })
 
+const nodeObsLimitFunc = (row) => {
+  if (row.limitResetIndex === 0 || row.limitUseTotal === -1) {
+    return '未配置'
+  }
+  return flowFormat(row.limitUseTotal) + " | " + row.limitTotal + 'GB'
+}
+
 const generateCmdString = () => {
   let tls = ' --tls=false'
   if (window.location.protocol.indexOf('https') > -1) {
@@ -298,6 +314,8 @@ const generateCmdString = () => {
         节点运行命令：
         <div>{{ generateCmdString() }}</div>
         <div>将xxxxxx修改为你的节点连接密钥</div>
+
+        <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
 
@@ -314,6 +332,12 @@ const generateCmdString = () => {
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
+          <n-button
+              :focusable="false"
+              type="warning"
+              @click="goToUrl('https://docs.sian.one/gostc/node')">
+            自建教程
+          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>
@@ -343,7 +367,10 @@ const generateCmdString = () => {
               <span>介绍：{{ row.remark }}</span><br>
               <span>标签：{{ row.tags.join('、') }}</span><br>
               <span>规则：{{ row.ruleNames.join('、') }}</span><br>
-              <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
+              <span>流量循环：{{ nodeObsLimitFunc(row) }}</span><br>
+              <span>30天流量( IN | OUT )：{{
+                  flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes)
+                }}</span><br>
               <span>自定义域名：{{ row.customDomain === 1 ? '支持' : '不支持' }}</span><br>
               <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
@@ -573,6 +600,27 @@ const generateCmdString = () => {
               <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
           </n-tab-pane>
+          <n-tab-pane name="limit" tab="流量循环">
+            <n-form-item path="limitResetIndex" label="重置日期(0表示流量不循环计算)">
+              <n-input-number
+                  :min="0" :max="31"
+                  v-model:value="state.create.data.limitResetIndex"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitTotal" label="预警流量(GB)">
+              <n-input-number
+                  :min="1"
+                  v-model:value="state.create.data.limitTotal"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitKind" label="计算方式">
+              <n-select
+                  v-model:value="state.create.data.limitKind"
+                  :default-value="state.create.data.limitKind"
+                  :options="[{label:'全部',value:0},{label:'上行',value:1},{label:'下行',value:2}]"
+              ></n-select>
+            </n-form-item>
+          </n-tab-pane>
         </n-tabs>
       </n-form>
     </Modal>
@@ -743,6 +791,27 @@ const generateCmdString = () => {
             </div>
             <n-form-item path="p2pPort" label="连接端口">
               <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
+            </n-form-item>
+          </n-tab-pane>
+          <n-tab-pane name="limit" tab="流量循环">
+            <n-form-item path="limitResetIndex" label="重置日期(0表示流量不循环计算)">
+              <n-input-number
+                  :min="0" :max="31"
+                  v-model:value="state.update.data.limitResetIndex"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitTotal" label="预警流量(GB)">
+              <n-input-number
+                  :min="1"
+                  v-model:value="state.update.data.limitTotal"
+              ></n-input-number>
+            </n-form-item>
+            <n-form-item path="limitKind" label="计算方式">
+              <n-select
+                  v-model:value="state.update.data.limitKind"
+                  :default-value="state.update.data.limitKind"
+                  :options="[{label:'全部',value:0},{label:'上行',value:1},{label:'下行',value:2}]"
+              ></n-select>
             </n-form-item>
           </n-tab-pane>
         </n-tabs>

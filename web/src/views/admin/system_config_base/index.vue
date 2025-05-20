@@ -8,8 +8,9 @@ const state = ref({
     title: '',
     favicon: '',
     baseUrl: '',
-    apiKey: '',
     checkIn:'2',
+    checkInStart:0,
+    checkInEnd:0,
     register:'2',
   },
   submitLoading: false,
@@ -24,6 +25,7 @@ const submit = async () => {
       closable: true,
       duration: 1500,
     })
+    await querySystemConfigFunc()
   } finally {
     state.value.submitLoading = false
   }
@@ -33,13 +35,17 @@ const generateApiKeyFunc = ()=>{
   state.value.data.apiKey = randomString(32)
 }
 
-onBeforeMount(async () => {
+const querySystemConfigFunc = async ()=>{
   try {
     let res = await apiAdminSystemConfigQuery({kind: 'SystemConfigBase'})
     state.value.data = res.data
   } finally {
 
   }
+}
+
+onBeforeMount(() => {
+  querySystemConfigFunc()
 })
 
 </script>
@@ -78,6 +84,12 @@ onBeforeMount(async () => {
             <template #checked>开启</template>
             <template #unchecked>关闭</template>
           </n-switch>
+        </n-form-item>
+        <n-form-item label="签到积分范围">
+          <n-input-group>
+            <n-input-number :min="0" placeholder="最小" v-model:value="state.data.checkInStart"></n-input-number>
+            <n-input-number :min="0" placeholder="最多" v-model:value="state.data.checkInEnd"></n-input-number>
+          </n-input-group>
         </n-form-item>
         <n-button type="success" size="small" @click="submit" :loading="state.submitLoading">保存</n-button>
       </n-form>

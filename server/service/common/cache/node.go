@@ -12,7 +12,29 @@ const (
 	node_version_key       = "node:version:"
 	node_port_use_key      = "node:port:"
 	node_custom_domain_key = "node:custom:domain:"
+	node_cache_key         = "node:cache:"
+	node_info_key          = "node:info:"
 )
+
+type NodeInfo struct {
+	Code            string
+	LimitResetIndex int
+	LimitTotal      int
+	LimitKind       int
+}
+
+func SetNodeInfo(data NodeInfo) {
+	global.Cache.SetStruct(node_info_key+data.Code, data, cache.NoExpiration)
+}
+
+func GetNodeInfo(code string) (result NodeInfo) {
+	_ = global.Cache.GetStruct(node_info_key+code, &result)
+	return result
+}
+
+func DelNodeInfo(code string) {
+	global.Cache.Del(node_info_key + code)
+}
 
 func SetNodeOnline(code string, online bool, duration time.Duration) {
 	global.Cache.SetString(node_online_key+code, func(online bool) string {
@@ -38,6 +60,19 @@ func SetNodeCustomDomain(code string, enable bool) {
 
 func GetNodeCustomDomain(code string) bool {
 	return global.Cache.GetString(node_custom_domain_key+code) == "1"
+}
+
+func SetNodeCache(code string, enable bool) {
+	global.Cache.SetString(node_cache_key+code, func(enable bool) string {
+		if enable {
+			return "1"
+		}
+		return "2"
+	}(enable), cache.NoExpiration)
+}
+
+func GetNodeCache(code string) bool {
+	return global.Cache.GetString(node_cache_key+code) == "1"
 }
 
 func SetNodeVersion(code string, version string) {

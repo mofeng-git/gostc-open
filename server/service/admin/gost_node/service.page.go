@@ -2,11 +2,13 @@ package service
 
 import (
 	"gorm.io/gen"
+	"server/model"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
 	"server/service/common/cache"
 	"server/service/common/node_rule"
+	"time"
 )
 
 type PageReq struct {
@@ -53,6 +55,11 @@ type Item struct {
 	Version     string `json:"version"`
 	InputBytes  int64  `json:"inputBytes"`
 	OutputBytes int64  `json:"outputBytes"`
+
+	LimitResetIndex int   `json:"limitResetIndex"`
+	LimitTotal      int   `json:"limitTotal"`
+	LimitUseTotal   int64 `json:"limitUseTotal"`
+	LimitKind       int   `json:"limitKind"`
 }
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
@@ -80,6 +87,8 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 	for _, bind := range nodeBinds {
 		nodeBindAccountMap[bind.NodeCode] = bind.User.Account
 	}
+
+	var dateOnly = time.Now().Format(time.DateOnly)
 	for _, node := range nodes {
 		var ruleNames []string
 		for _, rule := range node.GetRules() {
@@ -87,7 +96,26 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		}
 		name := node.Name
 		account := nodeBindAccountMap[node.Code]
-		obsInfo := cache.GetNodeObsDateRange(cache.MONTH_DATEONLY_LIST, node.Code)
+		// 获取最近30天的流量
+		monthObsInfo := cache.GetNodeObsDateRange(cache.MONTH_DATEONLY_LIST, node.Code)
+		// 获取今日的流量
+
+		// 获取循环日期的流量
+		var obsUseTotal int64
+		obsLimit := cache.GetNodeObsLimit(node.Code)
+		if obsLimit.InputBytes == -1 && obsLimit.OutputBytes == -1 {
+			obsUseTotal = -1
+		} else {
+			nowObsInfo := cache.GetNodeObs(dateOnly, node.Code)
+			switch node.LimitKind {
+			case model.GOST_NODE_LIMIT_KIND_ALL:
+				obsUseTotal += obsLimit.InputBytes + obsLimit.OutputBytes + nowObsInfo.InputBytes + nowObsInfo.OutputBytes
+			case model.GOST_NODE_LIMIT_KIND_INPUT:
+				obsUseTotal += obsLimit.InputBytes + nowObsInfo.InputBytes
+			case model.GOST_NODE_LIMIT_KIND_OUTPUT:
+				obsUseTotal += obsLimit.OutputBytes + nowObsInfo.OutputBytes
+			}
+		}
 		list = append(list, Item{
 			Code:                  node.Code,
 			Key:                   node.Key,
@@ -120,8 +148,12 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			P2PPort:               node.P2PPort,
 			Online:                utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
 			Version:               cache.GetNodeVersion(node.Code),
-			InputBytes:            obsInfo.InputBytes,
-			OutputBytes:           obsInfo.OutputBytes,
+			InputBytes:            monthObsInfo.InputBytes,
+			OutputBytes:           monthObsInfo.OutputBytes,
+			LimitResetIndex:       node.LimitResetIndex,
+			LimitTotal:            node.LimitTotal,
+			LimitKind:             node.LimitKind,
+			LimitUseTotal:         obsUseTotal,
 		})
 	}
 	return list, total

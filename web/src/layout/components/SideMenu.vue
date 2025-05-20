@@ -7,12 +7,19 @@ import {appStore} from "../../store/app.js";
 import {routerToMenu} from "../../utils/routerToMenu.js";
 import {normalRouters} from "../../router/routers/normal.js";
 
-
 const menuTreeDataComputed = computed(() => {
+  var funcMap = new Map()
+  funcMap.set("funcWeb",appStore().siteConfig.funcWeb)
+  funcMap.set("funcForward",appStore().siteConfig.funcForward)
+  funcMap.set("funcTunnel",appStore().siteConfig.funcTunnel)
+  funcMap.set("funcP2P",appStore().siteConfig.funcP2P)
+  funcMap.set("funcProxy",appStore().siteConfig.funcProxy)
+  funcMap.set("funcTun",appStore().siteConfig.funcTun)
+  funcMap.set("funcNode",appStore().siteConfig.funcNode)
   if (appStore().userInfo.admin === 1) {
-    return routerToMenu(allRouters)
+    return routerToMenu(allRouters,funcMap)
   }
-  return routerToMenu(normalRouters)
+  return routerToMenu(normalRouters,funcMap)
 })
 
 const renderMenuIcon = (option) => {

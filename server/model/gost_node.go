@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+const (
+	GOST_NODE_LIMIT_KIND_ALL    = 0 // 全部流量
+	GOST_NODE_LIMIT_KIND_INPUT  = 1 // 上行流量
+	GOST_NODE_LIMIT_KIND_OUTPUT = 2 // 下行流量
+)
+
 type GostNode struct {
 	Base
 	IndexValue            int              `gorm:"column:index_value;index;default:1000;comment:排序，升序"`
@@ -37,6 +43,10 @@ type GostNode struct {
 	Rules                 string           `gorm:"column:rules;comment:规则限制"`
 	Tags                  string           `gorm:"column:tags;comment:标签"`
 	Configs               []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
+
+	LimitResetIndex int `gorm:"column:limit_reset_index;comment:重置日期索引"`
+	LimitTotal      int `gorm:"column:limit_total;comment:预警流量(GB)"`
+	LimitKind       int `gorm:"column:limit_kind;size:1;default:0;comment:限制方式"`
 }
 
 func (n GostNode) GetDomainFull(domainPrefix string, customDomain string, enableCustom bool) string {

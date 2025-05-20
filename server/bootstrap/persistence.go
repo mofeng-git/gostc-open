@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	"server/global"
 	"server/model"
+	"server/pkg/orm"
 	"server/pkg/orm/mysql"
 	"server/pkg/orm/sqlite"
 )
@@ -46,7 +47,7 @@ func InitPersistence() {
 		global.DB.Close()
 	})
 
-	if err = global.DB.AutoMigrate(
+	if err = autoMigrate(global.DB,
 		&model.SystemUser{},
 		&model.SystemUserCheckin{},
 		&model.SystemConfig{},
@@ -72,4 +73,14 @@ func InitPersistence() {
 		Release()
 	}
 	global.Logger.Info("init table struct finish")
+}
+
+func autoMigrate(db orm.Interface, models ...any) error {
+	if err := db.AutoMigrate(models...); err != nil {
+		return err
+	}
+	for _, m := range models {
+		db.GetDB().Model(m).Where("version IS NULL").Update("version", 1)
+	}
+	return nil
 }

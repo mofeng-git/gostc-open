@@ -22,6 +22,7 @@ type Base struct {
 	Code      string `gorm:"column:code;size:100;uniqueIndex;comment:code"`
 	AllowEdit int    `gorm:"column:allow_edit;default:1;size:1;comment:是否可编辑"`
 	AllowDel  int    `gorm:"column:allow_del;default:1;size:1;comment:是否可删除"`
+	Version   int64  `gorm:"column:version;default:1;index"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

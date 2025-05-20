@@ -8,6 +8,7 @@ import (
 	"server/pkg/jwt"
 	"server/repository"
 	"server/repository/query"
+	"server/service/common/cache"
 	"server/service/common/node_port"
 	"strings"
 )
@@ -37,6 +38,10 @@ type CreateReq struct {
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
 	IndexValue            int      `json:"indexValue"`
+
+	LimitResetIndex int `json:"limitResetIndex"`
+	LimitTotal      int `json:"limitTotal"`
+	LimitKind       int `json:"limitKind"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -47,6 +52,13 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	if req.Proxy == 1 && req.Forward != 1 {
 		req.Proxy = 2
 	}
+
+	var cfg model.SystemConfigGost
+	cache.GetSystemConfigGost(&cfg)
+	if cfg.FuncNode != "1" {
+		return errors.New("管理员未启用该功能")
+	}
+
 	return db.Transaction(func(tx *query.Query) error {
 		var node = model.GostNode{
 			Key:                   uuid.NewString(),
@@ -74,6 +86,9 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			Rules:                 strings.Join(req.Rules, ","),
 			Tags:                  strings.Join(req.Tags, ","),
 			IndexValue:            req.IndexValue,
+			LimitKind:             req.LimitKind,
+			LimitTotal:            req.LimitTotal,
+			LimitResetIndex:       req.LimitResetIndex,
 		}
 		if err := tx.GostNode.Create(&node); err != nil {
 			log.Error("新增节点失败", zap.Error(err))
@@ -97,6 +112,13 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		node_port.Arrange(tx, node.Code)
+		cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+		cache.SetNodeInfo(cache.NodeInfo{
+			Code:            node.Code,
+			LimitResetIndex: node.LimitResetIndex,
+			LimitTotal:      node.LimitTotal,
+			LimitKind:       node.LimitKind,
+		})
 		return nil
 	})
 }

@@ -31,6 +31,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.Code = field.NewString(tableName, "code")
 	_gostNode.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostNode.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostNode.Version = field.NewInt64(tableName, "version")
 	_gostNode.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostNode.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostNode.IndexValue = field.NewInt(tableName, "index_value")
@@ -58,6 +59,9 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.P2PPort = field.NewString(tableName, "p2p_port")
 	_gostNode.Rules = field.NewString(tableName, "rules")
 	_gostNode.Tags = field.NewString(tableName, "tags")
+	_gostNode.LimitResetIndex = field.NewInt(tableName, "limit_reset_index")
+	_gostNode.LimitTotal = field.NewInt(tableName, "limit_total")
+	_gostNode.LimitKind = field.NewInt(tableName, "limit_kind")
 	_gostNode.Configs = gostNodeHasManyConfigs{
 		db: db.Session(&gorm.Session{}),
 
@@ -90,6 +94,7 @@ type gostNode struct {
 	Code                  field.String
 	AllowEdit             field.Int
 	AllowDel              field.Int
+	Version               field.Int64
 	CreatedAt             field.Time
 	UpdatedAt             field.Time
 	IndexValue            field.Int
@@ -117,6 +122,9 @@ type gostNode struct {
 	P2PPort               field.String
 	Rules                 field.String
 	Tags                  field.String
+	LimitResetIndex       field.Int
+	LimitTotal            field.Int
+	LimitKind             field.Int
 	Configs               gostNodeHasManyConfigs
 
 	fieldMap map[string]field.Expr
@@ -138,6 +146,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.IndexValue = field.NewInt(table, "index_value")
@@ -165,6 +174,9 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.P2PPort = field.NewString(table, "p2p_port")
 	g.Rules = field.NewString(table, "rules")
 	g.Tags = field.NewString(table, "tags")
+	g.LimitResetIndex = field.NewInt(table, "limit_reset_index")
+	g.LimitTotal = field.NewInt(table, "limit_total")
+	g.LimitKind = field.NewInt(table, "limit_kind")
 
 	g.fillFieldMap()
 
@@ -181,11 +193,12 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 32)
+	g.fieldMap = make(map[string]field.Expr, 36)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["index_value"] = g.IndexValue
@@ -213,6 +226,9 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["p2p_port"] = g.P2PPort
 	g.fieldMap["rules"] = g.Rules
 	g.fieldMap["tags"] = g.Tags
+	g.fieldMap["limit_reset_index"] = g.LimitResetIndex
+	g.fieldMap["limit_total"] = g.LimitTotal
+	g.fieldMap["limit_kind"] = g.LimitKind
 
 }
 

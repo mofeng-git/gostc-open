@@ -249,7 +249,7 @@ onBeforeMount(() => {
                     今日已签到，获取{{ state.userInfo?.checkinAmount }}积分
                   </n-tag>
                   <n-alert type="info" v-else>
-                    今日还未进行签到，签到可随机获取1-5积分，
+                    {{`今日还未进行签到，签到可随机获得${appStore().siteConfig.checkInStart}-${appStore().siteConfig.checkInEnd}积分，`}}
                     <n-button
                         text
                         type="info"

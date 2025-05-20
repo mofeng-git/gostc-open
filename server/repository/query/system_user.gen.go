@@ -31,6 +31,7 @@ func newSystemUser(db *gorm.DB, opts ...gen.DOOption) systemUser {
 	_systemUser.Code = field.NewString(tableName, "code")
 	_systemUser.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_systemUser.AllowDel = field.NewInt(tableName, "allow_del")
+	_systemUser.Version = field.NewInt64(tableName, "version")
 	_systemUser.CreatedAt = field.NewTime(tableName, "created_at")
 	_systemUser.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_systemUser.Account = field.NewString(tableName, "account")
@@ -53,6 +54,7 @@ type systemUser struct {
 	Code      field.String
 	AllowEdit field.Int
 	AllowDel  field.Int
+	Version   field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	Account   field.String
@@ -81,6 +83,7 @@ func (s *systemUser) updateTableName(table string) *systemUser {
 	s.Code = field.NewString(table, "code")
 	s.AllowEdit = field.NewInt(table, "allow_edit")
 	s.AllowDel = field.NewInt(table, "allow_del")
+	s.Version = field.NewInt64(table, "version")
 	s.CreatedAt = field.NewTime(table, "created_at")
 	s.UpdatedAt = field.NewTime(table, "updated_at")
 	s.Account = field.NewString(table, "account")
@@ -105,11 +108,12 @@ func (s *systemUser) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *systemUser) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 12)
+	s.fieldMap = make(map[string]field.Expr, 13)
 	s.fieldMap["id"] = s.Id
 	s.fieldMap["code"] = s.Code
 	s.fieldMap["allow_edit"] = s.AllowEdit
 	s.fieldMap["allow_del"] = s.AllowDel
+	s.fieldMap["version"] = s.Version
 	s.fieldMap["created_at"] = s.CreatedAt
 	s.fieldMap["updated_at"] = s.UpdatedAt
 	s.fieldMap["account"] = s.Account

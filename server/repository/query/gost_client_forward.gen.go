@@ -31,6 +31,7 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 	_gostClientForward.Code = field.NewString(tableName, "code")
 	_gostClientForward.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostClientForward.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostClientForward.Version = field.NewInt64(tableName, "version")
 	_gostClientForward.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostClientForward.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostClientForward.Name = field.NewString(tableName, "name")
@@ -108,6 +109,7 @@ type gostClientForward struct {
 	Code          field.String
 	AllowEdit     field.Int
 	AllowDel      field.Int
+	Version       field.Int64
 	CreatedAt     field.Time
 	UpdatedAt     field.Time
 	Name          field.String
@@ -161,6 +163,7 @@ func (g *gostClientForward) updateTableName(table string) *gostClientForward {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Name = field.NewString(table, "name")
@@ -205,11 +208,12 @@ func (g *gostClientForward) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (g *gostClientForward) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 35)
+	g.fieldMap = make(map[string]field.Expr, 36)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["name"] = g.Name

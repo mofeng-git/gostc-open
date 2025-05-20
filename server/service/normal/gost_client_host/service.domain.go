@@ -50,6 +50,14 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 			return errors.New("操作失败")
 		}
 
+		if !cache.GetNodeOnline(host.NodeCode) {
+			return errors.New("节点已离线，无法操作")
+		}
+
+		if !cache.GetNodeCustomDomain(host.NodeCode) {
+			return errors.New("该节点未启用自定义域名")
+		}
+
 		if host.CustomDomain != "" {
 			if host.CustomDomain != req.CustomDomain {
 				validDomain, _ := tx.GostClientHostDomain.Where(
@@ -68,9 +76,6 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 		node, _ := tx.GostNode.Where(tx.GostNode.Code.Eq(host.NodeCode)).First()
 		if node == nil {
 			return errors.New("节点错误")
-		}
-		if !cache.GetNodeCustomDomain(node.Code) {
-			return errors.New("该节点未启用自定义域名")
 		}
 
 		if req.CustomDomain != "" {

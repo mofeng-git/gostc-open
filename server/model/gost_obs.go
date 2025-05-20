@@ -4,6 +4,7 @@ const (
 	GOST_OBS_ORIGIN_KIND_NODE   = 1 // 节点
 	GOST_OBS_ORIGIN_KIND_CLIENT = 2 // 客户端
 	GOST_OBS_ORIGIN_KIND_TUNNEL = 3 // 隧道
+	GOST_OBS_ORIGIN_KIND_USER   = 4
 )
 
 type GostObs struct {

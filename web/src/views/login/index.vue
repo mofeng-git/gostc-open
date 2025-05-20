@@ -73,7 +73,7 @@ const loginOtpFunc = () => {
         state.value.loginOtp.loading = true
         let res = await apiAuthLoginOtp(state.value.loginOtp.data)
         localStore().auth.token = res.data.token
-        localStore().auth.tokenExpAt = res.data.tokenExpAt
+        localStore().auth.expAt = res.data.expAt
         window.location.reload()
       } finally {
         state.value.loginOtp.loading = false

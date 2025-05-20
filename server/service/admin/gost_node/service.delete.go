@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/repository"
 	"server/repository/query"
+	"server/service/common/cache"
 	"server/service/gost_engine"
 )
 
@@ -44,6 +45,7 @@ func (service *service) Delete(req DeleteReq) error {
 		_, _ = tx.GostNodeLogger.Where(tx.GostNodeLogger.NodeCode.Eq(node.Code)).Delete()
 		_, _ = tx.GostNodeBind.Where(tx.GostNodeBind.NodeCode.Eq(node.Code)).Delete()
 		gost_engine.NodeStop(node.Code, "节点已被删除")
+		cache.DelNodeInfo(node.Code)
 		return nil
 	})
 }

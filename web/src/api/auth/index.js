@@ -62,20 +62,11 @@ export const apiAuthUserCheckin = () => {
     })
 }
 
-// 修改密码
-export const apiAuthPwd = (data) => {
-    return request.request({
-        url: `${baseUrl}/pwd`,
-        method: 'POST',
-        data:data
-    })
-}
-
 // 续期
 export const apiAuthRenew = () => {
     return request.request({
         url: `${baseUrl}/renew`,
-        method: 'GET'
+        method: 'POST'
     })
 }
 

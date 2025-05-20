@@ -31,6 +31,7 @@ func newGostClientTunnel(db *gorm.DB, opts ...gen.DOOption) gostClientTunnel {
 	_gostClientTunnel.Code = field.NewString(tableName, "code")
 	_gostClientTunnel.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostClientTunnel.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostClientTunnel.Version = field.NewInt64(tableName, "version")
 	_gostClientTunnel.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostClientTunnel.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostClientTunnel.Name = field.NewString(tableName, "name")
@@ -100,6 +101,7 @@ type gostClientTunnel struct {
 	Code         field.String
 	AllowEdit    field.Int
 	AllowDel     field.Int
+	Version      field.Int64
 	CreatedAt    field.Time
 	UpdatedAt    field.Time
 	Name         field.String
@@ -145,6 +147,7 @@ func (g *gostClientTunnel) updateTableName(table string) *gostClientTunnel {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Name = field.NewString(table, "name")
@@ -181,11 +184,12 @@ func (g *gostClientTunnel) GetFieldByName(fieldName string) (field.OrderExpr, bo
 }
 
 func (g *gostClientTunnel) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 27)
+	g.fieldMap = make(map[string]field.Expr, 28)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["name"] = g.Name

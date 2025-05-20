@@ -34,6 +34,12 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		return errors.New("内网端口格式错误")
 	}
 
+	var cfg model.SystemConfigGost
+	cache.GetSystemConfigGost(&cfg)
+	if cfg.FuncTunnel != "1" {
+		return errors.New("管理员未启用该功能")
+	}
+
 	return db.Transaction(func(tx *query.Query) error {
 		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
 		if user == nil {
@@ -77,8 +83,13 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			if user.Amount.LessThan(cfg.Amount) {
 				return errors.New("积分不足")
 			}
-			user.Amount = user.Amount.Sub(cfg.Amount)
-			if err := tx.SystemUser.Save(user); err != nil {
+			if _, err := tx.SystemUser.Where(
+				tx.SystemUser.Code.Eq(user.Code),
+				tx.SystemUser.Version.Eq(user.Version),
+			).UpdateSimple(
+				tx.SystemUser.Amount.Value(user.Amount.Sub(user.Amount.Sub(cfg.Amount))),
+				tx.SystemUser.Version.Value(user.Version+1),
+			); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}
@@ -87,7 +98,13 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				return errors.New("积分不足")
 			}
 			user.Amount = user.Amount.Sub(cfg.Amount)
-			if err := tx.SystemUser.Save(user); err != nil {
+			if _, err := tx.SystemUser.Where(
+				tx.SystemUser.Code.Eq(user.Code),
+				tx.SystemUser.Version.Eq(user.Version),
+			).UpdateSimple(
+				tx.SystemUser.Amount.Value(user.Amount.Sub(user.Amount.Sub(cfg.Amount))),
+				tx.SystemUser.Version.Value(user.Version+1),
+			); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}

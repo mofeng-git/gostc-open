@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"server/model"
 	"server/repository"
+	"server/service/common/cache"
 	"server/service/common/node_port"
 	"strings"
 )
@@ -35,6 +36,10 @@ type CreateReq struct {
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
 	IndexValue            int      `json:"indexValue"`
+
+	LimitResetIndex int `json:"limitResetIndex"`
+	LimitTotal      int `json:"limitTotal"`
+	LimitKind       int `json:"limitKind"`
 }
 
 func (service *service) Create(req CreateReq) error {
@@ -71,11 +76,21 @@ func (service *service) Create(req CreateReq) error {
 		Rules:                 strings.Join(req.Rules, ","),
 		Tags:                  strings.Join(req.Tags, ","),
 		IndexValue:            req.IndexValue,
+		LimitResetIndex:       req.LimitResetIndex,
+		LimitTotal:            req.LimitTotal,
+		LimitKind:             req.LimitKind,
 	}
 	if err := db.GostNode.Create(&node); err != nil {
 		log.Error("新增节点失败", zap.Error(err))
 		return errors.New("操作失败")
 	}
+	cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+	cache.SetNodeInfo(cache.NodeInfo{
+		Code:            node.Code,
+		LimitResetIndex: node.LimitResetIndex,
+		LimitTotal:      node.LimitTotal,
+		LimitKind:       node.LimitKind,
+	})
 	node_port.Arrange(db, node.Code)
 	return nil
 }

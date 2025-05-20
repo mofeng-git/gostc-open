@@ -31,6 +31,7 @@ func newGostNodeBind(db *gorm.DB, opts ...gen.DOOption) gostNodeBind {
 	_gostNodeBind.Code = field.NewString(tableName, "code")
 	_gostNodeBind.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostNodeBind.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostNodeBind.Version = field.NewInt64(tableName, "version")
 	_gostNodeBind.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostNodeBind.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostNodeBind.NodeCode = field.NewString(tableName, "node_code")
@@ -73,6 +74,7 @@ type gostNodeBind struct {
 	Code      field.String
 	AllowEdit field.Int
 	AllowDel  field.Int
+	Version   field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	NodeCode  field.String
@@ -100,6 +102,7 @@ func (g *gostNodeBind) updateTableName(table string) *gostNodeBind {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.NodeCode = field.NewString(table, "node_code")
@@ -120,11 +123,12 @@ func (g *gostNodeBind) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (g *gostNodeBind) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 10)
+	g.fieldMap = make(map[string]field.Expr, 11)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["node_code"] = g.NodeCode

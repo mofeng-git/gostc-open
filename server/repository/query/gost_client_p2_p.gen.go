@@ -31,6 +31,7 @@ func newGostClientP2P(db *gorm.DB, opts ...gen.DOOption) gostClientP2P {
 	_gostClientP2P.Code = field.NewString(tableName, "code")
 	_gostClientP2P.AllowEdit = field.NewInt(tableName, "allow_edit")
 	_gostClientP2P.AllowDel = field.NewInt(tableName, "allow_del")
+	_gostClientP2P.Version = field.NewInt64(tableName, "version")
 	_gostClientP2P.CreatedAt = field.NewTime(tableName, "created_at")
 	_gostClientP2P.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_gostClientP2P.Name = field.NewString(tableName, "name")
@@ -99,6 +100,7 @@ type gostClientP2P struct {
 	Code         field.String
 	AllowEdit    field.Int
 	AllowDel     field.Int
+	Version      field.Int64
 	CreatedAt    field.Time
 	UpdatedAt    field.Time
 	Name         field.String
@@ -143,6 +145,7 @@ func (g *gostClientP2P) updateTableName(table string) *gostClientP2P {
 	g.Code = field.NewString(table, "code")
 	g.AllowEdit = field.NewInt(table, "allow_edit")
 	g.AllowDel = field.NewInt(table, "allow_del")
+	g.Version = field.NewInt64(table, "version")
 	g.CreatedAt = field.NewTime(table, "created_at")
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.Name = field.NewString(table, "name")
@@ -178,11 +181,12 @@ func (g *gostClientP2P) GetFieldByName(fieldName string) (field.OrderExpr, bool)
 }
 
 func (g *gostClientP2P) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 26)
+	g.fieldMap = make(map[string]field.Expr, 27)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
 	g.fieldMap["allow_del"] = g.AllowDel
+	g.fieldMap["version"] = g.Version
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["name"] = g.Name

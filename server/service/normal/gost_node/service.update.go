@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/service/common/cache"
 	"server/service/common/node_port"
 	"server/service/gost_engine"
 	"strings"
@@ -36,6 +37,10 @@ type UpdateReq struct {
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
 	IndexValue            int      `json:"indexValue"`
+
+	LimitResetIndex int `json:"limitResetIndex"`
+	LimitTotal      int `json:"limitTotal"`
+	LimitKind       int `json:"limitKind"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -82,6 +87,11 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	node.ForwardReplaceAddress = req.ForwardReplaceAddress
 	node.P2PPort = req.P2PPort
 	node.IndexValue = req.IndexValue
+
+	node.LimitResetIndex = req.LimitResetIndex
+	node.LimitTotal = req.LimitTotal
+	node.LimitKind = req.LimitKind
+
 	if err := db.GostNode.Save(node); err != nil {
 		log.Error("修改节点失败", zap.Error(err))
 		return errors.New("操作失败")
@@ -114,5 +124,12 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		gost_engine.ClientP2PConfig(db, code)
 	}
 	node_port.Arrange(db, node.Code)
+	cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+	cache.SetNodeInfo(cache.NodeInfo{
+		Code:            node.Code,
+		LimitResetIndex: node.LimitResetIndex,
+		LimitTotal:      node.LimitTotal,
+		LimitKind:       node.LimitKind,
+	})
 	return nil
 }

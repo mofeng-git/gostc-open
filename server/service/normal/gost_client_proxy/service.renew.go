@@ -42,8 +42,14 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			if user.Amount.LessThan(proxy.Amount) {
 				return errors.New("积分不足")
 			}
-			user.Amount = user.Amount.Sub(proxy.Amount)
-			if err := tx.SystemUser.Save(user); err != nil {
+
+			if _, err := tx.SystemUser.Where(
+				tx.SystemUser.Code.Eq(user.Code),
+				tx.SystemUser.Version.Eq(user.Version),
+			).UpdateSimple(
+				tx.SystemUser.Amount.Value(user.Amount.Sub(proxy.Amount)),
+				tx.SystemUser.Version.Value(user.Version+1),
+			); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
 				return errors.New("操作失败")
 			}
