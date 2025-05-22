@@ -260,3 +260,6 @@ go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe ./gui/
 <img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/zfb.png" alt=""/>
 <img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/wx.png" alt=""/>
 
+
+## Third-Party Licenses
+- [Library gws](https://github.com/lxzan/gws) - Apache-2.0 License
