@@ -62,6 +62,7 @@ const state = ref({
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
       p2pPort: '',
+      p2pDisableForward: 0,
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -100,6 +101,7 @@ const state = ref({
       tunnelReplaceAddress: '',
       forwardReplaceAddress: '',
       p2pPort: '',
+      p2pDisableForward: 0,
       rules: [],
       tags: [],
       indexValue: 1000,
@@ -175,6 +177,7 @@ const openCreate = () => {
     tunnelReplaceAddress: '',
     forwardReplaceAddress: '',
     p2pPort: '',
+    p2pDisableForward: 0,
     rules: [],
     tags: [],
     indexValue: 1000,
@@ -446,6 +449,7 @@ onBeforeMount(() => {
                 </n-tab-pane>
                 <n-tab-pane name="p2p" tab="P2P隧道">
                   <span>连接端口：{{ row.p2pPort }}</span><br>
+                  <span>中继转发：{{ row.p2pDisableForward === 0 ? '启用' : '禁用' }}</span><br>
                 </n-tab-pane>
               </n-tabs>
             </div>
@@ -680,6 +684,18 @@ onBeforeMount(() => {
             <n-form-item path="p2pPort" label="连接端口">
               <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
             </n-form-item>
+            <n-form-item path="p2pDisableForward" label="中继转发">
+              <n-switch
+                  :round="false"
+                  :default-value="state.create.data.p2pDisableForward"
+                  :checked-value="0"
+                  :unchecked-value="1"
+                  :on-update-value="value => {state.create.data.p2pDisableForward = value}"
+              >
+                <template #checked>启用转发</template>
+                <template #unchecked>禁用转发</template>
+              </n-switch>
+            </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="limit" tab="流量循环">
             <n-form-item path="limitResetIndex" label="重置日期(0表示流量不循环计算)">
@@ -891,6 +907,18 @@ onBeforeMount(() => {
             </div>
             <n-form-item path="p2pPort" label="连接端口">
               <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
+            </n-form-item>
+            <n-form-item path="p2pDisableForward" label="中继转发">
+              <n-switch
+                  :round="false"
+                  :default-value="state.update.data.p2pDisableForward"
+                  :checked-value="0"
+                  :unchecked-value="1"
+                  :on-update-value="value => {state.update.data.p2pDisableForward = value}"
+              >
+                <template #checked>启用转发</template>
+                <template #unchecked>禁用转发</template>
+              </n-switch>
             </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="limit" tab="流量循环">

@@ -50,6 +50,7 @@ type Item struct {
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
+	P2PDisableForward     int      `json:"p2pDisableForward"`
 
 	Online      int    `json:"online"`
 	Version     string `json:"version"`
@@ -146,6 +147,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			TunnelReplaceAddress:  node.TunnelReplaceAddress,
 			ForwardReplaceAddress: node.ForwardReplaceAddress,
 			P2PPort:               node.P2PPort,
+			P2PDisableForward:     node.P2PDisableForward,
 			Online:                utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
 			Version:               cache.GetNodeVersion(node.Code),
 			InputBytes:            monthObsInfo.InputBytes,

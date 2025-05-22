@@ -53,7 +53,7 @@ const state = ref({
     open: false,
     key: '',
   },
-  clients: [],
+  clients:[],
 })
 
 const refreshTable = () => {
@@ -308,6 +308,7 @@ const operatorRenderLabel = (option)=>{
               <span>并发数：{{ rLimiterText(row.config.rLimiter) }}</span><br>
               <span>连接数：{{ cLimiterText(row.config.cLimiter) }}</span><br>
               <span>套餐：{{ configText(row.config) }}</span><br>
+              <span>中继转发：{{ row.node.p2pDisableForward === 0 ? '支持' : '不支持' }}</span><br>
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">

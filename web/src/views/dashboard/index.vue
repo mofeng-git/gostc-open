@@ -22,6 +22,7 @@ import moment from "moment";
 import {apiNormalGostObsUserMonth} from "../../api/normal/gost_obs.js";
 
 const state = ref({
+  baseUrl: window.location.protocol + '//' + window.location.host,
   userInfo: {},
   gost: {},
   notices: [],
@@ -227,10 +228,26 @@ onBeforeMount(() => {
   obsUserMonthFunc()
 })
 
+const alertSystemConfigBaseUrl = computed(() => {
+  if (appStore().userInfo.admin === 1) {
+    return appStore().siteConfig.baseUrl !== state.value.baseUrl;
+  } else {
+    return false
+  }
+})
+
 </script>
 
 <template>
   <div>
+    <AppCard :show-border="false" v-if="alertSystemConfigBaseUrl">
+      <n-alert type="warning">
+        系统配置基础ULR：{{ appStore().siteConfig.baseUrl }}<br>
+        当前访问基础ULR：{{ state.baseUrl }}<br>
+        配置的基础URL与当前访问地址不匹配
+      </n-alert>
+    </AppCard>
+
     <AppCard :show-border="false">
       <n-grid :cols="gridColsComputed" :x-gap="12" :y-gap="12">
         <n-grid-item>
@@ -319,7 +336,7 @@ onBeforeMount(() => {
             <AppCard :show-border="false">
               <n-h4 style="font-weight: bold">通知公告</n-h4>
               <n-scrollbar style="max-height: 600px">
-                <n-alert style="margin-bottom: 8px" type="info" v-for="item in state.notices" :key="item.code"
+                <n-alert style="margin-bottom: 8px" type="info" v-for="(item,index) in state.notices" :key="item.code"
                          :bordered="false">
                   <template #header>
                     <div style="display: flex;justify-content: space-between;flex-direction: column;line-height: 1.5">
@@ -327,7 +344,10 @@ onBeforeMount(() => {
                       <span style="font-size: 0.8em">{{ item.date }}</span>
                     </div>
                   </template>
-                  {{ item.content }}
+                  <span v-for="(content,contentIndex) in item.content.split('\n')" :key="contentIndex">
+                    <br v-if="contentIndex!==0">
+                    {{ content }}
+                  </span>
                 </n-alert>
               </n-scrollbar>
             </AppCard>

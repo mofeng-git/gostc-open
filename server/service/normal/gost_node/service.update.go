@@ -36,6 +36,7 @@ type UpdateReq struct {
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
+	P2PDisableForward     int      `json:"p2pDisableForward"`
 	IndexValue            int      `json:"indexValue"`
 
 	LimitResetIndex int `json:"limitResetIndex"`
@@ -86,6 +87,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	node.ForwardMetadata = req.ForwardMetadata
 	node.ForwardReplaceAddress = req.ForwardReplaceAddress
 	node.P2PPort = req.P2PPort
+	node.P2PDisableForward = req.P2PDisableForward
 	node.IndexValue = req.IndexValue
 
 	node.LimitResetIndex = req.LimitResetIndex

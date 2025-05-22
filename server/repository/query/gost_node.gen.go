@@ -57,6 +57,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.ForwardMetadata = field.NewString(tableName, "forward_metadata")
 	_gostNode.ForwardReplaceAddress = field.NewString(tableName, "forward_replace_address")
 	_gostNode.P2PPort = field.NewString(tableName, "p2p_port")
+	_gostNode.P2PDisableForward = field.NewInt(tableName, "p2p_disable_forward")
 	_gostNode.Rules = field.NewString(tableName, "rules")
 	_gostNode.Tags = field.NewString(tableName, "tags")
 	_gostNode.LimitResetIndex = field.NewInt(tableName, "limit_reset_index")
@@ -120,6 +121,7 @@ type gostNode struct {
 	ForwardMetadata       field.String
 	ForwardReplaceAddress field.String
 	P2PPort               field.String
+	P2PDisableForward     field.Int
 	Rules                 field.String
 	Tags                  field.String
 	LimitResetIndex       field.Int
@@ -172,6 +174,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.ForwardMetadata = field.NewString(table, "forward_metadata")
 	g.ForwardReplaceAddress = field.NewString(table, "forward_replace_address")
 	g.P2PPort = field.NewString(table, "p2p_port")
+	g.P2PDisableForward = field.NewInt(table, "p2p_disable_forward")
 	g.Rules = field.NewString(table, "rules")
 	g.Tags = field.NewString(table, "tags")
 	g.LimitResetIndex = field.NewInt(table, "limit_reset_index")
@@ -193,7 +196,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 36)
+	g.fieldMap = make(map[string]field.Expr, 37)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -224,6 +227,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["forward_metadata"] = g.ForwardMetadata
 	g.fieldMap["forward_replace_address"] = g.ForwardReplaceAddress
 	g.fieldMap["p2p_port"] = g.P2PPort
+	g.fieldMap["p2p_disable_forward"] = g.P2PDisableForward
 	g.fieldMap["rules"] = g.Rules
 	g.fieldMap["tags"] = g.Tags
 	g.fieldMap["limit_reset_index"] = g.LimitResetIndex

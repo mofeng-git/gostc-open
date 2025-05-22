@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	v1 "server/pkg/p2p_cfg/v1"
 	"server/pkg/utils"
 )
@@ -36,39 +37,44 @@ func (p2p GostClientP2P) GenerateProxyCfgs() (v1.STCPProxyConfig, v1.XTCPProxyCo
 	if p2p.Node.P2P != 1 {
 		return v1.STCPProxyConfig{}, v1.XTCPProxyConfig{}
 	}
-	return v1.STCPProxyConfig{
-			ProxyBaseConfig: v1.ProxyBaseConfig{
-				Name: "stcp_" + p2p.Code,
-				Type: "stcp",
-				Transport: v1.ProxyTransport{
-					UseEncryption:      false,
-					UseCompression:     true,
-					BandwidthLimit:     "128KB",
-					BandwidthLimitMode: "client",
-				},
-				ProxyBackend: v1.ProxyBackend{
-					LocalIP:   p2p.TargetIp,
-					LocalPort: utils.StrMustInt(p2p.TargetPort),
-				},
+	var stcp = v1.STCPProxyConfig{
+		ProxyBaseConfig: v1.ProxyBaseConfig{
+			Name: "stcp_" + p2p.Code,
+			Type: "stcp",
+			Transport: v1.ProxyTransport{
+				UseEncryption:      false,
+				UseCompression:     true,
+				BandwidthLimit:     fmt.Sprintf("%dKB", p2p.Limiter*128),
+				BandwidthLimitMode: "client",
 			},
-			Secretkey:  p2p.VKey,
-			AllowUsers: []string{"*"},
-		}, v1.XTCPProxyConfig{
-			ProxyBaseConfig: v1.ProxyBaseConfig{
-				Name: "xtcp_" + p2p.Code,
-				Type: "xtcp",
-				Transport: v1.ProxyTransport{
-					UseEncryption:  false,
-					UseCompression: true,
-				},
-				ProxyBackend: v1.ProxyBackend{
-					LocalIP:   p2p.TargetIp,
-					LocalPort: utils.StrMustInt(p2p.TargetPort),
-				},
+			ProxyBackend: v1.ProxyBackend{
+				LocalIP:   p2p.TargetIp,
+				LocalPort: utils.StrMustInt(p2p.TargetPort),
 			},
-			Secretkey:  p2p.VKey,
-			AllowUsers: []string{"*"},
-		}
+		},
+		Secretkey:  p2p.VKey,
+		AllowUsers: []string{"*"},
+	}
+	var xtcp = v1.XTCPProxyConfig{
+		ProxyBaseConfig: v1.ProxyBaseConfig{
+			Name: "xtcp_" + p2p.Code,
+			Type: "xtcp",
+			Transport: v1.ProxyTransport{
+				UseEncryption:  false,
+				UseCompression: true,
+			},
+			ProxyBackend: v1.ProxyBackend{
+				LocalIP:   p2p.TargetIp,
+				LocalPort: utils.StrMustInt(p2p.TargetPort),
+			},
+		},
+		Secretkey:  p2p.VKey,
+		AllowUsers: []string{"*"},
+	}
+	if p2p.Node.P2PDisableForward == 0 {
+		return stcp, xtcp
+	}
+	return v1.STCPProxyConfig{}, xtcp
 }
 
 func (p2p GostClientP2P) GenerateVisitorCfgs() (v1.STCPVisitorConfig, v1.XTCPVisitorConfig) {

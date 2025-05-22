@@ -128,8 +128,10 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 			if !node_port.ValidPort(node.Code, req.Port, true) {
 				return errors.New("端口未开放或已被占用")
 			}
-			if !validPortAvailable(tx, node.Code, req.Port) {
-				return errors.New("端口已被占用")
+			if cache.GetNodeOnline(req.NodeCode) {
+				if !validPortAvailable(tx, node.Code, req.Port) {
+					return errors.New("端口已被占用")
+				}
 			}
 		}
 

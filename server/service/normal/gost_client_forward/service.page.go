@@ -56,10 +56,11 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Address      string `json:"address"`
+	Online       int    `json:"online"`
+	ForwardPorts string `json:"forwardPorts"`
 }
 
 type ItemConfig struct {
@@ -112,10 +113,11 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			ProxyProtocol: forward.ProxyProtocol,
 			Port:          forward.Port,
 			Node: ItemNode{
-				Code:    forward.NodeCode,
-				Name:    forward.Node.Name,
-				Address: forward.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
+				Code:         forward.NodeCode,
+				Name:         forward.Node.Name,
+				Address:      forward.Node.Address,
+				Online:       utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
+				ForwardPorts: forward.Node.ForwardPorts,
 			},
 			Client: ItemClient{
 				Code:   forward.ClientCode,

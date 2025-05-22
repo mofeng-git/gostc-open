@@ -37,6 +37,7 @@ type CreateReq struct {
 	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
 	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
 	P2PPort               string   `json:"p2pPort"`
+	P2PDisableForward     int      `json:"p2pDisableForward"`
 	IndexValue            int      `json:"indexValue"`
 
 	LimitResetIndex int `json:"limitResetIndex"`
@@ -83,6 +84,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			TunnelReplaceAddress:  req.TunnelReplaceAddress,
 			ForwardReplaceAddress: req.ForwardReplaceAddress,
 			P2PPort:               req.P2PPort,
+			P2PDisableForward:     req.P2PDisableForward,
 			Rules:                 strings.Join(req.Rules, ","),
 			Tags:                  strings.Join(req.Tags, ","),
 			IndexValue:            req.IndexValue,

@@ -40,6 +40,7 @@ type GostNode struct {
 	ForwardMetadata       string           `gorm:"column:forward_metadata;comment:其他信息"`
 	ForwardReplaceAddress string           `gorm:"column:forward_replace_address;comment:替换地址"`
 	P2PPort               string           `gorm:"column:p2p_port;comment:p2p连接端口"`
+	P2PDisableForward     int              `gorm:"column:p2p_disable_forward;size:1;default:0;comment:是否禁用中继"`
 	Rules                 string           `gorm:"column:rules;comment:规则限制"`
 	Tags                  string           `gorm:"column:tags;comment:标签"`
 	Configs               []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`

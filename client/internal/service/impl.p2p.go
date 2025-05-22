@@ -68,6 +68,11 @@ func (svc *P2P) run() (err error) {
 	data.XTCPCfg.BindAddr = svc.bind
 	data.XTCPCfg.BindPort, _ = strconv.Atoi(svc.port)
 
+	// 是否禁用中继转发
+	if data.DisableForward == 1 {
+		data.XTCPCfg.FallbackTo = ""
+	}
+
 	registry.Del(svc.key)
 	s := frpc.NewService(data.Common, nil, []v1.VisitorConfigurer{
 		&data.XTCPCfg,

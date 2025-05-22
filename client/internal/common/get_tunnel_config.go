@@ -55,25 +55,20 @@ func GetVisitTunnelConfig(url string) (result VisitCfg, err error) {
 }
 
 type P2PCfg struct {
-	Common  v1.ClientCommonConfig
-	XTCPCfg v1.XTCPVisitorConfig
-	STCPCfg v1.STCPVisitorConfig
+	Common         v1.ClientCommonConfig
+	XTCPCfg        v1.XTCPVisitorConfig
+	STCPCfg        v1.STCPVisitorConfig
+	DisableForward int
 }
 
 func GetP2PTunnelConfig(url string) (result P2PCfg, err error) {
 	var bytes []byte
-	retry := 0
-	for {
-		retry++
+	for retry := 0; retry <= 10; retry++ {
 		bytes, err = exec(url)
-		if err != nil {
-			if retry >= 3 {
-				return
-			}
-			time.Sleep(time.Second)
-		} else {
+		if err == nil {
 			break
 		}
+		time.Sleep(time.Second)
 	}
 	if err != nil {
 		return result, err

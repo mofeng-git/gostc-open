@@ -41,10 +41,11 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
+	Code              string `json:"code"`
+	Name              string `json:"name"`
+	Address           string `json:"address"`
+	Online            int    `json:"online"`
+	P2PDisableForward int    `json:"p2pDisableForward"`
 }
 
 type ItemConfig struct {
@@ -85,10 +86,11 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			TargetPort: p2p.TargetPort,
 			VKey:       p2p.VKey,
 			Node: ItemNode{
-				Code:    p2p.NodeCode,
-				Name:    p2p.Node.Name,
-				Address: p2p.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
+				Code:              p2p.NodeCode,
+				Name:              p2p.Node.Name,
+				Address:           p2p.Node.Address,
+				Online:            utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
+				P2PDisableForward: p2p.Node.P2PDisableForward,
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,

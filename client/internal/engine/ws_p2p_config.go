@@ -15,10 +15,14 @@ type ClientP2PConfigData struct {
 
 func (e *Event) WsP2PConfig(data ClientP2PConfigData) {
 	registry.Del(data.Code)
-	svc := frpc.NewService(data.Common, []v1.ProxyConfigurer{
-		&data.STCPCfg,
-		&data.XTCPCfg,
-	}, nil)
+	var proxys []v1.ProxyConfigurer
+	if data.STCPCfg.Name != "" {
+		proxys = append(proxys, &data.STCPCfg)
+	}
+	if data.XTCPCfg.Name != "" {
+		proxys = append(proxys, &data.XTCPCfg)
+	}
+	svc := frpc.NewService(data.Common, proxys, nil)
 	if err := svc.Start(); err == nil {
 		_ = registry.Set(data.Code, svc)
 		e.svcMap.Store(data.Code, true)

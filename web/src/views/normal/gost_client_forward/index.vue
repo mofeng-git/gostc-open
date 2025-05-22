@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch, h} from "vue";
+import {h, onBeforeMount, ref, watch} from "vue";
 import {
   apiNormalGostClientForwardAdmission,
   apiNormalGostClientForwardDelete,
@@ -288,38 +288,38 @@ const operatorOptions = [
     label: '流量',
     key: 'obs',
     disabled: false,
-    func:openObsModal,
+    func: openObsModal,
   },
   {
     label: '黑/白名单',
     key: 'admission',
     disabled: false,
-    func:openAdmission,
+    func: openAdmission,
   },
   {
     label: '规则匹配',
     key: 'matcher',
     disabled: false,
-    func:openMatcher,
+    func: openMatcher,
   },
 ]
-const operatorSelect = (key,row)=>{
-  for (let i=0;i<operatorOptions.length;i++){
-    if (operatorOptions[i].key===key){
+const operatorSelect = (key, row) => {
+  for (let i = 0; i < operatorOptions.length; i++) {
+    if (operatorOptions[i].key === key) {
       operatorOptions[i].func(row)
       return
     }
   }
 }
 
-const operatorRenderLabel = (option)=>{
-  return h(NButton,{
-    text:true,
-    size:"tiny",
-    focusable:false,
-    type:"info",
-  },{
-    default:()=> option.label,
+const operatorRenderLabel = (option) => {
+  return h(NButton, {
+    text: true,
+    size: "tiny",
+    focusable: false,
+    type: "info",
+  }, {
+    default: () => option.label,
   })
 }
 
@@ -420,7 +420,8 @@ const operatorRenderLabel = (option)=>{
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions"
+                          @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
                 <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
               </n-dropdown>
 
@@ -510,12 +511,19 @@ const operatorRenderLabel = (option)=>{
               placeholder="80"
           ></n-input>
         </n-form-item>
-        <n-form-item path="proxyProtocol" label="PROXY Protocol">
-          <n-select
-              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"
-              v-model:value="state.update.data.proxyProtocol"
-          ></n-select>
+        <n-alert type="info" :show-icon="true">
+          可选远程端口：{{state.update.data.node.forwardPorts}}
+        </n-alert>
+        <p></p>
+        <n-form-item path="port" label="远程端口">
+          <n-input v-model:value="state.update.data.port" placeholder="10001"></n-input>
         </n-form-item>
+<!--        <n-form-item path="proxyProtocol" label="PROXY Protocol">-->
+<!--          <n-select-->
+<!--              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"-->
+<!--              v-model:value="state.update.data.proxyProtocol"-->
+<!--          ></n-select>-->
+<!--        </n-form-item>-->
       </n-form>
     </Modal>
 

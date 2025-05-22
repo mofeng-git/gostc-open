@@ -7,6 +7,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
+	"strings"
 )
 
 type BaseReq struct {
@@ -21,6 +22,10 @@ type BaseReq struct {
 }
 
 func (service *service) Base(req BaseReq) error {
+	if !strings.HasPrefix(req.BaseUrl, "http://") && !strings.HasPrefix(req.BaseUrl, "https://") {
+		return errors.New("基础URL必须http://或https://开头")
+	}
+	req.BaseUrl = strings.TrimRight(req.BaseUrl, "/")
 	db, _, log := repository.Get("")
 	if req.CheckInStart > req.CheckInEnd {
 		req.CheckInStart, req.CheckInEnd = req.CheckInEnd, req.CheckInStart

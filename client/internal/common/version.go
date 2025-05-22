@@ -1,5 +1,5 @@
 package common
 
 var (
-	VERSION = "v1.2.6" // 服务端版本
+	VERSION = "v1.2.7" // 服务端版本
 )
