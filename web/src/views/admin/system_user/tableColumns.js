@@ -10,6 +10,7 @@ export function generateTableColumns(
 ) {
     return [
         {title: '账号', key: 'account', ellipsis: {tooltip: true}},
+        {title: '邮箱', key: 'email', ellipsis: {tooltip: true}},
         {
             title: '角色',
             key: 'admin',

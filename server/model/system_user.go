@@ -9,10 +9,11 @@ const (
 
 type SystemUser struct {
 	Base
-	Account  string          `gorm:"column:account;size:100;uniqueIndex;comment:账号"`
-	Password string          `gorm:"column:password;comment:密码"`
-	Salt     string          `gorm:"column:salt;size:8;comment:盐"`
-	OtpKey   string          `gorm:"column:otp_key;index;default:'';not null"`
-	Admin    int             `gorm:"column:admin;size:1;default:2;comment:是否为管理员"`
-	Amount   decimal.Decimal `gorm:"column:amount;default:0;comment:余额"`
+	Account   string          `gorm:"column:account;size:100;uniqueIndex;comment:账号"`
+	Password  string          `gorm:"column:password;comment:密码"`
+	Salt      string          `gorm:"column:salt;size:8;comment:盐"`
+	OtpKey    string          `gorm:"column:otp_key;index;default:'';not null"`
+	Admin     int             `gorm:"column:admin;size:1;default:2;comment:是否为管理员"`
+	Amount    decimal.Decimal `gorm:"column:amount;default:0;comment:余额"`
+	BindEmail SystemUserEmail `gorm:"foreignKey:UserCode;references:Code"`
 }

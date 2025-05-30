@@ -22,18 +22,18 @@ func Init() {
 	LOGGER_FILE_PATH = BASE_PATH + "/data/gostc.log"
 
 	fmt.Printf(`
-========================================
-MODE: %s
-VERSION: %s
+BASE_CONFIG:
+MODE=%s
+VERSION=%s
 BASE_PATH: %s
-LOGGER_FILE_PATH: %s
-LOGGER_LEVEL: %s
+LOGGER_FILE_PATH=%s
+LOGGER_LEVEL=%s
 ========================================
 `, MODE, VERSION, BASE_PATH, LOGGER_FILE_PATH, LOGGER_LEVEL)
 }
 
 var (
-	VERSION   = "v1.2.7" // 版本
+	VERSION   = "v1.2.8" // 版本
 	BASE_PATH = ""       // 基础目录
 	/*
 		prod:生产模式，程序运行根路径和程序的所在目录保持一致

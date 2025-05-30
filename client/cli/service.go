@@ -8,6 +8,7 @@ import (
 	"gostc-sub/gui/global"
 	"gostc-sub/internal/common"
 	"gostc-sub/internal/service"
+	"gostc-sub/pkg/env"
 	"gostc-sub/pkg/signal"
 	"gostc-sub/webui/backend/bootstrap"
 	"log"
@@ -90,6 +91,9 @@ func (p *program) run() {
 	flag.BoolVar(&console, "console", false, "log to stdout")
 
 	flag.Parse()
+
+	address = env.GetEnv("GOSTC_CLIENT_ADDR", address)
+	tlsEnable = env.GetEnv("GOSTC_CLIENT_TLS", tlsEnable)
 
 	common.Logger.Console(console)
 

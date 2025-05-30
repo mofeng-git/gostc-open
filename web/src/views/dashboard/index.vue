@@ -8,10 +8,13 @@ import {localStore} from "../../store/local.js";
 import Modal from "../../components/Modal.vue";
 import {requiredRule} from "../../utils/formDataRule.js";
 import {
+  apiAuthBindEmail,
   apiAuthCloseOtp,
+  apiAuthGenBindEmailCode,
   apiAuthGenOtp,
   apiAuthOpenOtp,
   apiAuthPassword,
+  apiAuthUnBindEmail,
   apiAuthUserCheckin,
   apiAuthUserInfo
 } from "../../api/auth/index.js";
@@ -54,7 +57,32 @@ const state = ref({
   checkinLoading: false,
   obsDataRange: 1,
   obsLoading: false,
-  obsData: []
+  obsData: [],
+  gift: {
+    open: false,
+    key: '',
+    loading: false,
+  },
+  cdk: {
+    open: false,
+    key: '',
+    loading: false,
+  },
+  bindEmail: {
+    open: false,
+    loading: false,
+    genLoading: false,
+    data: {
+      target: '',
+      key: '',
+      code: '',
+    },
+    dataRules: {
+      target: requiredRule('请输入绑定的邮箱'),
+      code: requiredRule('请输入验证码'),
+    },
+  },
+  unBindEmailLoading: false,
 })
 
 const cardStyleComputed = computed(() => {
@@ -221,6 +249,74 @@ const obsUserMonthFunc = async () => {
   }
 }
 
+const openBindEmailModal = () => {
+  state.value.bindEmail.data = {
+    target: '',
+    key: '',
+    code: ''
+  }
+  state.value.bindEmail.open = true
+}
+
+const closeBindEmailModal = () => {
+  state.value.bindEmail.open = false
+}
+
+const genBindEmailCodeFunc = () => {
+  bindEmailRef.value.validate(async valid => {
+    if (!valid) {
+      try {
+        state.value.bindEmail.genLoading = true
+        state.value.bindEmail.data.code = ''
+        let res = await apiAuthGenBindEmailCode(state.value.bindEmail.data)
+        state.value.bindEmail.data.key = res.data
+      } finally {
+        state.value.bindEmail.genLoading = false
+      }
+    }
+  })
+}
+
+const bindEmailRef = ref()
+const bindEmailFunc = () => {
+  if (state.value.bindEmail.data.key===''){
+    $message.create('请先发送验证码',{
+      type:"warning",
+      closable:true,
+      duration:1500,
+    })
+    return
+  }
+  if (state.value.bindEmail.data.code===''){
+    $message.create('请输入验证码',{
+      type:"warning",
+      closable:true,
+      duration:1500,
+    })
+    return
+  }
+  bindEmailRef.value.validate(async valid => {
+    if (!valid) {
+      try {
+        state.value.bindEmail.loading = true
+        await apiAuthBindEmail(state.value.bindEmail.data)
+        window.location.reload()
+      } finally {
+        state.value.bindEmail.loading = false
+      }
+    }
+  })
+}
+
+const unBindEmailFunc = async () => {
+  try {
+    await apiAuthUnBindEmail()
+    window.location.reload()
+  } finally {
+
+  }
+}
+
 onBeforeMount(() => {
   state.value.userInfo = appStore().userInfo
   noticeListFunc()
@@ -258,7 +354,23 @@ const alertSystemConfigBaseUrl = computed(() => {
                 <n-descriptions-item label="账号">{{ state.userInfo.account }}</n-descriptions-item>
                 <n-descriptions-item label="积分">{{ state.userInfo.amount }}</n-descriptions-item>
                 <n-descriptions-item label="注册时间">{{ state.userInfo.createdAt }}</n-descriptions-item>
+
+                <n-descriptions-item label="邮箱" v-if="state.userInfo.email!==''">
+                  {{ state.userInfo.email }}
+                  <n-popconfirm
+                      :on-positive-click="unBindEmailFunc"
+                      :positive-button-props="{loading:state.unBindEmailLoading}">
+                    <template #trigger>
+                      <n-button text type="info" :focusable="false" size="small">解绑</n-button>
+                    </template>
+                    确认解绑吗？
+                  </n-popconfirm>
+                </n-descriptions-item>
+                <n-descriptions-item label="邮箱" v-if="state.userInfo.email===''">
+                  <n-button text type="info" :focusable="false" size="small" @click="openBindEmailModal">绑定</n-button>
+                </n-descriptions-item>
               </n-descriptions>
+
               <div v-if="appStore().siteConfig.checkIn==='1'">
                 <p></p>
                 <n-spin :show="state.checkinLoading">
@@ -266,7 +378,9 @@ const alertSystemConfigBaseUrl = computed(() => {
                     今日已签到，获取{{ state.userInfo?.checkinAmount }}积分
                   </n-tag>
                   <n-alert type="info" v-else>
-                    {{`今日还未进行签到，签到可随机获得${appStore().siteConfig.checkInStart}-${appStore().siteConfig.checkInEnd}积分，`}}
+                    {{
+                      `今日还未进行签到，签到可随机获得${appStore().siteConfig.checkInStart}-${appStore().siteConfig.checkInEnd}积分，`
+                    }}
                     <n-button
                         text
                         type="info"
@@ -363,7 +477,8 @@ const alertSystemConfigBaseUrl = computed(() => {
                   <n-radio-button :value="2">最近30天</n-radio-button>
                 </n-radio-group>
               </n-space>
-              <Obs :data="state.obsData" :loading="state.obsLoading" :dark="localStore().darkTheme" style="width: 100%"></Obs>
+              <Obs :data="state.obsData" :loading="state.obsLoading" :dark="localStore().darkTheme"
+                   style="width: 100%"></Obs>
             </AppCard>
           </n-el>
         </n-grid-item>
@@ -414,6 +529,34 @@ const alertSystemConfigBaseUrl = computed(() => {
         </n-grid-item>
       </n-grid>
     </Modal>
+
+    <Modal
+        title="绑定邮箱"
+        :show="state.bindEmail.open"
+        confirm-text="绑定"
+        cancel-text="取消"
+        width="500px"
+        @on-confirm="bindEmailFunc"
+        @on-cancel="closeBindEmailModal"
+        :confirm-loading="state.bindEmail.loading"
+    >
+      <n-form ref="bindEmailRef" :rules="state.bindEmail.dataRules" :model="state.bindEmail.data">
+        <n-form-item label="邮箱" path="target">
+          <n-input-group>
+            <n-input v-model:value="state.bindEmail.data.target" placeholder="请输入邮箱"></n-input>
+            <n-button :disabled="state.bindEmail.data.target===''" type="info" @click="genBindEmailCodeFunc" :loading="state.bindEmail.genLoading">
+              {{ state.bindEmail.data.key === '' ? '发送' : '重新发送' }}
+            </n-button>
+          </n-input-group>
+        </n-form-item>
+
+        <n-form-item label="验证码" path="code" v-if="state.bindEmail.data.key!==''">
+          <n-input :disabled="state.bindEmail.data.key===''" v-model:value="state.bindEmail.data.code"
+                   placeholder="请输入验证码"></n-input>
+        </n-form-item>
+      </n-form>
+      <n-alert type="info">绑定邮箱后，如果忘记密码可以通过邮箱重置密码</n-alert>
+    </Modal>
   </div>
 </template>
 
@@ -422,11 +565,4 @@ const alertSystemConfigBaseUrl = computed(() => {
   font-weight: bold !important;
   font-size: 14px !important;
 }
-
-:deep(.n-grid) {
-  & > div > div:first-child {
-    //height: 100% !important;
-  }
-}
-
 </style>

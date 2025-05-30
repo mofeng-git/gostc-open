@@ -95,3 +95,49 @@ export const apiAuthCloseOtp = (data) => {
         data
     })
 }
+
+// 发送重置密码邮箱验证码
+export const apiAuthGenResetPwdEmailCode = (data) => {
+    return request.request({
+        url: `${baseUrl}/genResetPwdEmailCode`,
+        method: 'POST',
+        data
+    })
+}
+
+// 重置密码
+export const apiAuthResetPwd = (data) => {
+    return request.request({
+        url: `${baseUrl}/resetPwd`,
+        method: 'POST',
+        data
+    })
+}
+
+
+// 发送绑定邮箱验证码
+export const apiAuthGenBindEmailCode = (data) => {
+    return request.request({
+        url: `${baseUrl}/genBindEmailCode`,
+        method: 'POST',
+        data
+    })
+}
+
+// 绑定邮箱
+export const apiAuthBindEmail = (data) => {
+    return request.request({
+        url: `${baseUrl}/bindEmail`,
+        method: 'POST',
+        data
+    })
+}
+
+// 解绑邮箱
+export const apiAuthUnBindEmail = (data) => {
+    return request.request({
+        url: `${baseUrl}/unBindEmail`,
+        method: 'POST',
+        data
+    })
+}

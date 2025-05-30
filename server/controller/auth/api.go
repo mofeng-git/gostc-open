@@ -124,8 +124,71 @@ func OpenOtp(c *gin.Context) {
 	}
 	bean.Response.Ok(c)
 }
+
 func CloseOtp(c *gin.Context) {
 	if err := svr.CloseOtp(middleware.GetClaims(c)); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
+func BindEmail(c *gin.Context) {
+	var req service.BindEmailReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	claims := middleware.GetClaims(c)
+	if err := svr.BindEmail(claims, req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
+func GenBindEmailCode(c *gin.Context) {
+	var req service.GenBindEmailCodeReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	claims := middleware.GetClaims(c)
+	result, err := svr.GenBindEmailCode(claims, req)
+	if err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.OkData(c, result)
+}
+
+func UnBindEmail(c *gin.Context) {
+	claims := middleware.GetClaims(c)
+	svr.UnBindEmail(claims)
+	bean.Response.Ok(c)
+}
+
+func GenResetPwdEmailCode(c *gin.Context) {
+	var req service.GenResetPwdEmailCodeReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	result, err := svr.GenResetPwdEmailCode(req)
+	if err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.OkData(c, result)
+}
+
+func ResetPwd(c *gin.Context) {
+	var req service.ResetPwdReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.ResetPwd(req); err != nil {
 		bean.Response.Fail(c, err.Error())
 		return
 	}

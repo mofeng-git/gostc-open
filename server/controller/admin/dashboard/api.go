@@ -16,6 +16,14 @@ func NodeObs(c *gin.Context) {
 	bean.Response.OkData(c, svr.NodeObs())
 }
 
+func UserObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.UserObsDate(c.Query("date")))
+}
+
+func NodeObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.NodeObsDate(c.Query("date")))
+}
+
 func Count(c *gin.Context) {
 	bean.Response.OkData(c, svr.Count())
 }

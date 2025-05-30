@@ -1,12 +1,14 @@
 package bootstrap
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"server/configs"
 	"server/global"
+	"server/pkg/env"
 	"server/pkg/utils"
 	"time"
 )
@@ -37,6 +39,24 @@ func InitConfig() {
 		global.Logger.Fatal("config serialize fail", zap.String("path", configFilePath), zap.Error(err))
 	}
 	global.Logger.Info("config load finish", zap.String("path", configFilePath))
+
+	envCfg()
+}
+
+// 使用环境变量覆盖一些配置
+func envCfg() {
+	// 覆盖服务端口
+	addr := env.GetEnv("GOSTC_ADMIN_ADDR", "")
+	if addr != "" {
+		global.Config.Address = addr
+		global.Logger.Info("overwrite address configuration with environment variables", zap.String("GOSTC_ADMIN_ADDR", addr))
+	}
+
+	fmt.Printf(`
+ENV_CONFIG:
+GOSTC_ADMIN_ADDR=%s
+========================================
+`, addr)
 }
 
 func writeConfigFile(path string) error {

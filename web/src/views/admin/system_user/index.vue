@@ -33,6 +33,7 @@ const state = ref({
       account: '',
       password: '',
       amount: '0',
+      admin: 2,
     },
     dataRules: {
       account: requiredRule('账号不能为空'),
@@ -47,6 +48,7 @@ const state = ref({
       account: '',
       password: '',
       amount: '0',
+      admin: 2,
     },
     dataRules: {
       account: requiredRule('账号不能为空'),
@@ -79,6 +81,7 @@ const openCreate = () => {
     account: '',
     password: '',
     amount: '0',
+    admin: 2,
   }
   state.value.create.open = true
 }
@@ -94,6 +97,7 @@ const openUpdate = (row) => {
     account: row.account,
     password: '',
     amount: row.amount,
+    admin: row.admin,
   }
 }
 
@@ -220,6 +224,13 @@ onBeforeMount(() => {
         <n-form-item path="password" label="密码">
           <n-input v-model:value.trim="state.create.data.password"></n-input>
         </n-form-item>
+        <n-form-item path="admin" label="角色(重新登录生效)">
+          <n-select
+              v-model:value="state.create.data.admin"
+              :default-value="state.create.data.admin"
+              :options="[{label:'管理员',value:1},{label:'普通用户',value:2}]"
+          ></n-select>
+        </n-form-item>
         <n-form-item path="amount" label="积分">
           <n-input v-model:value.trim="state.create.data.amount"></n-input>
         </n-form-item>
@@ -243,6 +254,13 @@ onBeforeMount(() => {
         </n-form-item>
         <n-form-item path="password" label="密码">
           <n-input v-model:value.trim="state.update.data.password"></n-input>
+        </n-form-item>
+        <n-form-item path="admin" label="角色(重新登录生效)">
+          <n-select
+              v-model:value="state.update.data.admin"
+              :default-value="state.update.data.admin"
+              :options="[{label:'管理员',value:1},{label:'普通用户',value:2}]"
+          ></n-select>
         </n-form-item>
         <n-form-item path="amount" label="积分">
           <n-input v-model:value.trim="state.update.data.amount"></n-input>

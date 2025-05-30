@@ -45,7 +45,6 @@ curl -sSL https://raw.githubusercontent.com/SianHH/gostc-open/main/install.sh | 
 curl -sSL https://alist.sian.one/direct/gostc/gostc-open/install.sh | bash -s -- server
 ```
 
-
 install后，需要systemctl start gostc-admin启动服务
 
 安装完成后通过以下命令管理
@@ -63,6 +62,13 @@ systemctl status gostc-admin # 查看状态
 默认端口：8080
 
 默认账号密码：admin/admin
+
+### 详细教程可以查看以下链接资源
+
+[详细文档](https://docs.sian.one)
+
+[B站视频合集](https://www.bilibili.com/video/BV1nS98Y8Eaq/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
+
 
 ### 服务端卸载
 ```shell
@@ -139,6 +145,11 @@ services:
 
 ### 客户端/节点
 
+参数`--tls`根据服务端是否使用SSL设置
+
+参数`-addr`是服务端的访问地址
+
+
 节点：
 ```yaml
 version: "3"
@@ -149,6 +160,9 @@ services:
     network_mode: host # 客户端推荐网络使用host模式
     container_name: gostc
     command:
+      - --tls=true
+      - -addr
+      - gost.sian.one
       - -s
       - -key
       - ****** # 替换为节点密钥
@@ -164,6 +178,9 @@ services:
     network_mode: host # 客户端推荐网络使用host模式
     container_name: gostc
     command:
+      - --tls=true
+      - -addr
+      - gost.sian.one
       - -key
       - ****** # 替换为客户端密钥
 ```
@@ -249,12 +266,6 @@ go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe ./gui/
 如果后台管理服务不启用SSL，需要设置--tls=false
 
 -addr指定的127.0.0.1:8080修改为实际的后台管理
-
-## 基础使用教程(视频)
-[B站视频](https://www.bilibili.com/video/BV1nS98Y8Eaq/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
-
-## 自建教程(视频)
-[B站视频](https://www.bilibili.com/video/BV1s19nY3EB5/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
 
 ## 赞助
 <img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/zfb.png" alt=""/>

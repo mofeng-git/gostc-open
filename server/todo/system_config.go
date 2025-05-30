@@ -34,9 +34,23 @@ func systemConfig() {
 		_ = db.SystemConfig.Create(item)
 	}
 
+	for _, item := range model.GenerateSystemConfigEmail(
+		"2",
+		"管理员",
+		"",
+		"",
+		"",
+		"",
+		"您正在进行重置密码操作，请勿将验证码告诉他人，验证码：{{CODE}}(5分钟有效)，发件时间：{{DATETIME}}",
+	) {
+		_ = db.SystemConfig.Create(item)
+	}
+
 	configs, _ := db.SystemConfig.Find()
 	baseConfig := model.GetSystemConfigBase(configs)
 	cache.SetSystemConfigBase(baseConfig)
 	gostConfig := model.GetSystemConfigGost(configs)
 	cache.SetSystemConfigGost(gostConfig)
+	emailConfig := model.GetSystemConfigEmail(configs)
+	cache.SetSystemConfigEmail(emailConfig)
 }

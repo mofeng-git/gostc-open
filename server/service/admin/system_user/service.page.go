@@ -13,6 +13,7 @@ type PageReq struct {
 	bean.PageParam
 	Account string `json:"account"`
 	Admin   int    `json:"admin"`
+	Email   string `json:"email"`
 }
 
 type Item struct {
@@ -20,6 +21,7 @@ type Item struct {
 	Account     string          `json:"account"`
 	Admin       int             `json:"admin"`
 	Amount      decimal.Decimal `json:"amount"`
+	Email       string          `json:"email"`
 	CreatedAt   string          `json:"createdAt"`
 	InputBytes  int64           `json:"inputBytes"`
 	OutputBytes int64           `json:"outputBytes"`
@@ -34,7 +36,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 	if req.Admin > 0 {
 		where = append(where, db.SystemUser.Admin.Eq(req.Admin))
 	}
-	users, total, _ := db.SystemUser.Where(where...).Order(db.SystemUser.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
+	users, total, _ := db.SystemUser.Preload(db.SystemUser.BindEmail).Where(where...).Order(db.SystemUser.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, user := range users {
 		obsInfo := cache.GetUserObsDateRange(cache.MONTH_DATEONLY_LIST, user.Code)
 		list = append(list, Item{
@@ -42,6 +44,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Account:     user.Account,
 			Admin:       user.Admin,
 			Amount:      user.Amount,
+			Email:       user.BindEmail.Email,
 			CreatedAt:   user.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,

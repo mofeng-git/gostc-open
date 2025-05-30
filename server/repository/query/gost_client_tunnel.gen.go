@@ -77,8 +77,16 @@ func newGostClientTunnel(db *gorm.DB, opts ...gen.DOOption) gostClientTunnel {
 		RelationField: field.NewRelation("Client", "model.GostClient"),
 		User: struct {
 			field.RelationField
+			BindEmail struct {
+				field.RelationField
+			}
 		}{
 			RelationField: field.NewRelation("Client.User", "model.SystemUser"),
+			BindEmail: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("Client.User.BindEmail", "model.SystemUserEmail"),
+			},
 		},
 	}
 
@@ -308,6 +316,9 @@ type gostClientTunnelBelongsToClient struct {
 
 	User struct {
 		field.RelationField
+		BindEmail struct {
+			field.RelationField
+		}
 	}
 }
 

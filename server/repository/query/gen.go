@@ -39,6 +39,7 @@ var (
 	SystemNotice         *systemNotice
 	SystemUser           *systemUser
 	SystemUserCheckin    *systemUserCheckin
+	SystemUserEmail      *systemUserEmail
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -65,6 +66,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	SystemNotice = &Q.SystemNotice
 	SystemUser = &Q.SystemUser
 	SystemUserCheckin = &Q.SystemUserCheckin
+	SystemUserEmail = &Q.SystemUserEmail
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -92,6 +94,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		SystemNotice:         newSystemNotice(db, opts...),
 		SystemUser:           newSystemUser(db, opts...),
 		SystemUserCheckin:    newSystemUserCheckin(db, opts...),
+		SystemUserEmail:      newSystemUserEmail(db, opts...),
 	}
 }
 
@@ -120,6 +123,7 @@ type Query struct {
 	SystemNotice         systemNotice
 	SystemUser           systemUser
 	SystemUserCheckin    systemUserCheckin
+	SystemUserEmail      systemUserEmail
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -149,6 +153,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		SystemNotice:         q.SystemNotice.clone(db),
 		SystemUser:           q.SystemUser.clone(db),
 		SystemUserCheckin:    q.SystemUserCheckin.clone(db),
+		SystemUserEmail:      q.SystemUserEmail.clone(db),
 	}
 }
 
@@ -185,6 +190,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		SystemNotice:         q.SystemNotice.replaceDB(db),
 		SystemUser:           q.SystemUser.replaceDB(db),
 		SystemUserCheckin:    q.SystemUserCheckin.replaceDB(db),
+		SystemUserEmail:      q.SystemUserEmail.replaceDB(db),
 	}
 }
 
@@ -211,6 +217,7 @@ type queryCtx struct {
 	SystemNotice         ISystemNoticeDo
 	SystemUser           ISystemUserDo
 	SystemUserCheckin    ISystemUserCheckinDo
+	SystemUserEmail      ISystemUserEmailDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -237,6 +244,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		SystemNotice:         q.SystemNotice.WithContext(ctx),
 		SystemUser:           q.SystemUser.WithContext(ctx),
 		SystemUserCheckin:    q.SystemUserCheckin.WithContext(ctx),
+		SystemUserEmail:      q.SystemUserEmail.WithContext(ctx),
 	}
 }
 

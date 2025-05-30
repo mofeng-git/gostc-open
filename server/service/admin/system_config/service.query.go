@@ -19,6 +19,10 @@ func (service *service) Query(req QueryReq) any {
 		var cfg model.SystemConfigGost
 		cache.GetSystemConfigGost(&cfg)
 		return cfg
+	case model.SYSTEM_CONFIG_KIND_EMAIL:
+		var cfg model.SystemConfigEmail
+		cache.GetSystemConfigEmail(&cfg)
+		return cfg
 	}
 	return nil
 }

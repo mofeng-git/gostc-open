@@ -34,6 +34,32 @@ func Gost(c *gin.Context) {
 	bean.Response.Ok(c)
 }
 
+func Email(c *gin.Context) {
+	var req service.EmailReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.Email(req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
+func EmailVerify(c *gin.Context) {
+	var req service.EmailVerifyReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.EmailVerify(req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
 func Query(c *gin.Context) {
 	var req service.QueryReq
 	if err := c.ShouldBindJSON(&req); err != nil {

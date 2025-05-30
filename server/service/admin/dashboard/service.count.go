@@ -22,6 +22,8 @@ type CountResp struct {
 	User        int64 `json:"user"`
 	InputBytes  int64 `json:"inputBytes"`
 	OutputBytes int64 `json:"outputBytes"`
+
+	CheckInTotal int64 `json:"checkInTotal"`
 }
 
 func (service *service) Count() (result CountResp) {
@@ -55,5 +57,7 @@ func (service *service) Count() (result CountResp) {
 	result.P2P, _ = db.GostClientP2P.Count()
 
 	result.User, _ = db.SystemUser.Count()
+
+	result.CheckInTotal, _ = db.SystemUserCheckin.Where(db.SystemUserCheckin.EventDate.Eq(time.Now().Format(time.DateOnly))).Count()
 	return result
 }

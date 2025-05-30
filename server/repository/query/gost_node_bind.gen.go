@@ -59,6 +59,11 @@ func newGostNodeBind(db *gorm.DB, opts ...gen.DOOption) gostNodeBind {
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("User", "model.SystemUser"),
+		BindEmail: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("User.BindEmail", "model.SystemUserEmail"),
+		},
 	}
 
 	_gostNodeBind.fillFieldMap()
@@ -228,6 +233,10 @@ type gostNodeBindBelongsToUser struct {
 	db *gorm.DB
 
 	field.RelationField
+
+	BindEmail struct {
+		field.RelationField
+	}
 }
 
 func (a gostNodeBindBelongsToUser) Where(conds ...field.Expr) *gostNodeBindBelongsToUser {

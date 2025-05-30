@@ -40,6 +40,11 @@ func newSystemUser(db *gorm.DB, opts ...gen.DOOption) systemUser {
 	_systemUser.OtpKey = field.NewString(tableName, "otp_key")
 	_systemUser.Admin = field.NewInt(tableName, "admin")
 	_systemUser.Amount = field.NewField(tableName, "amount")
+	_systemUser.BindEmail = systemUserHasOneBindEmail{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("BindEmail", "model.SystemUserEmail"),
+	}
 
 	_systemUser.fillFieldMap()
 
@@ -63,6 +68,7 @@ type systemUser struct {
 	OtpKey    field.String
 	Admin     field.Int
 	Amount    field.Field
+	BindEmail systemUserHasOneBindEmail
 
 	fieldMap map[string]field.Expr
 }
@@ -108,7 +114,7 @@ func (s *systemUser) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *systemUser) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 13)
+	s.fieldMap = make(map[string]field.Expr, 14)
 	s.fieldMap["id"] = s.Id
 	s.fieldMap["code"] = s.Code
 	s.fieldMap["allow_edit"] = s.AllowEdit
@@ -122,6 +128,7 @@ func (s *systemUser) fillFieldMap() {
 	s.fieldMap["otp_key"] = s.OtpKey
 	s.fieldMap["admin"] = s.Admin
 	s.fieldMap["amount"] = s.Amount
+
 }
 
 func (s systemUser) clone(db *gorm.DB) systemUser {
@@ -132,6 +139,77 @@ func (s systemUser) clone(db *gorm.DB) systemUser {
 func (s systemUser) replaceDB(db *gorm.DB) systemUser {
 	s.systemUserDo.ReplaceDB(db)
 	return s
+}
+
+type systemUserHasOneBindEmail struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a systemUserHasOneBindEmail) Where(conds ...field.Expr) *systemUserHasOneBindEmail {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a systemUserHasOneBindEmail) WithContext(ctx context.Context) *systemUserHasOneBindEmail {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a systemUserHasOneBindEmail) Session(session *gorm.Session) *systemUserHasOneBindEmail {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a systemUserHasOneBindEmail) Model(m *model.SystemUser) *systemUserHasOneBindEmailTx {
+	return &systemUserHasOneBindEmailTx{a.db.Model(m).Association(a.Name())}
+}
+
+type systemUserHasOneBindEmailTx struct{ tx *gorm.Association }
+
+func (a systemUserHasOneBindEmailTx) Find() (result *model.SystemUserEmail, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a systemUserHasOneBindEmailTx) Append(values ...*model.SystemUserEmail) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a systemUserHasOneBindEmailTx) Replace(values ...*model.SystemUserEmail) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a systemUserHasOneBindEmailTx) Delete(values ...*model.SystemUserEmail) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a systemUserHasOneBindEmailTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a systemUserHasOneBindEmailTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type systemUserDo struct{ gen.DO }

@@ -83,8 +83,16 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 		RelationField: field.NewRelation("Client", "model.GostClient"),
 		User: struct {
 			field.RelationField
+			BindEmail struct {
+				field.RelationField
+			}
 		}{
 			RelationField: field.NewRelation("Client.User", "model.SystemUser"),
+			BindEmail: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("Client.User.BindEmail", "model.SystemUserEmail"),
+			},
 		},
 	}
 
@@ -332,6 +340,9 @@ type gostClientHostBelongsToClient struct {
 
 	User struct {
 		field.RelationField
+		BindEmail struct {
+			field.RelationField
+		}
 	}
 }
 

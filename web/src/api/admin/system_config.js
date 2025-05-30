@@ -18,6 +18,22 @@ export const apiAdminSystemConfigGost = (data) => {
     })
 }
 
+export const apiAdminSystemConfigEmail = (data) => {
+    return request.request({
+        url: `${baseUrl}/email`,
+        method: 'POST',
+        data
+    })
+}
+
+export const apiAdminSystemConfigEmailVerify = (data) => {
+    return request.request({
+        url: `${baseUrl}/emailVerify`,
+        method: 'POST',
+        data: data
+    })
+}
+
 export const apiAdminSystemConfigQuery = (data) => {
     return request.request({
         url: `${baseUrl}/query`,

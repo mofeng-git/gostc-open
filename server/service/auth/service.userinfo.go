@@ -16,11 +16,12 @@ type UserInfoResp struct {
 	Admin         int    `json:"admin"`
 	Otp           int    `json:"otp"`
 	CreatedAt     string `json:"createdAt"`
+	Email         string `json:"email"`
 }
 
 func (service *service) UserInfo(claims jwt.Claims) (result UserInfoResp, err error) {
 	db, _, _ := repository.Get("")
-	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(claims.Code)).First()
+	user, _ := db.SystemUser.Preload(db.SystemUser.BindEmail).Where(db.SystemUser.Code.Eq(claims.Code)).First()
 	if user == nil {
 		return result, errors.New("未查询到账户信息")
 	}
@@ -39,5 +40,6 @@ func (service *service) UserInfo(claims jwt.Claims) (result UserInfoResp, err er
 		Otp:           utils.TrinaryOperation(user.OtpKey == "", 2, 1),
 		CheckinAmount: checkIn.Amount.String(),
 		CreatedAt:     user.CreatedAt.Format(time.DateTime),
+		Email:         user.BindEmail.Email,
 	}, nil
 }

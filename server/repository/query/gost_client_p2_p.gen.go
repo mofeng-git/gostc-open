@@ -76,8 +76,16 @@ func newGostClientP2P(db *gorm.DB, opts ...gen.DOOption) gostClientP2P {
 		RelationField: field.NewRelation("Client", "model.GostClient"),
 		User: struct {
 			field.RelationField
+			BindEmail struct {
+				field.RelationField
+			}
 		}{
 			RelationField: field.NewRelation("Client.User", "model.SystemUser"),
+			BindEmail: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("Client.User.BindEmail", "model.SystemUserEmail"),
+			},
 		},
 	}
 
@@ -304,6 +312,9 @@ type gostClientP2PBelongsToClient struct {
 
 	User struct {
 		field.RelationField
+		BindEmail struct {
+			field.RelationField
+		}
 	}
 }
 

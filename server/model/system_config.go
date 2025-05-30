@@ -1,10 +1,15 @@
 package model
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+	"time"
+)
 
 const (
-	SYSTEM_CONFIG_KIND_BASE = "SystemConfigBase" // 基础配置
-	SYSTEM_CONFIG_KIND_GOST = "SystemConfigGost" // Gost配置
+	SYSTEM_CONFIG_KIND_BASE  = "SystemConfigBase"  // 基础配置
+	SYSTEM_CONFIG_KIND_GOST  = "SystemConfigGost"  // Gost配置
+	SYSTEM_CONFIG_KIND_EMAIL = "SystemConfigEmail" // 邮件配置
 )
 
 type SystemConfig struct {
@@ -110,6 +115,72 @@ func GetSystemConfigGost(list []*SystemConfig) (result SystemConfigGost) {
 			result.FuncTun = item.Value
 		case "funcNode":
 			result.FuncNode = item.Value
+		}
+	}
+	return result
+}
+
+type SystemConfigEmail struct {
+	Enable   string `json:"enable"` // 是否启用邮件服务
+	NickName string `json:"nickName"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	User     string `json:"user"`
+	Pwd      string `json:"pwd"`
+
+	ResetPwdTpl string `json:"resetPwdTpl"` // 重置密码邮件模板
+}
+
+func (cfg SystemConfigEmail) GenerateUserBindEmailTpl(code string, now time.Time) string {
+	tpl := "您正在进行绑定邮箱操作，请勿将验证码告诉他人，验证码：{{CODE}}(5分钟有效)，发件时间：{{DATETIME}}"
+	result := strings.ReplaceAll(tpl, "{{CODE}}", code)
+	result = strings.ReplaceAll(result, "{{DATETIME}}", now.Format(time.DateTime))
+	return result
+}
+
+func (cfg SystemConfigEmail) GenerateResetPwdTpl(code string, now time.Time) string {
+	result := strings.ReplaceAll(cfg.ResetPwdTpl, "{{CODE}}", code)
+	result = strings.ReplaceAll(result, "{{DATETIME}}", now.Format(time.DateTime))
+	return result
+}
+
+func (cfg SystemConfigEmail) GenerateResetPwdResultTpl(account, password string, now time.Time) string {
+	tpl := "重置密码成功，您的账号：{{ACCOUNT}}，您的新密码：{{PASSWORD}}，发件时间：{{DATETIME}}"
+	result := strings.ReplaceAll(tpl, "{{PASSWORD}}", password)
+	result = strings.ReplaceAll(result, "{{ACCOUNT}}", account)
+	result = strings.ReplaceAll(result, "{{DATETIME}}", now.Format(time.DateTime))
+	return result
+}
+
+func GenerateSystemConfigEmail(enable, nickName, host, port, user, pwd, resetPwdTpl string) []*SystemConfig {
+	return []*SystemConfig{
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "enable", Value: enable},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "nickName", Value: nickName},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "host", Value: host},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "port", Value: port},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "user", Value: user},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "pwd", Value: pwd},
+		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "resetPwdTpl", Value: resetPwdTpl},
+	}
+}
+
+func GetSystemConfigEmail(list []*SystemConfig) (result SystemConfigEmail) {
+	for _, item := range list {
+		switch item.Key {
+		case "enable":
+			result.Enable = item.Value
+		case "nickName":
+			result.NickName = item.Value
+		case "host":
+			result.Host = item.Value
+		case "port":
+			result.Port = item.Value
+		case "user":
+			result.User = item.Value
+		case "pwd":
+			result.Pwd = item.Value
+		case "resetPwdTpl":
+			result.ResetPwdTpl = item.Value
 		}
 	}
 	return result

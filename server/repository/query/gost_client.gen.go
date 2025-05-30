@@ -41,6 +41,11 @@ func newGostClient(db *gorm.DB, opts ...gen.DOOption) gostClient {
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("User", "model.SystemUser"),
+		BindEmail: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("User.BindEmail", "model.SystemUserEmail"),
+		},
 	}
 
 	_gostClient.fillFieldMap()
@@ -133,6 +138,10 @@ type gostClientBelongsToUser struct {
 	db *gorm.DB
 
 	field.RelationField
+
+	BindEmail struct {
+		field.RelationField
+	}
 }
 
 func (a gostClientBelongsToUser) Where(conds ...field.Expr) *gostClientBelongsToUser {

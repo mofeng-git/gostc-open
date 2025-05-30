@@ -4,6 +4,7 @@ import {apiAuthCaptcha, apiAuthLogin, apiAuthLoginOtp, apiAuthRegister} from "..
 import {localStore} from "../../store/local.js";
 import {appStore} from "../../store/app.js";
 import {requiredRule} from "../../utils/formDataRule.js";
+import router from "../../router/index.js";
 
 const state = ref({
   tabsValue: 'login',
@@ -73,7 +74,7 @@ const loginOtpFunc = () => {
         state.value.loginOtp.loading = true
         let res = await apiAuthLoginOtp(state.value.loginOtp.data)
         localStore().auth.token = res.data.token
-        localStore().auth.expAt = res.data.expAt
+        localStore().auth.tokenExpAt = res.data.tokenExpAt
         window.location.reload()
       } finally {
         state.value.loginOtp.loading = false
@@ -93,7 +94,7 @@ const loginFunc = () => {
           state.value.loginOtp.data.key = res.data.token
         } else {
           localStore().auth.token = res.data.token
-          localStore().auth.tokenExpAt = res.data.tokenExpAt
+          localStore().auth.expAt = res.data.expAt
           window.location.reload()
         }
       } catch (err) {
@@ -211,6 +212,9 @@ onBeforeMount(() => {
               验证登录
             </n-button>
           </n-form>
+          <n-space justify="end">
+            <n-button text type="primary" @click="router.push({name:'ResetPassword'})">忘记密码？</n-button>
+          </n-space>
         </n-tab-pane>
 
         <n-tab-pane name="register" tab="注册" v-if="appStore().siteConfig.register === '1'">

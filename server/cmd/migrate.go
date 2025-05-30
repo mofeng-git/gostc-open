@@ -152,6 +152,9 @@ var MigrateCmd = cobra.Command{
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserCheckin{}); err != nil {
 				return err
 			}
+			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserEmail{}); err != nil {
+				return err
+			}
 			return nil
 		}); err != nil {
 			fmt.Println("migrate fail,error:", err)
@@ -179,6 +182,7 @@ func Migrate[Model model.GostAuth |
 	model.SystemConfig |
 	model.SystemNotice |
 	model.SystemUser |
+	model.SystemUserEmail |
 	model.SystemUserCheckin](source *gorm.DB, target *gorm.DB, model Model) error {
 	if err := target.AutoMigrate(&model); err != nil {
 		return err

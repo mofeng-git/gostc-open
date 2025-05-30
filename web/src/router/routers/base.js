@@ -23,6 +23,17 @@ export const baseRouters = [
         }
     },
     {
+        path: '/resetPassword',
+        name: 'ResetPassword',
+        component: () => import('../../views/resetPassword/index.vue'),
+        meta: {
+            title: '忘记密码',
+            layout: 'empty',
+            hidden: 1,
+            icon: '',
+        }
+    },
+    {
         path: '/403',
         name: '403',
         component: () => import('../../views/public/403.vue'),

@@ -43,6 +43,7 @@ func main() {
 		model.SystemNotice{},
 		model.SystemUser{},
 		model.SystemUserCheckin{},
+		model.SystemUserEmail{},
 	)
 	g.Execute()
 }

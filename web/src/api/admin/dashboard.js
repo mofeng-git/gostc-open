@@ -16,6 +16,20 @@ export const apiAdminDashboardNodeObs = () => {
     })
 }
 
+export const apiAdminDashboardUserObsDate = (date) => {
+    return request.request({
+        url: `${baseUrl}/userObsDate?date=` + date,
+        method: 'POST',
+    })
+}
+
+export const apiAdminDashboardNodeObsDate = (date) => {
+    return request.request({
+        url: `${baseUrl}/nodeObsDate?date=` + date,
+        method: 'POST',
+    })
+}
+
 export const apiAdminDashboardCount = () => {
     return request.request({
         url: `${baseUrl}/count`,

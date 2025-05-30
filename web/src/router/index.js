@@ -43,7 +43,7 @@ const initUserInfo = async () => {
 
 // 公开访问的路由
 const publicRouterName = baseRouters.map(item => item.name).filter(item => {
-    return item !== 'Login'
+    return item !== 'Login' && item!=='ResetPassword'
 })
 // 登录用户可访问的路由
 const normalRouterName = getRouterAllNames(normalRouters)
@@ -73,7 +73,7 @@ router.beforeEach(async (to, from, next) => {
     }
     if (!localStore().auth.token) {
         // 未登录
-        if (to.name === 'Login') {
+        if (to.name === 'Login' || to.name === 'ResetPassword') {
             next()
         } else {
             next('/login')
@@ -81,7 +81,8 @@ router.beforeEach(async (to, from, next) => {
     } else {
         await initUserInfo()
         // 已登录
-        if (to.name === 'Login') {
+
+        if (to.name === 'Login' || to.name === 'ResetPassword') {
             next({name: normalRouterName[0]})
         } else {
             if (normalRouterName.indexOf(to.name) >= 0) {
