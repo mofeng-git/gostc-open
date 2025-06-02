@@ -109,7 +109,11 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 	}
 
 	var forwardNodes []*config.ForwardNodeConfig
+	var handlerMetadata = map[string]any{}
 	if forward.MatcherEnable == 1 {
+		// 仅开规则匹配时，启用流量嗅探
+		// 开启流量嗅探的情况下，部分TCP服务会无法正常转发，例如：mysql、vnc等
+		handlerMetadata["sniffing"] = true
 		for _, matcher := range forward.GetMatcher() {
 			var addr = matcher.TargetIp + ":" + matcher.TargetPort
 			forwardNodes = append(forwardNodes, &config.ForwardNodeConfig{
@@ -155,9 +159,6 @@ func (forward *GostClientForward) GenerateTcpSvcConfig(chain, limiter, cLimiter,
 		admissions = append(admissions, admissionBlack)
 	}
 
-	var handlerMetadata = map[string]any{
-		"sniffing": true,
-	}
 	if forward.ProxyProtocol != 0 {
 		handlerMetadata["proxyProtocol"] = forward.ProxyProtocol
 	}
@@ -246,6 +247,9 @@ func (forward *GostClientForward) GenerateChainConfig(auth GostAuth) config.Chai
 							Auth: &config.AuthConfig{
 								Username: auth.User,
 								Password: auth.Password,
+							},
+							Metadata: map[string]any{
+								"nodelay": true,
 							},
 						},
 						Dialer: &config.DialerConfig{
