@@ -31,6 +31,13 @@ This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/g
 
 ![config](https://raw.githubusercontent.com/SianHH/gostc-open/main/images/config.png)
 
+### 详细教程可以查看以下链接资源
+
+[详细文档](https://docs.sian.one)
+
+[B站视频合集](https://www.bilibili.com/video/BV1nS98Y8Eaq/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
+
+
 ## 一键安装脚本
 
 ### 服务端安装
@@ -62,13 +69,6 @@ systemctl status gostc-admin # 查看状态
 默认端口：8080
 
 默认账号密码：admin/admin
-
-### 详细教程可以查看以下链接资源
-
-[详细文档](https://docs.sian.one)
-
-[B站视频合集](https://www.bilibili.com/video/BV1nS98Y8Eaq/?share_source=copy_web&vd_source=e53d6abce322860f4471dade0a511536)
-
 
 ### 服务端卸载
 ```shell
