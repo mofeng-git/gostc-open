@@ -55,7 +55,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -115,7 +114,6 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				RLimiter:     proxy.RLimiter,
 				CLimiter:     proxy.CLimiter,
 				ExpAt:        time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    proxy.OnlyChina,
 			},
 			Enable:      proxy.Enable,
 			WarnMsg:     warn_msg.GetProxyWarnMsg(*proxy),

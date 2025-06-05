@@ -19,28 +19,29 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code         string     `json:"code"`
-	Name         string     `json:"name"`
-	TargetIp     string     `json:"targetIp"`
-	TargetPort   string     `json:"targetPort"`
-	DomainPrefix string     `json:"domainPrefix"`
-	DomainFull   string     `json:"domainFull"`
-	CustomDomain string     `json:"customDomain"`
-	CustomCert   string     `json:"customCert"`
-	CustomKey    string     `json:"customKey"`
-	CustomEnable int        `json:"customEnable"`
-	Node         ItemNode   `json:"node"`
-	Client       ItemClient `json:"client"`
-	Config       ItemConfig `json:"config"`
-	Enable       int        `json:"enable"`
-	WarnMsg      string     `json:"warnMsg"`
-	CreatedAt    string     `json:"createdAt"`
-	InputBytes   int64      `json:"inputBytes"`
-	OutputBytes  int64      `json:"outputBytes"`
-	WhiteEnable  int        `json:"whiteEnable"`
-	BlackEnable  int        `json:"blackEnable"`
-	WhiteList    []string   `json:"whiteList"`
-	BlackList    []string   `json:"blackList"`
+	Code             string     `json:"code"`
+	Name             string     `json:"name"`
+	TargetIp         string     `json:"targetIp"`
+	TargetPort       string     `json:"targetPort"`
+	DomainPrefix     string     `json:"domainPrefix"`
+	DomainFull       string     `json:"domainFull"`
+	CustomDomain     string     `json:"customDomain"`
+	CustomCert       string     `json:"customCert"`
+	CustomKey        string     `json:"customKey"`
+	CustomEnable     int        `json:"customEnable"`
+	CustomForceHttps int        `json:"customForceHttps"`
+	Node             ItemNode   `json:"node"`
+	Client           ItemClient `json:"client"`
+	Config           ItemConfig `json:"config"`
+	Enable           int        `json:"enable"`
+	WarnMsg          string     `json:"warnMsg"`
+	CreatedAt        string     `json:"createdAt"`
+	InputBytes       int64      `json:"inputBytes"`
+	OutputBytes      int64      `json:"outputBytes"`
+	WhiteEnable      int        `json:"whiteEnable"`
+	BlackEnable      int        `json:"blackEnable"`
+	WhiteList        []string   `json:"whiteList"`
+	BlackList        []string   `json:"blackList"`
 }
 
 type ItemClient struct {
@@ -65,7 +66,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -91,16 +91,17 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 	for _, host := range hosts {
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, host.Code)
 		list = append(list, Item{
-			Code:         host.Code,
-			Name:         host.Name,
-			TargetIp:     host.TargetIp,
-			TargetPort:   host.TargetPort,
-			DomainPrefix: host.DomainPrefix,
-			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
-			CustomDomain: host.CustomDomain,
-			CustomCert:   host.CustomCert,
-			CustomKey:    host.CustomKey,
-			CustomEnable: utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
+			Code:             host.Code,
+			Name:             host.Name,
+			TargetIp:         host.TargetIp,
+			TargetPort:       host.TargetPort,
+			DomainPrefix:     host.DomainPrefix,
+			DomainFull:       host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+			CustomDomain:     host.CustomDomain,
+			CustomCert:       host.CustomCert,
+			CustomKey:        host.CustomKey,
+			CustomForceHttps: host.CustomForceHttps,
+			CustomEnable:     utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			Node: ItemNode{
 				Code:         host.NodeCode,
 				Name:         host.Node.Name,
@@ -122,7 +123,6 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				RLimiter:     host.RLimiter,
 				CLimiter:     host.CLimiter,
 				ExpAt:        time.Unix(host.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    host.OnlyChina,
 			},
 			Enable:      host.Enable,
 			WarnMsg:     warn_msg.GetHostWarnMsg(*host),

@@ -25,7 +25,7 @@ func (service *service) Delete(req DeleteReq) error {
 			log.Error("删除用户代理隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientRemoveProxyConfig(*proxy, proxy.Node)
+		gost_engine.ClientRemoveProxyConfig(*proxy)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

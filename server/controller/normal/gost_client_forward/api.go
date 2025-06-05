@@ -48,6 +48,19 @@ func Renew(c *gin.Context) {
 	bean.Response.Ok(c)
 }
 
+func Migrate(c *gin.Context) {
+	var req service.MigrateReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		bean.Response.Param(c, err)
+		return
+	}
+	if err := svr.Migrate(middleware.GetClaims(c), req); err != nil {
+		bean.Response.Fail(c, err.Error())
+		return
+	}
+	bean.Response.Ok(c)
+}
+
 func Update(c *gin.Context) {
 	var req service.UpdateReq
 	if err := c.ShouldBindJSON(&req); err != nil {

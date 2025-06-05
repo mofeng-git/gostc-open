@@ -27,3 +27,19 @@ func NodeObsDate(c *gin.Context) {
 func Count(c *gin.Context) {
 	bean.Response.OkData(c, svr.Count())
 }
+
+func ClientObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.ClientObsDate(c.Query("date")))
+}
+
+func ClientHostObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.ClientHostObsDate(c.Query("date")))
+}
+
+func ClientForwardObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.ClientForwardObsDate(c.Query("date")))
+}
+
+func ClientTunnelObsDate(c *gin.Context) {
+	bean.Response.OkData(c, svr.ClientTunnelObsDate(c.Query("date")))
+}

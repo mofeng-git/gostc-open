@@ -5,6 +5,7 @@ import {
   apiNormalGostClientForwardDelete,
   apiNormalGostClientForwardEnable,
   apiNormalGostClientForwardMatcher,
+  apiNormalGostClientForwardMigrate,
   apiNormalGostClientForwardPage,
   apiNormalGostClientForwardRenew,
   apiNormalGostClientForwardUpdate
@@ -93,6 +94,14 @@ const state = ref({
     dataRange: 1,
   },
   clients: [],
+  migrate: {
+    open: false,
+    data: {
+      code: '',
+      clientCode: '',
+    },
+    loading: false,
+  },
 })
 
 const refreshTable = () => {
@@ -278,6 +287,27 @@ const clientListFunc = async () => {
   }
 }
 
+const openMigrateModal = (row) => {
+  state.value.migrate.data.code = row.code
+  state.value.migrate.data.clientCode = row.client.code
+  state.value.migrate.open = true
+}
+
+const closeMigrateModal = () => {
+  state.value.migrate.open = false
+}
+
+const migrateFunc = async () => {
+  try {
+    state.value.migrate.loading = true
+    await apiNormalGostClientForwardMigrate(state.value.migrate.data)
+    closeMigrateModal()
+    refreshTable()
+  } finally {
+    state.value.migrate.loading = false
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
   clientListFunc()
@@ -301,6 +331,12 @@ const operatorOptions = [
     key: 'matcher',
     disabled: false,
     func: openMatcher,
+  },
+  {
+    label: '转移隧道',
+    key: 'migrate',
+    disabled: false,
+    func: openMigrateModal,
   },
 ]
 const operatorSelect = (key, row) => {
@@ -512,18 +548,18 @@ const operatorRenderLabel = (option) => {
           ></n-input>
         </n-form-item>
         <n-alert type="info" :show-icon="true">
-          可选远程端口：{{state.update.data.node.forwardPorts}}
+          可选远程端口：{{ state.update.data.node.forwardPorts }}
         </n-alert>
         <p></p>
         <n-form-item path="port" label="远程端口">
           <n-input v-model:value="state.update.data.port" placeholder="10001"></n-input>
         </n-form-item>
-<!--        <n-form-item path="proxyProtocol" label="PROXY Protocol">-->
-<!--          <n-select-->
-<!--              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"-->
-<!--              v-model:value="state.update.data.proxyProtocol"-->
-<!--          ></n-select>-->
-<!--        </n-form-item>-->
+        <!--        <n-form-item path="proxyProtocol" label="PROXY Protocol">-->
+        <!--          <n-select-->
+        <!--              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"-->
+        <!--              v-model:value="state.update.data.proxyProtocol"-->
+        <!--          ></n-select>-->
+        <!--        </n-form-item>-->
       </n-form>
     </Modal>
 
@@ -669,6 +705,32 @@ const operatorRenderLabel = (option) => {
         </n-radio-group>
       </n-space>
       <Obs :data="state.obs.data" style="width:100%" :loading="state.obs.loading" :dark="localStore().darkTheme"></Obs>
+    </Modal>
+
+    <Modal
+        title="转移隧道"
+        :show="state.migrate.open"
+        @on-confirm="migrateFunc"
+        @on-cancel="closeMigrateModal"
+        :confirm-loading="state.migrate.loading"
+        width="400px"
+    >
+      <n-alert type="info">
+        请注意，迁移到新的客户端后，请确认新的客户端依然能正常访问到内网目标地址
+      </n-alert>
+      <br>
+      <n-form>
+        <n-form-item label="新客户端" path="clientCode">
+          <n-select
+              :options="state.clients"
+              label-field="name"
+              value-field="code"
+              v-model:value="state.migrate.data.clientCode"
+              :default-value="state.migrate.data.clientCode"
+              placeholder="请选择目标客户端"
+          ></n-select>
+        </n-form-item>
+      </n-form>
     </Modal>
   </div>
 </template>

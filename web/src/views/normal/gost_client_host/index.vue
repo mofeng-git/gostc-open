@@ -5,6 +5,7 @@ import {
   apiNormalGostClientHostDelete,
   apiNormalGostClientHostDomain,
   apiNormalGostClientHostEnable,
+  apiNormalGostClientHostMigrate,
   apiNormalGostClientHostPage,
   apiNormalGostClientHostRenew,
   apiNormalGostClientHostUpdate
@@ -22,7 +23,6 @@ import Online from "../../../icon/online.vue";
 import {cLimiterText, configExpText, configText, limiterText, rLimiterText} from "./index.js";
 import {flowFormat} from "../../../utils/flow.js";
 import {NButton, NSpace} from "naive-ui";
-import {goToUrl} from "../../../utils/browser.js";
 import moment from "moment/moment.js";
 import {apiNormalGostObsTunnelMonth} from "../../../api/normal/gost_obs.js";
 import Obs from "../../../components/Obs.vue";
@@ -84,11 +84,20 @@ const state = ref({
       customDomain: '',
       customCert: '',
       customKey: '',
+      customForceHttps: 0,
     },
     nodeAddress: '',
     customEnable: 2,
   },
   clients: [],
+  migrate: {
+    open: false,
+    data: {
+      code: '',
+      clientCode: '',
+    },
+    loading: false,
+  },
 })
 
 const refreshTable = () => {
@@ -212,6 +221,7 @@ const openDomainModal = (row) => {
     customDomain: row.customDomain,
     customCert: row.customCert,
     customKey: row.customKey,
+    customForceHttps: row.customForceHttps,
   }
   state.value.domain.open = true
 }
@@ -230,7 +240,6 @@ const domainFunc = async () => {
     state.value.domain.loading = false
   }
 }
-
 
 const openObsModal = (row) => {
   state.value.obs.code = row.code
@@ -278,6 +287,27 @@ const clientListFunc = async () => {
   }
 }
 
+const openMigrateModal = (row) => {
+  state.value.migrate.data.code = row.code
+  state.value.migrate.data.clientCode = row.client.code
+  state.value.migrate.open = true
+}
+
+const closeMigrateModal = () => {
+  state.value.migrate.open = false
+}
+
+const migrateFunc = async () => {
+  try {
+    state.value.migrate.loading = true
+    await apiNormalGostClientHostMigrate(state.value.migrate.data)
+    closeMigrateModal()
+    refreshTable()
+  } finally {
+    state.value.migrate.loading = false
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
   clientListFunc()
@@ -301,6 +331,12 @@ const operatorOptions = [
     key: 'domain',
     disabled: false,
     func: openDomainModal,
+  },
+  {
+    label: '转移隧道',
+    key: 'migrate',
+    disabled: false,
+    func: openMigrateModal,
   },
 ]
 const operatorSelect = (key, row) => {
@@ -573,6 +609,16 @@ const operatorRenderLabel = (option) => {
         <n-form-item path="customDomain" label="域名(空则移除自定义域名)">
           <n-input v-model:value="state.domain.data.customDomain" placeholder="www.example.com"></n-input>
         </n-form-item>
+        <n-switch
+            v-model:value="state.domain.data.customForceHttps"
+            :unchecked-value="0"
+            :checked-value="1"
+            :default-value="state.domain.data.customForceHttps"
+            :round="false">
+          <template #unchecked>关闭强制HTTPS</template>
+          <template #checked>开启强制HTTPS</template>
+        </n-switch>
+        <p></p>
         <n-form-item path="customCert" label="证书(PEM，不设置，则使用默认TLS)">
           <n-input type="textarea" :autosize="{minRows:3,maxRows:6}" v-model:value="state.domain.data.customCert"
                    placeholder="-----BEGIN CERTIFICATE-----"></n-input>
@@ -600,6 +646,32 @@ const operatorRenderLabel = (option) => {
         </n-radio-group>
       </n-space>
       <Obs :data="state.obs.data" style="width:100%" :loading="state.obs.loading" :dark="localStore().darkTheme"></Obs>
+    </Modal>
+
+    <Modal
+        title="转移隧道"
+        :show="state.migrate.open"
+        @on-confirm="migrateFunc"
+        @on-cancel="closeMigrateModal"
+        :confirm-loading="state.migrate.loading"
+        width="400px"
+    >
+      <n-alert type="info">
+        请注意，迁移到新的客户端后，请确认新的客户端依然能正常访问到内网目标地址
+      </n-alert>
+      <br>
+      <n-form>
+        <n-form-item label="新客户端" path="clientCode">
+          <n-select
+              :options="state.clients"
+              label-field="name"
+              value-field="code"
+              v-model:value="state.migrate.data.clientCode"
+              :default-value="state.migrate.data.clientCode"
+              placeholder="请选择目标客户端"
+          ></n-select>
+        </n-form-item>
+      </n-form>
     </Modal>
   </div>
 </template>

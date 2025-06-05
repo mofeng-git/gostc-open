@@ -58,7 +58,6 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 	_gostClientForward.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientForward.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientForward.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientForward.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientForward.ExpAt = field.NewInt64(tableName, "exp_at")
 	_gostClientForward.Node = gostClientForwardBelongsToNode{
 		db: db.Session(&gorm.Session{}),
@@ -144,7 +143,6 @@ type gostClientForward struct {
 	Limiter       field.Int
 	RLimiter      field.Int
 	CLimiter      field.Int
-	OnlyChina     field.Int
 	ExpAt         field.Int64
 	Node          gostClientForwardBelongsToNode
 
@@ -198,7 +196,6 @@ func (g *gostClientForward) updateTableName(table string) *gostClientForward {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -216,7 +213,7 @@ func (g *gostClientForward) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (g *gostClientForward) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 36)
+	g.fieldMap = make(map[string]field.Expr, 35)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -248,7 +245,6 @@ func (g *gostClientForward) fillFieldMap() {
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 
 }

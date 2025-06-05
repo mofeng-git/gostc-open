@@ -13,6 +13,7 @@ func InitGostClientForward(group *gin.RouterGroup) {
 	g.POST("admission", gost_client_forward.Admission)
 	g.POST("renew", gost_client_forward.Renew)
 	g.POST("update", gost_client_forward.Update)
+	g.POST("migrate", gost_client_forward.Migrate)
 	g.POST("matcher", gost_client_forward.Matcher)
 	g.POST("enable", gost_client_forward.Enable)
 	g.POST("delete", gost_client_forward.Delete)

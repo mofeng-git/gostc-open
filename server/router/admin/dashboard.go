@@ -13,5 +13,9 @@ func InitDashboard(group *gin.RouterGroup) {
 	g.POST("nodeObs", dashboard.NodeObs)
 	g.POST("userObsDate", dashboard.UserObsDate)
 	g.POST("nodeObsDate", dashboard.NodeObsDate)
+	g.POST("clientObsDate", dashboard.ClientObsDate)
+	g.POST("clientHostObsDate", dashboard.ClientHostObsDate)
+	g.POST("clientForwardObsDate", dashboard.ClientForwardObsDate)
+	g.POST("clientTunnelObsDate", dashboard.ClientTunnelObsDate)
 	g.POST("count", dashboard.Count)
 }

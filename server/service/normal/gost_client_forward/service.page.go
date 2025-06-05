@@ -70,7 +70,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -132,7 +131,6 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				RLimiter:     forward.RLimiter,
 				CLimiter:     forward.CLimiter,
 				ExpAt:        time.Unix(forward.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    forward.OnlyChina,
 			},
 			Enable:        forward.Enable,
 			WarnMsg:       warn_msg.GetForwardWarnMsg(*forward),

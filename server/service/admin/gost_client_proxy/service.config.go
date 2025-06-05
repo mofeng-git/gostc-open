@@ -20,7 +20,6 @@ type ConfigReq struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -58,7 +57,6 @@ func (service *service) Config(req ConfigReq) error {
 		proxy.Limiter = req.Limiter
 		proxy.RLimiter = req.RLimiter
 		proxy.CLimiter = req.CLimiter
-		proxy.OnlyChina = req.OnlyChina
 		proxy.ExpAt = expAt.Unix()
 		if err = tx.GostClientProxy.Save(proxy); err != nil {
 			log.Error("修改代理隧道配置失败", zap.Error(err))

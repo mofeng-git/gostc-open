@@ -6,26 +6,6 @@ import (
 	"sort"
 )
 
-type UserObsItem struct {
-	Account     string `json:"account"`
-	InputBytes  int64  `json:"inputBytes"`
-	OutputBytes int64  `json:"outputBytes"`
-}
-
-type userObsSortable []UserObsItem
-
-func (u userObsSortable) Len() int {
-	return len(u)
-}
-
-func (u userObsSortable) Less(i, j int) bool {
-	return u[i].InputBytes+u[i].OutputBytes > u[j].InputBytes+u[j].OutputBytes
-}
-
-func (u userObsSortable) Swap(i, j int) {
-	u[i], u[j] = u[j], u[i]
-}
-
 func (service *service) UserObs() (result []UserObsItem) {
 	db, _, _ := repository.Get("")
 	users, _ := db.SystemUser.Select(

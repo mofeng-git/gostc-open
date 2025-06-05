@@ -7,28 +7,6 @@ import (
 	"sort"
 )
 
-type NodeObsItem struct {
-	Code        string `json:"code"`
-	Name        string `json:"name"`
-	Online      int    `json:"online"`
-	InputBytes  int64  `json:"inputBytes"`
-	OutputBytes int64  `json:"outputBytes"`
-}
-
-type nodeObsSortable []NodeObsItem
-
-func (u nodeObsSortable) Len() int {
-	return len(u)
-}
-
-func (u nodeObsSortable) Less(i, j int) bool {
-	return u[i].InputBytes+u[i].OutputBytes > u[j].InputBytes+u[j].OutputBytes
-}
-
-func (u nodeObsSortable) Swap(i, j int) {
-	u[i], u[j] = u[j], u[i]
-}
-
 func (service *service) NodeObs() (result []NodeObsItem) {
 	db, _, _ := repository.Get("")
 	nodes, _ := db.GostNode.Select(

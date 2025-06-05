@@ -24,7 +24,6 @@ var (
 	GostClientForward    *gostClientForward
 	GostClientHost       *gostClientHost
 	GostClientHostDomain *gostClientHostDomain
-	GostClientLogger     *gostClientLogger
 	GostClientP2P        *gostClientP2P
 	GostClientProxy      *gostClientProxy
 	GostClientTunnel     *gostClientTunnel
@@ -32,7 +31,6 @@ var (
 	GostNodeBind         *gostNodeBind
 	GostNodeConfig       *gostNodeConfig
 	GostNodeDomain       *gostNodeDomain
-	GostNodeLogger       *gostNodeLogger
 	GostNodePort         *gostNodePort
 	GostObs              *gostObs
 	SystemConfig         *systemConfig
@@ -51,7 +49,6 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	GostClientForward = &Q.GostClientForward
 	GostClientHost = &Q.GostClientHost
 	GostClientHostDomain = &Q.GostClientHostDomain
-	GostClientLogger = &Q.GostClientLogger
 	GostClientP2P = &Q.GostClientP2P
 	GostClientProxy = &Q.GostClientProxy
 	GostClientTunnel = &Q.GostClientTunnel
@@ -59,7 +56,6 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	GostNodeBind = &Q.GostNodeBind
 	GostNodeConfig = &Q.GostNodeConfig
 	GostNodeDomain = &Q.GostNodeDomain
-	GostNodeLogger = &Q.GostNodeLogger
 	GostNodePort = &Q.GostNodePort
 	GostObs = &Q.GostObs
 	SystemConfig = &Q.SystemConfig
@@ -79,7 +75,6 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		GostClientForward:    newGostClientForward(db, opts...),
 		GostClientHost:       newGostClientHost(db, opts...),
 		GostClientHostDomain: newGostClientHostDomain(db, opts...),
-		GostClientLogger:     newGostClientLogger(db, opts...),
 		GostClientP2P:        newGostClientP2P(db, opts...),
 		GostClientProxy:      newGostClientProxy(db, opts...),
 		GostClientTunnel:     newGostClientTunnel(db, opts...),
@@ -87,7 +82,6 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		GostNodeBind:         newGostNodeBind(db, opts...),
 		GostNodeConfig:       newGostNodeConfig(db, opts...),
 		GostNodeDomain:       newGostNodeDomain(db, opts...),
-		GostNodeLogger:       newGostNodeLogger(db, opts...),
 		GostNodePort:         newGostNodePort(db, opts...),
 		GostObs:              newGostObs(db, opts...),
 		SystemConfig:         newSystemConfig(db, opts...),
@@ -108,7 +102,6 @@ type Query struct {
 	GostClientForward    gostClientForward
 	GostClientHost       gostClientHost
 	GostClientHostDomain gostClientHostDomain
-	GostClientLogger     gostClientLogger
 	GostClientP2P        gostClientP2P
 	GostClientProxy      gostClientProxy
 	GostClientTunnel     gostClientTunnel
@@ -116,7 +109,6 @@ type Query struct {
 	GostNodeBind         gostNodeBind
 	GostNodeConfig       gostNodeConfig
 	GostNodeDomain       gostNodeDomain
-	GostNodeLogger       gostNodeLogger
 	GostNodePort         gostNodePort
 	GostObs              gostObs
 	SystemConfig         systemConfig
@@ -138,7 +130,6 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		GostClientForward:    q.GostClientForward.clone(db),
 		GostClientHost:       q.GostClientHost.clone(db),
 		GostClientHostDomain: q.GostClientHostDomain.clone(db),
-		GostClientLogger:     q.GostClientLogger.clone(db),
 		GostClientP2P:        q.GostClientP2P.clone(db),
 		GostClientProxy:      q.GostClientProxy.clone(db),
 		GostClientTunnel:     q.GostClientTunnel.clone(db),
@@ -146,7 +137,6 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		GostNodeBind:         q.GostNodeBind.clone(db),
 		GostNodeConfig:       q.GostNodeConfig.clone(db),
 		GostNodeDomain:       q.GostNodeDomain.clone(db),
-		GostNodeLogger:       q.GostNodeLogger.clone(db),
 		GostNodePort:         q.GostNodePort.clone(db),
 		GostObs:              q.GostObs.clone(db),
 		SystemConfig:         q.SystemConfig.clone(db),
@@ -175,7 +165,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		GostClientForward:    q.GostClientForward.replaceDB(db),
 		GostClientHost:       q.GostClientHost.replaceDB(db),
 		GostClientHostDomain: q.GostClientHostDomain.replaceDB(db),
-		GostClientLogger:     q.GostClientLogger.replaceDB(db),
 		GostClientP2P:        q.GostClientP2P.replaceDB(db),
 		GostClientProxy:      q.GostClientProxy.replaceDB(db),
 		GostClientTunnel:     q.GostClientTunnel.replaceDB(db),
@@ -183,7 +172,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		GostNodeBind:         q.GostNodeBind.replaceDB(db),
 		GostNodeConfig:       q.GostNodeConfig.replaceDB(db),
 		GostNodeDomain:       q.GostNodeDomain.replaceDB(db),
-		GostNodeLogger:       q.GostNodeLogger.replaceDB(db),
 		GostNodePort:         q.GostNodePort.replaceDB(db),
 		GostObs:              q.GostObs.replaceDB(db),
 		SystemConfig:         q.SystemConfig.replaceDB(db),
@@ -202,7 +190,6 @@ type queryCtx struct {
 	GostClientForward    IGostClientForwardDo
 	GostClientHost       IGostClientHostDo
 	GostClientHostDomain IGostClientHostDomainDo
-	GostClientLogger     IGostClientLoggerDo
 	GostClientP2P        IGostClientP2PDo
 	GostClientProxy      IGostClientProxyDo
 	GostClientTunnel     IGostClientTunnelDo
@@ -210,7 +197,6 @@ type queryCtx struct {
 	GostNodeBind         IGostNodeBindDo
 	GostNodeConfig       IGostNodeConfigDo
 	GostNodeDomain       IGostNodeDomainDo
-	GostNodeLogger       IGostNodeLoggerDo
 	GostNodePort         IGostNodePortDo
 	GostObs              IGostObsDo
 	SystemConfig         ISystemConfigDo
@@ -229,7 +215,6 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		GostClientForward:    q.GostClientForward.WithContext(ctx),
 		GostClientHost:       q.GostClientHost.WithContext(ctx),
 		GostClientHostDomain: q.GostClientHostDomain.WithContext(ctx),
-		GostClientLogger:     q.GostClientLogger.WithContext(ctx),
 		GostClientP2P:        q.GostClientP2P.WithContext(ctx),
 		GostClientProxy:      q.GostClientProxy.WithContext(ctx),
 		GostClientTunnel:     q.GostClientTunnel.WithContext(ctx),
@@ -237,7 +222,6 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		GostNodeBind:         q.GostNodeBind.WithContext(ctx),
 		GostNodeConfig:       q.GostNodeConfig.WithContext(ctx),
 		GostNodeDomain:       q.GostNodeDomain.WithContext(ctx),
-		GostNodeLogger:       q.GostNodeLogger.WithContext(ctx),
 		GostNodePort:         q.GostNodePort.WithContext(ctx),
 		GostObs:              q.GostObs.WithContext(ctx),
 		SystemConfig:         q.SystemConfig.WithContext(ctx),

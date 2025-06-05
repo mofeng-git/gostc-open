@@ -20,7 +20,6 @@ type ConfigReq struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -57,7 +56,6 @@ func (service *service) Config(req ConfigReq) error {
 		tunnel.Limiter = req.Limiter
 		tunnel.RLimiter = req.RLimiter
 		tunnel.CLimiter = req.CLimiter
-		tunnel.OnlyChina = req.OnlyChina
 		tunnel.ExpAt = expAt.Unix()
 		if err = tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道配置失败", zap.Error(err))

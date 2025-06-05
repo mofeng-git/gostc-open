@@ -17,7 +17,6 @@ type ListItem struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	IndexValue   int    `json:"indexValue"`
 }
 
@@ -37,7 +36,6 @@ func (service *service) List(req ListReq) (list []ListItem) {
 			Limiter:      cfg.Limiter,
 			RLimiter:     cfg.RLimiter,
 			CLimiter:     cfg.CLimiter,
-			OnlyChina:    cfg.OnlyChina,
 			IndexValue:   cfg.IndexValue,
 		})
 	}

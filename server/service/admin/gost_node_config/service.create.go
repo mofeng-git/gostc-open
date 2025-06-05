@@ -17,7 +17,6 @@ type CreateReq struct {
 	Limiter      int    `json:"limiter" label:"速率"`
 	RLimiter     int    `json:"rLimiter" label:"并发数"`
 	CLimiter     int    `json:"cLimiter" label:"连接数"`
-	OnlyChina    int    `json:"onlyChina" label:"仅中国大陆可用"`
 	NodeCode     string `binding:"required" json:"nodeCode"`
 	IndexValue   int    `json:"indexValue"`
 }
@@ -45,7 +44,6 @@ func (service *service) Create(req CreateReq) (err error) {
 		RLimiter:     req.RLimiter,
 		CLimiter:     req.CLimiter,
 		NodeCode:     req.NodeCode,
-		OnlyChina:    req.OnlyChina,
 		IndexValue:   req.IndexValue,
 	}); err != nil {
 		log.Error("新增套餐配置失败", zap.Error(err))

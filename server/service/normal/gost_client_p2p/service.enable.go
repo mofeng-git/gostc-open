@@ -36,7 +36,7 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 	if p2p.Enable == 1 {
 		gost_engine.ClientP2PConfig(db, p2p.Code)
 	} else {
-		gost_engine.ClientRemoveP2PConfig(*p2p, p2p.Node)
+		gost_engine.ClientRemoveP2PConfig(*p2p)
 	}
 	return nil
 }

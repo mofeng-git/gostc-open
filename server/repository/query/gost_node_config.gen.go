@@ -43,7 +43,6 @@ func newGostNodeConfig(db *gorm.DB, opts ...gen.DOOption) gostNodeConfig {
 	_gostNodeConfig.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostNodeConfig.CLimiter = field.NewInt(tableName, "c_limiter")
 	_gostNodeConfig.NodeCode = field.NewString(tableName, "node_code")
-	_gostNodeConfig.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostNodeConfig.Node = gostNodeConfigBelongsToNode{
 		db: db.Session(&gorm.Session{}),
 
@@ -88,7 +87,6 @@ type gostNodeConfig struct {
 	RLimiter     field.Int
 	CLimiter     field.Int
 	NodeCode     field.String
-	OnlyChina    field.Int
 	Node         gostNodeConfigBelongsToNode
 
 	fieldMap map[string]field.Expr
@@ -122,7 +120,6 @@ func (g *gostNodeConfig) updateTableName(table string) *gostNodeConfig {
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
 	g.NodeCode = field.NewString(table, "node_code")
-	g.OnlyChina = field.NewInt(table, "only_china")
 
 	g.fillFieldMap()
 
@@ -139,7 +136,7 @@ func (g *gostNodeConfig) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostNodeConfig) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 18)
+	g.fieldMap = make(map[string]field.Expr, 17)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -156,7 +153,6 @@ func (g *gostNodeConfig) fillFieldMap() {
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
 	g.fieldMap["node_code"] = g.NodeCode
-	g.fieldMap["only_china"] = g.OnlyChina
 
 }
 

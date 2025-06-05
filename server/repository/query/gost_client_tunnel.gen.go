@@ -50,7 +50,6 @@ func newGostClientTunnel(db *gorm.DB, opts ...gen.DOOption) gostClientTunnel {
 	_gostClientTunnel.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientTunnel.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientTunnel.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientTunnel.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientTunnel.ExpAt = field.NewInt64(tableName, "exp_at")
 	_gostClientTunnel.Node = gostClientTunnelBelongsToNode{
 		db: db.Session(&gorm.Session{}),
@@ -128,7 +127,6 @@ type gostClientTunnel struct {
 	Limiter      field.Int
 	RLimiter     field.Int
 	CLimiter     field.Int
-	OnlyChina    field.Int
 	ExpAt        field.Int64
 	Node         gostClientTunnelBelongsToNode
 
@@ -174,7 +172,6 @@ func (g *gostClientTunnel) updateTableName(table string) *gostClientTunnel {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -192,7 +189,7 @@ func (g *gostClientTunnel) GetFieldByName(fieldName string) (field.OrderExpr, bo
 }
 
 func (g *gostClientTunnel) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 28)
+	g.fieldMap = make(map[string]field.Expr, 27)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -216,7 +213,6 @@ func (g *gostClientTunnel) fillFieldMap() {
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 
 }

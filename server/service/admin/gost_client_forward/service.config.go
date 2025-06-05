@@ -20,7 +20,6 @@ type ConfigReq struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -58,7 +57,6 @@ func (service *service) Config(req ConfigReq) error {
 		forward.Limiter = req.Limiter
 		forward.RLimiter = req.RLimiter
 		forward.CLimiter = req.CLimiter
-		forward.OnlyChina = req.OnlyChina
 		forward.ExpAt = expAt.Unix()
 		if err = tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发配置失败", zap.Error(err))

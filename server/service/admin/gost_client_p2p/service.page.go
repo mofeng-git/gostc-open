@@ -54,7 +54,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -115,7 +114,6 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				RLimiter:     p2p.RLimiter,
 				CLimiter:     p2p.CLimiter,
 				ExpAt:        time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    p2p.OnlyChina,
 			},
 			Enable:    p2p.Enable,
 			WarnMsg:   warn_msg.GetP2PWarnMsg(*p2p),

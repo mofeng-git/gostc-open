@@ -123,7 +123,6 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				Limiter:      cfg.Limiter,
 				RLimiter:     cfg.RLimiter,
 				CLimiter:     cfg.CLimiter,
-				OnlyChina:    cfg.OnlyChina,
 				ExpAt:        expAt,
 			},
 		}

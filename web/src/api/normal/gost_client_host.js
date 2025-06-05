@@ -41,6 +41,13 @@ export const apiNormalGostClientHostRenew = (data) => {
     })
 }
 
+export const apiNormalGostClientHostMigrate = (data) => {
+    return request.request({
+        url: `${baseUrl}/migrate`,
+        method: 'POST',
+        data
+    })
+}
 
 export const apiNormalGostClientHostEnable = (data) => {
     return request.request({

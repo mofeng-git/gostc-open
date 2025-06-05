@@ -16,10 +16,11 @@ import (
 )
 
 type DomainReq struct {
-	Code         string `binding:"required" json:"code"`
-	CustomDomain string `json:"customDomain"`
-	CustomCert   string `json:"customCert"`
-	CustomKey    string `json:"customKey"`
+	Code             string `binding:"required" json:"code"`
+	CustomDomain     string `json:"customDomain"`
+	CustomCert       string `json:"customCert"`
+	CustomKey        string `json:"customKey"`
+	CustomForceHttps int    `json:"customForceHttps"`
 }
 
 func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
@@ -94,11 +95,12 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 		host.CustomDomain = req.CustomDomain
 		host.CustomCert = req.CustomCert
 		host.CustomKey = req.CustomKey
+		host.CustomForceHttps = req.CustomForceHttps
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("保存用户域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey)
+		gost_engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey, host.CustomForceHttps)
 		gost_engine.NodeIngress(tx, host.NodeCode)
 		return nil
 	})

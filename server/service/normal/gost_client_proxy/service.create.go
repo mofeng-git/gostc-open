@@ -125,7 +125,6 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				Limiter:      cfg.Limiter,
 				RLimiter:     cfg.RLimiter,
 				CLimiter:     cfg.CLimiter,
-				OnlyChina:    cfg.OnlyChina,
 				ExpAt:        expAt,
 			},
 		}
@@ -170,7 +169,14 @@ func CheckPort(tx *query.Query, client model.GostClient, port string) error {
 		return nil
 	}
 	// 发送端口检测消息
-	gost_engine.ClientPortCheck(tx, client.Code, port)
+	async, allow := gost_engine.ClientPortCheck(tx, client.Code, port)
+	if async {
+		if allow {
+			return nil
+		} else {
+			return errors.New("端口已被占用")
+		}
+	}
 	for retry := 0; retry < maxRetries; retry++ {
 		time.Sleep(checkInterval)
 		if use, ok := cache.GetClientPortUse(client.Code, port); ok {

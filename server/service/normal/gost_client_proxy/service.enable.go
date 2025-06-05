@@ -39,7 +39,7 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 	if proxy.Enable == 1 {
 		gost_engine.ClientProxyConfig(db, proxy.Code)
 	} else {
-		gost_engine.ClientRemoveProxyConfig(*proxy, proxy.Node)
+		gost_engine.ClientRemoveProxyConfig(*proxy)
 	}
 	return nil
 }

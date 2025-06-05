@@ -58,7 +58,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -122,7 +121,6 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				RLimiter:     host.RLimiter,
 				CLimiter:     host.CLimiter,
 				ExpAt:        time.Unix(host.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    host.OnlyChina,
 			},
 			Enable:      host.Enable,
 			WarnMsg:     warn_msg.GetHostWarnMsg(*host),

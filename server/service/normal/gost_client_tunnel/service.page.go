@@ -56,7 +56,6 @@ type ItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -108,7 +107,6 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				RLimiter:     tunnel.RLimiter,
 				CLimiter:     tunnel.CLimiter,
 				ExpAt:        time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
-				OnlyChina:    tunnel.OnlyChina,
 			},
 			Enable:      tunnel.Enable,
 			WarnMsg:     warn_msg.GetTunnelWarnMsg(*tunnel),

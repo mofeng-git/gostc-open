@@ -160,7 +160,6 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 				Limiter:      cfg.Limiter,
 				RLimiter:     cfg.RLimiter,
 				CLimiter:     cfg.CLimiter,
-				OnlyChina:    cfg.OnlyChina,
 				ExpAt:        expAt,
 			},
 		}
@@ -202,7 +201,10 @@ const (
 )
 
 func validPortAvailable(tx *query.Query, nodeCode string, port string) bool {
-	gost_engine.NodePortCheck(tx, nodeCode, port)
+	async, allow := gost_engine.NodePortCheck(tx, nodeCode, port)
+	if async {
+		return allow
+	}
 	for retry := 0; retry < maxPortCheckRetries; retry++ {
 		time.Sleep(portCheckRetryInterval)
 		inUse, exists := cache.GetNodePortUse(nodeCode, port)

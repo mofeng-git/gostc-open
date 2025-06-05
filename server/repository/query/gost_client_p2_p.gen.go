@@ -49,7 +49,6 @@ func newGostClientP2P(db *gorm.DB, opts ...gen.DOOption) gostClientP2P {
 	_gostClientP2P.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientP2P.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientP2P.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientP2P.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientP2P.ExpAt = field.NewInt64(tableName, "exp_at")
 	_gostClientP2P.Node = gostClientP2PBelongsToNode{
 		db: db.Session(&gorm.Session{}),
@@ -126,7 +125,6 @@ type gostClientP2P struct {
 	Limiter      field.Int
 	RLimiter     field.Int
 	CLimiter     field.Int
-	OnlyChina    field.Int
 	ExpAt        field.Int64
 	Node         gostClientP2PBelongsToNode
 
@@ -171,7 +169,6 @@ func (g *gostClientP2P) updateTableName(table string) *gostClientP2P {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -189,7 +186,7 @@ func (g *gostClientP2P) GetFieldByName(fieldName string) (field.OrderExpr, bool)
 }
 
 func (g *gostClientP2P) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 27)
+	g.fieldMap = make(map[string]field.Expr, 26)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -212,7 +209,6 @@ func (g *gostClientP2P) fillFieldMap() {
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 
 }

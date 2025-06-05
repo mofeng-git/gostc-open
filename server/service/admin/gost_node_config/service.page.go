@@ -20,7 +20,6 @@ type Item struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	IndexValue   int    `json:"indexValue"`
 }
 
@@ -45,7 +44,6 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Limiter:      cfg.Limiter,
 			RLimiter:     cfg.RLimiter,
 			CLimiter:     cfg.CLimiter,
-			OnlyChina:    cfg.OnlyChina,
 			IndexValue:   cfg.IndexValue,
 		})
 	}

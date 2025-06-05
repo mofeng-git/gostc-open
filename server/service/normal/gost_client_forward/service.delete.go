@@ -32,7 +32,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 			return errors.New("操作失败")
 		}
 		node_port.ReleasePort(forward.NodeCode, forward.Port)
-		gost_engine.ClientRemoveForwardConfig(*forward, forward.Node)
+		gost_engine.ClientRemoveForwardConfig(*forward)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

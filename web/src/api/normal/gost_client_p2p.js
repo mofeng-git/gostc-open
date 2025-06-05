@@ -33,6 +33,14 @@ export const apiNormalGostClientP2PRenew = (data) => {
     })
 }
 
+export const apiNormalGostClientP2PMigrate = (data) => {
+    return request.request({
+        url: `${baseUrl}/migrate`,
+        method: 'POST',
+        data
+    })
+}
+
 export const apiNormalGostClientP2PEnable = (data) => {
     return request.request({
         url: `${baseUrl}/enable`,

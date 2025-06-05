@@ -33,6 +33,14 @@ export const apiNormalGostClientTunnelRenew = (data) => {
     })
 }
 
+export const apiNormalGostClientTunnelMigrate = (data) => {
+    return request.request({
+        url: `${baseUrl}/migrate`,
+        method: 'POST',
+        data
+    })
+}
+
 export const apiNormalGostClientTunnelEnable = (data) => {
     return request.request({
         url: `${baseUrl}/enable`,

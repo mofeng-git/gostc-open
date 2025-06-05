@@ -20,7 +20,6 @@ type ConfigReq struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -57,7 +56,6 @@ func (service *service) Config(req ConfigReq) error {
 		p2p.Limiter = req.Limiter
 		p2p.RLimiter = req.RLimiter
 		p2p.CLimiter = req.CLimiter
-		p2p.OnlyChina = req.OnlyChina
 		p2p.ExpAt = expAt.Unix()
 		if err = tx.GostClientP2P.Save(p2p); err != nil {
 			log.Error("修改P2P隧道配置失败", zap.Error(err))

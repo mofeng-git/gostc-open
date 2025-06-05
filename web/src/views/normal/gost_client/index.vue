@@ -287,7 +287,6 @@ const generateCmdString = () => {
             </n-h4>
             <div>
               <span>版本：{{ row.version || '未知' }}</span><br>
-              <span>上线IP：{{ row.ip || '未知' }}</span><br>
               <span>上线时间：{{ row.lastTime || '未知' }}</span><br>
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>

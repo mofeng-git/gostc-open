@@ -48,7 +48,6 @@ func newGostClientProxy(db *gorm.DB, opts ...gen.DOOption) gostClientProxy {
 	_gostClientProxy.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientProxy.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientProxy.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientProxy.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientProxy.ExpAt = field.NewInt64(tableName, "exp_at")
 	_gostClientProxy.Node = gostClientProxyBelongsToNode{
 		db: db.Session(&gorm.Session{}),
@@ -124,7 +123,6 @@ type gostClientProxy struct {
 	Limiter      field.Int
 	RLimiter     field.Int
 	CLimiter     field.Int
-	OnlyChina    field.Int
 	ExpAt        field.Int64
 	Node         gostClientProxyBelongsToNode
 
@@ -168,7 +166,6 @@ func (g *gostClientProxy) updateTableName(table string) *gostClientProxy {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -186,7 +183,7 @@ func (g *gostClientProxy) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (g *gostClientProxy) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 26)
+	g.fieldMap = make(map[string]field.Expr, 25)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -208,7 +205,6 @@ func (g *gostClientProxy) fillFieldMap() {
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 
 }

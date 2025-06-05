@@ -18,7 +18,6 @@ type UpdateReq struct {
 	Limiter      int    `json:"limiter" label:"速率"`
 	RLimiter     int    `json:"rLimiter" label:"并发数"`
 	CLimiter     int    `json:"cLimiter" label:"连接数"`
-	OnlyChina    int    `json:"onlyChina" label:"仅中国大陆可用"`
 	IndexValue   int    `json:"indexValue"`
 }
 
@@ -47,7 +46,6 @@ func (service *service) Update(req UpdateReq) (err error) {
 	cfg.Limiter = req.Limiter
 	cfg.RLimiter = req.RLimiter
 	cfg.CLimiter = req.CLimiter
-	cfg.OnlyChina = req.OnlyChina
 	cfg.IndexValue = req.IndexValue
 	if err := db.GostNodeConfig.Save(cfg); err != nil {
 		log.Error("修改套餐配置失败", zap.Error(err))

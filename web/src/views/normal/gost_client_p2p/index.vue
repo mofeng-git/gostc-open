@@ -1,8 +1,9 @@
 <script setup>
-import {onBeforeMount, ref, h} from "vue";
+import {h, onBeforeMount, ref} from "vue";
 import {
   apiNormalGostClientP2PDelete,
   apiNormalGostClientP2PEnable,
+  apiNormalGostClientP2PMigrate,
   apiNormalGostClientP2PPage,
   apiNormalGostClientP2PRenew,
   apiNormalGostClientP2PUpdate
@@ -54,6 +55,14 @@ const state = ref({
     key: '',
   },
   clients:[],
+  migrate: {
+    open: false,
+    data: {
+      code: '',
+      clientCode: '',
+    },
+    loading: false,
+  },
 })
 
 const refreshTable = () => {
@@ -165,6 +174,27 @@ const clientListFunc = async () => {
   }
 }
 
+const openMigrateModal = (row) => {
+  state.value.migrate.data.code = row.code
+  state.value.migrate.data.clientCode = row.client.code
+  state.value.migrate.open = true
+}
+
+const closeMigrateModal = () => {
+  state.value.migrate.open = false
+}
+
+const migrateFunc = async () => {
+  try {
+    state.value.migrate.loading = true
+    await apiNormalGostClientP2PMigrate(state.value.migrate.data)
+    closeMigrateModal()
+    refreshTable()
+  } finally {
+    state.value.migrate.loading = false
+  }
+}
+
 onBeforeMount(() => {
   pageFunc()
   clientListFunc()
@@ -184,6 +214,12 @@ const operatorOptions = [
     key: 'look',
     disabled: false,
     func:openLookFunc,
+  },
+  {
+    label: '转移隧道',
+    key: 'migrate',
+    disabled: false,
+    func:openMigrateModal,
   },
 ]
 const operatorSelect = (key,row)=>{
@@ -213,6 +249,8 @@ const operatorRenderLabel = (option)=>{
       <n-alert type="info">
         访客端运行命令：
         <div>{{ generateCmdString() }}</div>
+        <div>含义：当前有两条P2P隧道，他们的访问密钥分别为aaaaaa、bbbbbb，访客端运行后，会把aaaaaa密钥的隧道配置的内网服务在访客端设备开启监听8080端口，访问8080端口就相当于访问隧道指向的内网服务，bbbbbb密钥的隧道同理</div>
+        <div>其他问题：Linux可能会碰到权限问题，执行以下命令解决：sudo chmod +x gostc</div>
       </n-alert>
     </AppCard>
     <AppCard :show-border="false">
@@ -400,6 +438,32 @@ const operatorRenderLabel = (option)=>{
         </n-form-item>
         <n-form-item path="targetPort" label="内网端口">
           <n-input v-model:value="state.update.data.targetPort" placeholder="80"></n-input>
+        </n-form-item>
+      </n-form>
+    </Modal>
+
+    <Modal
+        title="转移隧道"
+        :show="state.migrate.open"
+        @on-confirm="migrateFunc"
+        @on-cancel="closeMigrateModal"
+        :confirm-loading="state.migrate.loading"
+        width="400px"
+    >
+      <n-alert type="info">
+        请注意，迁移到新的客户端后，请确认新的客户端依然能正常访问到内网目标地址
+      </n-alert>
+      <br>
+      <n-form>
+        <n-form-item label="新客户端" path="clientCode">
+          <n-select
+              :options="state.clients"
+              label-field="name"
+              value-field="code"
+              v-model:value="state.migrate.data.clientCode"
+              :default-value="state.migrate.data.clientCode"
+              placeholder="请选择目标客户端"
+          ></n-select>
         </n-form-item>
       </n-form>
     </Modal>

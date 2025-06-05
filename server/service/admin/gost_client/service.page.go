@@ -19,7 +19,6 @@ type Item struct {
 	Code        string `json:"code"`
 	Name        string `json:"name"`
 	Key         string `json:"key"`
-	Ip          string `json:"ip"`
 	Online      int    `json:"online"`
 	LastTime    string `json:"lastTime"`
 	Version     string `json:"version"`
@@ -56,7 +55,6 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Code:        client.Code,
 			Name:        client.Name,
 			Key:         client.Key,
-			Ip:          cache.GetClientIp(client.Code),
 			Online:      utils.TrinaryOperation(cache.GetClientOnline(client.Code), 1, 2),
 			LastTime:    cache.GetClientLastTime(client.Code),
 			Version:     cache.GetClientVersion(client.Code),

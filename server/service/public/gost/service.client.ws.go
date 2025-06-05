@@ -22,17 +22,24 @@ func (service *service) ClientWs(c *gin.Context) {
 
 	value, ok := gost_engine.EngineRegistry.Get(client.Code)
 	if ok {
-		value.Close("客户端已在别处连接，连接IP：" + c.ClientIP())
+		value.GetClient().Stop("客户端已在别处连接，连接IP：" + c.ClientIP())
 	}
-	engine, err := gost_engine.NewEngine(client.Code, c.Writer, c.Request, gost_engine.NewClientEvent(client.Code, c.ClientIP(), log))
+
+	engine, err := gost_engine.NewGwsClientEngine(client.Code, c.Writer, c.Request)
 	if err != nil {
 		log.Error("建立连接失败", zap.String("key", key), zap.Error(err))
 		return
 	}
+	clientEngine := gost_engine.NewClientEngine(client.Code, engine)
+
+	//engine, err := gost_engine.NewGwsClientEngine(client.Code, c.Writer, c.Request, gost_engine.NewClientEvent(client.Code, c.ClientIP(), log))
+	//if err != nil {
+	//	log.Error("建立连接失败", zap.String("key", key), zap.Error(err))
+	//	return
+	//}
 	if client.Code == "" {
-		engine.Close("客户端不存在")
+		engine.Stop("客户端不存在")
 	} else {
-		gost_engine.EngineRegistry.Set(engine)
+		gost_engine.EngineRegistry.Set(clientEngine)
 	}
-	go engine.ReadLoop()
 }

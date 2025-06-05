@@ -33,7 +33,6 @@ func newGostClientConfig(db *gorm.DB, opts ...gen.DOOption) gostClientConfig {
 	_gostClientConfig.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientConfig.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientConfig.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientConfig.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientConfig.ExpAt = field.NewInt64(tableName, "exp_at")
 
 	_gostClientConfig.fillFieldMap()
@@ -51,7 +50,6 @@ type gostClientConfig struct {
 	Limiter      field.Int
 	RLimiter     field.Int
 	CLimiter     field.Int
-	OnlyChina    field.Int
 	ExpAt        field.Int64
 
 	fieldMap map[string]field.Expr
@@ -75,7 +73,6 @@ func (g *gostClientConfig) updateTableName(table string) *gostClientConfig {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -93,14 +90,13 @@ func (g *gostClientConfig) GetFieldByName(fieldName string) (field.OrderExpr, bo
 }
 
 func (g *gostClientConfig) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 8)
+	g.fieldMap = make(map[string]field.Expr, 7)
 	g.fieldMap["charging_type"] = g.ChargingType
 	g.fieldMap["cycle"] = g.Cycle
 	g.fieldMap["amount"] = g.Amount
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 }
 

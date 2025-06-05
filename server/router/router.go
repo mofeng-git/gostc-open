@@ -6,10 +6,12 @@ import (
 	"server/global"
 	"server/pkg/logger"
 	"server/pkg/middleware"
+	"server/pkg/rpc_protocol/websocket"
 	"server/router/admin"
 	"server/router/auth"
 	"server/router/normal"
 	"server/router/public"
+	"server/router/rpc"
 	"strings"
 )
 
@@ -31,7 +33,6 @@ func init() {
 
 		adminGroup := engine.Group("api/v1/admin")
 		admin.InitGostClient(adminGroup)
-		admin.InitGostClientLogger(adminGroup)
 		admin.InitGostClientForward(adminGroup)
 		admin.InitGostClientHost(adminGroup)
 		admin.InitGostClientTunnel(adminGroup)
@@ -40,7 +41,6 @@ func init() {
 		admin.InitGostNodeConfig(adminGroup)
 		admin.InitGostNode(adminGroup)
 		admin.InitGostNodeBind(adminGroup)
-		admin.InitGostNodeLogger(adminGroup)
 		admin.InitGostNodeRule(adminGroup)
 		admin.InitSystemUser(adminGroup)
 		admin.InitSystemNotice(adminGroup)
@@ -58,7 +58,6 @@ func init() {
 		normalGroup := engine.Group("api/v1/normal")
 		normal.InitGost(normalGroup)
 		normal.InitGostClient(normalGroup)
-		normal.InitGostClientLogger(normalGroup)
 		normal.InitGostClientForward(normalGroup)
 		normal.InitGostClientHost(normalGroup)
 		normal.InitGostClientTunnel(normalGroup)
@@ -67,5 +66,13 @@ func init() {
 		normal.InitGostNode(normalGroup)
 		normal.InitGostObs(normalGroup)
 		normal.InitSystemNotice(normalGroup)
+		normal.InitDashboard(normalGroup)
+
+		// RPC Server
+		ln, err := websocket.Listen(global.Config.Address, nil)
+		if err != nil {
+			panic("rpc server listen fail,err" + err.Error())
+		}
+		rpc.InitGost(engine, ln)
 	}
 }

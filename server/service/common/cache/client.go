@@ -28,14 +28,6 @@ func GetClientOnline(code string) bool {
 	return global.Cache.GetString(client_online_key+code) == "1"
 }
 
-func SetClientIp(code string, ip string) {
-	global.Cache.SetString(client_ip_key+code, ip, cache.NoExpiration)
-}
-
-func GetClientIp(code string) string {
-	return global.Cache.GetString(client_ip_key + code)
-}
-
 func SetClientVersion(code string, version string) {
 	global.Cache.SetString(client_version_key+code, version, cache.NoExpiration)
 }

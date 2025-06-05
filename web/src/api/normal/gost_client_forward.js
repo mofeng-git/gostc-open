@@ -33,6 +33,14 @@ export const apiNormalGostClientForwardRenew = (data) => {
     })
 }
 
+export const apiNormalGostClientForwardMigrate = (data) => {
+    return request.request({
+        url: `${baseUrl}/migrate`,
+        method: 'POST',
+        data
+    })
+}
+
 export const apiNormalGostClientForwardEnable = (data) => {
     return request.request({
         url: `${baseUrl}/enable`,

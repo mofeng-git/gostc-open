@@ -41,6 +41,7 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.CustomDomain = field.NewString(tableName, "custom_domain")
 	_gostClientHost.CustomCert = field.NewString(tableName, "custom_cert")
 	_gostClientHost.CustomKey = field.NewString(tableName, "custom_key")
+	_gostClientHost.CustomForceHttps = field.NewInt(tableName, "custom_force_https")
 	_gostClientHost.NodeCode = field.NewString(tableName, "node_code")
 	_gostClientHost.ClientCode = field.NewString(tableName, "client_code")
 	_gostClientHost.UserCode = field.NewString(tableName, "user_code")
@@ -56,7 +57,6 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.Limiter = field.NewInt(tableName, "limiter")
 	_gostClientHost.RLimiter = field.NewInt(tableName, "r_limiter")
 	_gostClientHost.CLimiter = field.NewInt(tableName, "c_limiter")
-	_gostClientHost.OnlyChina = field.NewInt(tableName, "only_china")
 	_gostClientHost.ExpAt = field.NewInt64(tableName, "exp_at")
 	_gostClientHost.Node = gostClientHostBelongsToNode{
 		db: db.Session(&gorm.Session{}),
@@ -110,39 +110,39 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 type gostClientHost struct {
 	gostClientHostDo
 
-	ALL          field.Asterisk
-	Id           field.Int
-	Code         field.String
-	AllowEdit    field.Int
-	AllowDel     field.Int
-	Version      field.Int64
-	CreatedAt    field.Time
-	UpdatedAt    field.Time
-	Name         field.String
-	TargetIp     field.String
-	TargetPort   field.String
-	DomainPrefix field.String
-	CustomDomain field.String
-	CustomCert   field.String
-	CustomKey    field.String
-	NodeCode     field.String
-	ClientCode   field.String
-	UserCode     field.String
-	Enable       field.Int
-	Status       field.Int
-	WhiteEnable  field.Int
-	BlackEnable  field.Int
-	WhiteList    field.String
-	BlackList    field.String
-	ChargingType field.Int
-	Cycle        field.Int
-	Amount       field.Field
-	Limiter      field.Int
-	RLimiter     field.Int
-	CLimiter     field.Int
-	OnlyChina    field.Int
-	ExpAt        field.Int64
-	Node         gostClientHostBelongsToNode
+	ALL              field.Asterisk
+	Id               field.Int
+	Code             field.String
+	AllowEdit        field.Int
+	AllowDel         field.Int
+	Version          field.Int64
+	CreatedAt        field.Time
+	UpdatedAt        field.Time
+	Name             field.String
+	TargetIp         field.String
+	TargetPort       field.String
+	DomainPrefix     field.String
+	CustomDomain     field.String
+	CustomCert       field.String
+	CustomKey        field.String
+	CustomForceHttps field.Int
+	NodeCode         field.String
+	ClientCode       field.String
+	UserCode         field.String
+	Enable           field.Int
+	Status           field.Int
+	WhiteEnable      field.Int
+	BlackEnable      field.Int
+	WhiteList        field.String
+	BlackList        field.String
+	ChargingType     field.Int
+	Cycle            field.Int
+	Amount           field.Field
+	Limiter          field.Int
+	RLimiter         field.Int
+	CLimiter         field.Int
+	ExpAt            field.Int64
+	Node             gostClientHostBelongsToNode
 
 	Client gostClientHostBelongsToClient
 
@@ -177,6 +177,7 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.CustomDomain = field.NewString(table, "custom_domain")
 	g.CustomCert = field.NewString(table, "custom_cert")
 	g.CustomKey = field.NewString(table, "custom_key")
+	g.CustomForceHttps = field.NewInt(table, "custom_force_https")
 	g.NodeCode = field.NewString(table, "node_code")
 	g.ClientCode = field.NewString(table, "client_code")
 	g.UserCode = field.NewString(table, "user_code")
@@ -192,7 +193,6 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.Limiter = field.NewInt(table, "limiter")
 	g.RLimiter = field.NewInt(table, "r_limiter")
 	g.CLimiter = field.NewInt(table, "c_limiter")
-	g.OnlyChina = field.NewInt(table, "only_china")
 	g.ExpAt = field.NewInt64(table, "exp_at")
 
 	g.fillFieldMap()
@@ -225,6 +225,7 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["custom_domain"] = g.CustomDomain
 	g.fieldMap["custom_cert"] = g.CustomCert
 	g.fieldMap["custom_key"] = g.CustomKey
+	g.fieldMap["custom_force_https"] = g.CustomForceHttps
 	g.fieldMap["node_code"] = g.NodeCode
 	g.fieldMap["client_code"] = g.ClientCode
 	g.fieldMap["user_code"] = g.UserCode
@@ -240,7 +241,6 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["limiter"] = g.Limiter
 	g.fieldMap["r_limiter"] = g.RLimiter
 	g.fieldMap["c_limiter"] = g.CLimiter
-	g.fieldMap["only_china"] = g.OnlyChina
 	g.fieldMap["exp_at"] = g.ExpAt
 
 }

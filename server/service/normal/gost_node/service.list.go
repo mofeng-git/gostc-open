@@ -42,7 +42,6 @@ type ListItemConfig struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 }
 
 func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
@@ -79,7 +78,6 @@ func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 				Limiter:      cfg.Limiter,
 				RLimiter:     cfg.RLimiter,
 				CLimiter:     cfg.CLimiter,
-				OnlyChina:    cfg.OnlyChina,
 			})
 		}
 		var ruleNames []string

@@ -13,6 +13,7 @@ func InitGostClientHost(group *gin.RouterGroup) {
 	g.POST("domain", gost_client_host.Domain)
 	g.POST("admission", gost_client_host.Admission)
 	g.POST("renew", gost_client_host.Renew)
+	g.POST("migrate", gost_client_host.Migrate)
 	g.POST("update", gost_client_host.Update)
 	g.POST("enable", gost_client_host.Enable)
 	g.POST("delete", gost_client_host.Delete)

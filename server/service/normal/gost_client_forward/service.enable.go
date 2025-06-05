@@ -39,7 +39,7 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 	if forward.Enable == 1 {
 		gost_engine.ClientForwardConfig(db, forward.Code)
 	} else {
-		gost_engine.ClientRemoveForwardConfig(*forward, forward.Node)
+		gost_engine.ClientRemoveForwardConfig(*forward)
 	}
 	return nil
 }

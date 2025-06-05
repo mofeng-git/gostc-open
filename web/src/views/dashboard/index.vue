@@ -1,4 +1,5 @@
 <script setup>
+import {resizeDirective} from '../../utils/resize.js'
 import {computed, onBeforeMount, ref, watch} from "vue";
 import {appStore} from "../../store/app.js";
 import AppCard from "../../layout/components/AppCard.vue";
@@ -19,10 +20,20 @@ import {
   apiAuthUserInfo
 } from "../../api/auth/index.js";
 import {NButton, NPopconfirm} from "naive-ui";
-import {apiNormalGostInfo} from "../../api/normal/gost.js";
 import {flowFormat} from "../../utils/flow.js";
 import moment from "moment";
 import {apiNormalGostObsUserMonth} from "../../api/normal/gost_obs.js";
+import {
+  apiNormalDashboardClientForwardObsDate,
+  apiNormalDashboardClientHostObsDate,
+  apiNormalDashboardClientObsDate,
+  apiNormalDashboardClientTunnelObsDate,
+  apiNormalDashboardCount
+} from "../../api/normal/dashboard.js";
+import Online from "../../icon/online.vue";
+import DatePicker from "../../components/DatePicker.vue";
+
+const vResize = resizeDirective
 
 const state = ref({
   baseUrl: window.location.protocol + '//' + window.location.host,
@@ -58,16 +69,6 @@ const state = ref({
   obsDataRange: 1,
   obsLoading: false,
   obsData: [],
-  gift: {
-    open: false,
-    key: '',
-    loading: false,
-  },
-  cdk: {
-    open: false,
-    key: '',
-    loading: false,
-  },
   bindEmail: {
     open: false,
     loading: false,
@@ -83,6 +84,10 @@ const state = ref({
     },
   },
   unBindEmailLoading: false,
+  clientObsDate: [],
+  clientHostObsDate: [],
+  clientForwardObsDate: [],
+  clientTunnelObsDate: [],
 })
 
 const cardStyleComputed = computed(() => {
@@ -91,6 +96,7 @@ const cardStyleComputed = computed(() => {
     borderRadius: 'var(--border-radius)',
     borderWidth: '1px',
     borderStyle: 'solid',
+    // border: '1px solid ' + (localStore().darkTheme ? 'rgba(255, 255, 255, 0.09)' : 'rgb(239, 239, 245)')
   }
 })
 
@@ -110,10 +116,59 @@ const noticeListFunc = async () => {
   }
 }
 
-const gostInfoFunc = async () => {
+const countFunc = async () => {
   try {
-    let res = await apiNormalGostInfo()
+    let res = await apiNormalDashboardCount()
     state.value.gost = res.data
+  } finally {
+
+  }
+}
+
+
+const clientObsDateFunc = async (date) => {
+  try {
+    if (date) {
+      date = moment(date).format('yyyy-MM-DD')
+    }
+    let res = await apiNormalDashboardClientObsDate(date)
+    state.value.clientObsDate = res.data || []
+  } finally {
+
+  }
+}
+
+const clientHostObsDateFunc = async (date) => {
+  try {
+    if (date) {
+      date = moment(date).format('yyyy-MM-DD')
+    }
+    let res = await apiNormalDashboardClientHostObsDate(date)
+    state.value.clientHostObsDate = res.data || []
+  } finally {
+
+  }
+}
+
+const clientForwardObsDateFunc = async (date) => {
+  try {
+    if (date) {
+      date = moment(date).format('yyyy-MM-DD')
+    }
+    let res = await apiNormalDashboardClientForwardObsDate(date)
+    state.value.clientForwardObsDate = res.data || []
+  } finally {
+
+  }
+}
+
+const clientTunnelObsDateFunc = async (date) => {
+  try {
+    if (date) {
+      date = moment(date).format('yyyy-MM-DD')
+    }
+    let res = await apiNormalDashboardClientTunnelObsDate(date)
+    state.value.clientTunnelObsDate = res.data || []
   } finally {
 
   }
@@ -279,19 +334,19 @@ const genBindEmailCodeFunc = () => {
 
 const bindEmailRef = ref()
 const bindEmailFunc = () => {
-  if (state.value.bindEmail.data.key===''){
-    $message.create('请先发送验证码',{
-      type:"warning",
-      closable:true,
-      duration:1500,
+  if (state.value.bindEmail.data.key === '') {
+    $message.create('请先发送验证码', {
+      type: "warning",
+      closable: true,
+      duration: 1500,
     })
     return
   }
-  if (state.value.bindEmail.data.code===''){
-    $message.create('请输入验证码',{
-      type:"warning",
-      closable:true,
-      duration:1500,
+  if (state.value.bindEmail.data.code === '') {
+    $message.create('请输入验证码', {
+      type: "warning",
+      closable: true,
+      duration: 1500,
     })
     return
   }
@@ -317,11 +372,17 @@ const unBindEmailFunc = async () => {
   }
 }
 
+
 onBeforeMount(() => {
   state.value.userInfo = appStore().userInfo
   noticeListFunc()
-  gostInfoFunc()
+  countFunc()
   obsUserMonthFunc()
+  let date = new Date()
+  clientObsDateFunc(date)
+  clientHostObsDateFunc(date)
+  clientForwardObsDateFunc(date)
+  clientTunnelObsDateFunc(date)
 })
 
 const alertSystemConfigBaseUrl = computed(() => {
@@ -331,6 +392,11 @@ const alertSystemConfigBaseUrl = computed(() => {
     return false
   }
 })
+
+const heightSync = ref(0)
+const userInfoResize = (arg) => {
+  heightSync.value = arg.height
+}
 
 </script>
 
@@ -344,11 +410,12 @@ const alertSystemConfigBaseUrl = computed(() => {
       </n-alert>
     </AppCard>
 
+
     <AppCard :show-border="false">
       <n-grid :cols="gridColsComputed" :x-gap="12" :y-gap="12">
         <n-grid-item>
           <n-el tag="div" :style="cardStyleComputed">
-            <AppCard :show-border="false">
+            <AppCard :show-border="false" v-resize="userInfoResize">
               <n-h4 style="font-weight: bold">个人信息</n-h4>
               <n-descriptions :column="1" label-placement="left" label-class="userinfo-label">
                 <n-descriptions-item label="账号">{{ state.userInfo.account }}</n-descriptions-item>
@@ -449,7 +516,7 @@ const alertSystemConfigBaseUrl = computed(() => {
           <n-el tag="div" :style="cardStyleComputed">
             <AppCard :show-border="false">
               <n-h4 style="font-weight: bold">通知公告</n-h4>
-              <n-scrollbar style="max-height: 600px">
+              <n-scrollbar :style="{maxHeight:heightSync-44+'px'}">
                 <n-alert style="margin-bottom: 8px" type="info" v-for="(item,index) in state.notices" :key="item.code"
                          :bordered="false">
                   <template #header>
@@ -467,6 +534,136 @@ const alertSystemConfigBaseUrl = computed(() => {
             </AppCard>
           </n-el>
         </n-grid-item>
+
+        <n-grid-item>
+          <n-el tag="div" :style="cardStyleComputed">
+            <n-card size="small" :content-style="{padding:'6px 16px !important'}">
+              <template #header>
+                <n-space justify="space-between" align="center">
+                  <span>客户端流量排行 ( IN | OUT )</span>
+                  <DatePicker :max-value="new Date()" @on-before="args => clientObsDateFunc(args)"
+                              @on-after="args => clientObsDateFunc(args)"></DatePicker>
+                </n-space>
+              </template>
+              <n-scrollbar style="height: 300px">
+                <n-list v-if="state.clientObsDate?.length">
+                  <n-list-item v-for="(obs,index) in state.clientObsDate">
+                    <div style="display: flex;justify-content: space-between;align-items: center">
+                      <div style="width: 50px">{{ index + 1 }}</div>
+                      <div style="flex: 1">
+                        <Online :online="obs.online === 1"></Online>
+                        {{ obs.name }}
+                      </div>
+                      <div>
+                        <span>{{ flowFormat(obs.inputBytes) }}</span>
+                        <n-divider vertical></n-divider>
+                        <span>{{ flowFormat(obs.outputBytes) }}</span>
+                      </div>
+                    </div>
+                  </n-list-item>
+                </n-list>
+                <n-empty v-else style="width: 100%;" description="暂无数据"></n-empty>
+              </n-scrollbar>
+            </n-card>
+          </n-el>
+        </n-grid-item>
+
+        <n-grid-item>
+          <n-el tag="div" :style="cardStyleComputed">
+            <n-card size="small" :content-style="{padding:'6px 16px !important'}">
+              <template #header>
+                <n-space justify="space-between" align="center">
+                  <span>域名解析流量排行 ( IN | OUT )</span>
+                  <DatePicker :max-value="new Date()" @on-before="args => clientHostObsDateFunc(args)"
+                              @on-after="args => clientHostObsDateFunc(args)"></DatePicker>
+                </n-space>
+              </template>
+              <n-scrollbar style="height: 300px">
+                <n-list v-if="state.clientHostObsDate?.length">
+                  <n-list-item v-for="(obs,index) in state.clientHostObsDate">
+                    <div style="display: flex;justify-content: space-between;align-items: center">
+                      <div style="width: 50px">{{ index + 1 }}</div>
+                      <div style="flex: 1">
+                        {{ obs.name }}
+                      </div>
+                      <div>
+                        <span>{{ flowFormat(obs.inputBytes) }}</span>
+                        <n-divider vertical></n-divider>
+                        <span>{{ flowFormat(obs.outputBytes) }}</span>
+                      </div>
+                    </div>
+                  </n-list-item>
+                </n-list>
+                <n-empty v-else style="width: 100%;" description="暂无数据"></n-empty>
+              </n-scrollbar>
+            </n-card>
+          </n-el>
+        </n-grid-item>
+
+        <n-grid-item>
+          <n-el tag="div" :style="cardStyleComputed">
+            <n-card size="small" :content-style="{padding:'6px 16px !important'}">
+              <template #header>
+                <n-space justify="space-between" align="center">
+                  <span>端口转发流量排行 ( IN | OUT )</span>
+                  <DatePicker :max-value="new Date()" @on-before="args => clientForwardObsDateFunc(args)"
+                              @on-after="args => clientForwardObsDateFunc(args)"></DatePicker>
+                </n-space>
+              </template>
+              <n-scrollbar style="height: 300px">
+                <n-list v-if="state.clientForwardObsDate?.length">
+                  <n-list-item v-for="(obs,index) in state.clientForwardObsDate">
+                    <div style="display: flex;justify-content: space-between;align-items: center">
+                      <div style="width: 50px">{{ index + 1 }}</div>
+                      <div style="flex: 1">
+                        {{ obs.name }}
+                      </div>
+                      <div>
+                        <span>{{ flowFormat(obs.inputBytes) }}</span>
+                        <n-divider vertical></n-divider>
+                        <span>{{ flowFormat(obs.outputBytes) }}</span>
+                      </div>
+                    </div>
+                  </n-list-item>
+                </n-list>
+                <n-empty v-else style="width: 100%;" description="暂无数据"></n-empty>
+              </n-scrollbar>
+            </n-card>
+          </n-el>
+        </n-grid-item>
+
+        <n-grid-item>
+          <n-el tag="div" :style="cardStyleComputed">
+            <n-card size="small" :content-style="{padding:'6px 16px !important'}">
+              <template #header>
+                <n-space justify="space-between" align="center">
+                  <span>私有隧道流量排行 ( IN | OUT )</span>
+                  <DatePicker :max-value="new Date()" @on-before="args => clientTunnelObsDateFunc(args)"
+                              @on-after="args => clientTunnelObsDateFunc(args)"></DatePicker>
+                </n-space>
+              </template>
+              <n-scrollbar style="height: 300px">
+                <n-list v-if="state.clientTunnelObsDate?.length">
+                  <n-list-item v-for="(obs,index) in state.clientTunnelObsDate">
+                    <div style="display: flex;justify-content: space-between;align-items: center">
+                      <div style="width: 50px">{{ index + 1 }}</div>
+                      <div style="flex: 1">
+                        {{ obs.name }}
+                      </div>
+                      <div>
+                        <span>{{ flowFormat(obs.inputBytes) }}</span>
+                        <n-divider vertical></n-divider>
+                        <span>{{ flowFormat(obs.outputBytes) }}</span>
+                      </div>
+                    </div>
+                  </n-list-item>
+                </n-list>
+                <n-empty v-else style="width: 100%;" description="暂无数据"></n-empty>
+              </n-scrollbar>
+            </n-card>
+          </n-el>
+        </n-grid-item>
+
         <n-grid-item :span="gridColsComputed">
           <n-el tag="div" :style="cardStyleComputed">
             <AppCard :show-border="false" style="min-height: 300px">
@@ -544,7 +741,8 @@ const alertSystemConfigBaseUrl = computed(() => {
         <n-form-item label="邮箱" path="target">
           <n-input-group>
             <n-input v-model:value="state.bindEmail.data.target" placeholder="请输入邮箱"></n-input>
-            <n-button :disabled="state.bindEmail.data.target===''" type="info" @click="genBindEmailCodeFunc" :loading="state.bindEmail.genLoading">
+            <n-button :disabled="state.bindEmail.data.target===''" type="info" @click="genBindEmailCodeFunc"
+                      :loading="state.bindEmail.genLoading">
               {{ state.bindEmail.data.key === '' ? '发送' : '重新发送' }}
             </n-button>
           </n-input-group>
@@ -564,5 +762,8 @@ const alertSystemConfigBaseUrl = computed(() => {
 :deep(.userinfo-label), :deep(.n-thing-header__title) {
   font-weight: bold !important;
   font-size: 14px !important;
+}
+:deep(.n-card){
+  border: none;
 }
 </style>

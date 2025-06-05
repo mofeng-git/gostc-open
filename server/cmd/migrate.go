@@ -101,9 +101,6 @@ var MigrateCmd = cobra.Command{
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClient{}); err != nil {
 				return err
 			}
-			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClientLogger{}); err != nil {
-				return err
-			}
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClientForward{}); err != nil {
 				return err
 			}
@@ -120,9 +117,6 @@ var MigrateCmd = cobra.Command{
 				return err
 			}
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostNode{}); err != nil {
-				return err
-			}
-			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostNodeLogger{}); err != nil {
 				return err
 			}
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostNodeBind{}); err != nil {
@@ -166,14 +160,12 @@ var MigrateCmd = cobra.Command{
 
 func Migrate[Model model.GostAuth |
 	model.GostClient |
-	model.GostClientLogger |
 	model.GostClientForward |
 	model.GostClientHost |
 	model.GostClientP2P |
 	model.GostClientProxy |
 	model.GostClientTunnel |
 	model.GostNode |
-	model.GostNodeLogger |
 	model.GostNodeBind |
 	model.GostNodeConfig |
 	model.GostNodeDomain |

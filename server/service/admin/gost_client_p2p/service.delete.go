@@ -25,7 +25,7 @@ func (service *service) Delete(req DeleteReq) error {
 			log.Error("删除用户P2P隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientRemoveP2PConfig(*p2p, p2p.Node)
+		gost_engine.ClientRemoveP2PConfig(*p2p)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

@@ -20,7 +20,6 @@ type ConfigReq struct {
 	Limiter      int    `json:"limiter"`
 	RLimiter     int    `json:"rLimiter"`
 	CLimiter     int    `json:"cLimiter"`
-	OnlyChina    int    `json:"onlyChina"`
 	ExpAt        string `json:"expAt"`
 }
 
@@ -58,7 +57,6 @@ func (service *service) Config(req ConfigReq) error {
 		host.Limiter = req.Limiter
 		host.RLimiter = req.RLimiter
 		host.CLimiter = req.CLimiter
-		host.OnlyChina = req.OnlyChina
 		host.ExpAt = expAt.Unix()
 		if err = tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析配置失败", zap.Error(err))

@@ -108,7 +108,6 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			Name:         "自建节点套餐",
 			ChargingType: model.GOST_CONFIG_CHARGING_FREE,
 			NodeCode:     node.Code,
-			OnlyChina:    2,
 		}); err != nil {
 			log.Error("新增节点失败", zap.Error(err))
 			return errors.New("操作失败")

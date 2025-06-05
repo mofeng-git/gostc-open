@@ -5,6 +5,7 @@ import (
 	"github.com/go-gost/core/logger"
 	"github.com/go-gost/x/config/parsing"
 	xlogger "github.com/go-gost/x/logger"
+	arpcLog "github.com/lesismal/arpc/log"
 	frpLog "gostc-sub/pkg/p2p/pkg/util/log"
 	"log"
 	"sync"
@@ -33,6 +34,7 @@ func init() {
 	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
 	parsing.SetDefaultTLSConfig(tlsConfig)
 	frpLog.RefreshDefault()
+	arpcLog.SetLevel(arpcLog.LevelError)
 }
 
 var Logger = NewCircularLogger(10000)
