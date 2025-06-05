@@ -14,9 +14,10 @@ func InitServer() {
 	var domains = make(map[string]proxy.DomainConfig)
 	for domain, item := range global.Config.Domains {
 		domains[domain] = proxy.DomainConfig{
-			Target: item.Target,
-			Cert:   item.Cert,
-			Key:    item.Key,
+			Target:     item.Target,
+			Cert:       item.Cert,
+			Key:        item.Key,
+			ForceHttps: item.ForceHttps,
 		}
 	}
 
@@ -24,9 +25,10 @@ func InitServer() {
 		HTTPAddr:  global.Config.HTTPAddr,
 		HTTPSAddr: global.Config.HTTPSAddr,
 		Default: proxy.DomainConfig{
-			Target: global.Config.Default.Target,
-			Cert:   global.Config.Default.Cert,
-			Key:    global.Config.Default.Key,
+			Target:     global.Config.Default.Target,
+			Cert:       global.Config.Default.Cert,
+			Key:        global.Config.Default.Key,
+			ForceHttps: global.Config.Default.ForceHttps,
 		},
 		Domains: domains,
 	}, global.Logger)

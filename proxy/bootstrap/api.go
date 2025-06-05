@@ -16,10 +16,11 @@ import (
 )
 
 type DomainReq struct {
-	Domain string `json:"domain"`
-	Target string `json:"target"`
-	Cert   string `json:"cert"`
-	Key    string `json:"key"`
+	Domain     string `json:"domain"`
+	Target     string `json:"target"`
+	Cert       string `json:"cert"`
+	Key        string `json:"key"`
+	ForceHttps int    `json:"forceHttps"`
 }
 
 func verifyCertificateAndKey(cert, key string) error {
@@ -71,18 +72,20 @@ func InitApi() {
 		}
 
 		global.Config.Domains[req.Domain] = configs.DomainConfig{
-			Target: req.Target,
-			Cert:   certFile,
-			Key:    keyFile,
+			Target:     req.Target,
+			Cert:       certFile,
+			Key:        keyFile,
+			ForceHttps: req.ForceHttps == 1,
 		}
 		marshal, _ := yaml.Marshal(global.Config)
 		if err := os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644); err != nil {
 			global.Logger.Error("save config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
 		}
 		server.UpdateDomain(req.Domain, proxy.DomainConfig{
-			Target: req.Target,
-			Cert:   certFile,
-			Key:    keyFile,
+			Target:     req.Target,
+			Cert:       certFile,
+			Key:        keyFile,
+			ForceHttps: req.ForceHttps == 1,
 		})
 	})
 

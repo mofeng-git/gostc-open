@@ -20,6 +20,7 @@ type Server struct {
 	proxyMap          map[string]*httputil.ReverseProxy
 	targetMap         map[string]*url.URL
 	certMap           map[string]*tls.Certificate
+	forceHttps        map[string]*bool
 	defaultCert       *tls.Certificate
 	defaultProxy      *httputil.ReverseProxy
 	defaultTarget     *url.URL
@@ -43,6 +44,7 @@ func NewServer(cfg Config, log *zap.Logger) *Server {
 		proxyMap:          make(map[string]*httputil.ReverseProxy),
 		targetMap:         make(map[string]*url.URL),
 		certMap:           make(map[string]*tls.Certificate),
+		forceHttps:        make(map[string]*bool),
 		defaultCert:       nil,
 		defaultProxy:      nil,
 		defaultTarget:     nil,
@@ -111,6 +113,7 @@ func (server *Server) UpdateDomain(domain string, cfg DomainConfig) {
 			delete(server.certMap, domain)
 		}
 	}
+	server.forceHttps[domain] = &cfg.ForceHttps
 }
 
 func (server *Server) configureTransport(proxy *httputil.ReverseProxy) {
@@ -195,7 +198,8 @@ func (server *Server) StartHTTPSServer() error {
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 		GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			cert, err := server.findCert(hello.ServerName)
+			matcher := server.findDomainMatcher(hello.ServerName)
+			cert, err := server.findCert(matcher)
 			if err != nil {
 				return nil, err
 			}
@@ -232,13 +236,11 @@ func (server *Server) findDomainMatcher(domain string) *domainMatcher {
 	return matcher
 }
 
-func (server *Server) findCert(domain string) (cert *tls.Certificate, err error) {
-	matcher := server.findDomainMatcher(domain)
-
+func (server *Server) findCert(matcher *domainMatcher) (cert *tls.Certificate, err error) {
 	server.mu.RLock()
 	defer server.mu.RUnlock()
 	var exists bool
-	cert, exists = server.certMap[domain]
+	cert, exists = server.certMap[matcher.FullDomain]
 	if exists {
 		return cert, nil
 	}
@@ -256,12 +258,11 @@ func (server *Server) findCert(domain string) (cert *tls.Certificate, err error)
 	return server.defaultCert, nil
 }
 
-func (server *Server) findProxy(domain string) (proxy *httputil.ReverseProxy, err error) {
-	matcher := server.findDomainMatcher(domain)
+func (server *Server) findProxy(matcher *domainMatcher) (proxy *httputil.ReverseProxy, err error) {
 	server.mu.RLock()
 	defer server.mu.RUnlock()
 	var exists bool
-	proxy, exists = server.proxyMap[domain]
+	proxy, exists = server.proxyMap[matcher.FullDomain]
 	if exists {
 		return proxy, nil
 	}
@@ -279,12 +280,11 @@ func (server *Server) findProxy(domain string) (proxy *httputil.ReverseProxy, er
 	return server.defaultProxy, nil
 }
 
-func (server *Server) findTarget(domain string) (target *url.URL, err error) {
-	matcher := server.findDomainMatcher(domain)
+func (server *Server) findTarget(matcher *domainMatcher) (target *url.URL, err error) {
 	server.mu.RLock()
 	defer server.mu.RUnlock()
 	var exists bool
-	target, exists = server.targetMap[domain]
+	target, exists = server.targetMap[matcher.FullDomain]
 	if exists {
 		return target, nil
 	}
@@ -300,6 +300,35 @@ func (server *Server) findTarget(domain string) (target *url.URL, err error) {
 		return nil, errors.New("no match backend for this domain")
 	}
 	return server.defaultTarget, nil
+}
+
+func (server *Server) isForceHttps(matcher *domainMatcher) bool {
+	if server.httpsServer == nil {
+		return false
+	}
+	server.mu.RLock()
+	defer server.mu.RUnlock()
+	var exists bool
+	var target *bool
+	target, exists = server.forceHttps[matcher.FullDomain]
+	if exists {
+		return *target
+	}
+	target, exists = server.forceHttps[matcher.DotDomain]
+	if exists {
+		return *target
+	}
+	target, exists = server.forceHttps[matcher.StarDomain]
+	if exists {
+		return *target
+	}
+	return false
+}
+
+func (server *Server) httpsRedirect(w http.ResponseWriter, r *http.Request) {
+	host, _, _ := net.SplitHostPort(r.Host)
+	_, httpsPort, _ := net.SplitHostPort(server.httpsAddr)
+	http.Redirect(w, r, "https://"+host+":"+httpsPort+r.RequestURI, http.StatusMovedPermanently)
 }
 
 func (server *Server) httpProxyHandler(w http.ResponseWriter, r *http.Request) {
@@ -320,14 +349,21 @@ func (server *Server) httpProxyHandler(w http.ResponseWriter, r *http.Request) {
 	if h, _, err := net.SplitHostPort(host); err == nil {
 		domain = h
 	}
+	matcher := server.findDomainMatcher(domain)
 
-	proxy, err := server.findProxy(domain)
+	// 强制HTTPS
+	if server.isForceHttps(matcher) {
+		server.httpsRedirect(w, r)
+		return
+	}
+
+	proxy, err := server.findProxy(matcher)
 	if err != nil {
 		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
 		return
 	}
 
-	target, err := server.findTarget(domain)
+	target, err := server.findTarget(matcher)
 	if err != nil {
 		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
 		return
@@ -358,20 +394,20 @@ func (server *Server) httpsProxyHandler(w http.ResponseWriter, r *http.Request) 
 		domain = h
 	}
 
-	proxy, err := server.findProxy(domain)
+	matcher := server.findDomainMatcher(domain)
+
+	proxy, err := server.findProxy(matcher)
 	if err != nil {
 		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
 		return
 	}
-
-	//target, err := server.findTarget(domain)
-	//if err != nil {
-	//	http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
-	//	return
-	//}
-
+	target, err := server.findTarget(matcher)
+	if err != nil {
+		http.Error(w, "No backend configured for this domain", http.StatusBadGateway)
+		return
+	}
 	r.Header.Set("X-Forwarded-Host", r.Host)
-	r.Header.Set("X-Origin-Host", r.Host)
+	r.Header.Set("X-Origin-Host", target.Host)
 	r.Host = domain
 	proxy.ServeHTTP(w, r)
 }

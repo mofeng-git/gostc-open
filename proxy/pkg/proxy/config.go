@@ -14,9 +14,10 @@ type Config struct {
 }
 
 type DomainConfig struct {
-	Target string `yaml:"target"`
-	Cert   string `yaml:"cert"`
-	Key    string `yaml:"key"`
+	Target     string `yaml:"target"`
+	Cert       string `yaml:"cert"`
+	Key        string `yaml:"key"`
+	ForceHttps bool   `yaml:"force-https"` // 是否强制HTTPS
 }
 
 func (cfg DomainConfig) Generate() (*url.URL, *httputil.ReverseProxy, *tls.Certificate) {

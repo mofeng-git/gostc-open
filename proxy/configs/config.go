@@ -11,7 +11,8 @@ type Config struct {
 
 // DomainConfig 定义域名配置
 type DomainConfig struct {
-	Target string `yaml:"target"`
-	Cert   string `yaml:"cert"`
-	Key    string `yaml:"key"`
+	Target     string `yaml:"target"`
+	Cert       string `yaml:"cert"`
+	Key        string `yaml:"key"`
+	ForceHttps bool   `yaml:"force-https"`
 }
