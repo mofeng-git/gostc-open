@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
+	rpcService "gostc-sub/internal/service/rpc"
 	"os"
 	"strconv"
 	"sync"
@@ -74,7 +75,7 @@ func configExample() {
 func startForConfig() {
 	wg := &sync.WaitGroup{}
 	for _, client := range Cfg.Clients {
-		svc := service2.NewClient(common.GenerateWsUrl(client.Tls, client.Address), client.Key)
+		svc := rpcService.NewClient(common.GenerateWsUrl(client.Tls, client.Address), client.Key)
 		if err := svc.Start(); err != nil {
 			fmt.Println(client.Key, client.Remark, "启动失败", err)
 		}

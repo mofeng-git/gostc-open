@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
+	rpcService "gostc-sub/internal/service/rpc"
 	"gostc-sub/webui/backend/bootstrap"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
@@ -19,7 +20,7 @@ func init() {
 			var client model.Client
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &client)
-			svc := service2.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), client.Key)
+			svc := rpcService.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), client.Key)
 			global.ClientMap.Store(client.Key, svc)
 			if client.AutoStart == 1 {
 				_ = svc.Start()

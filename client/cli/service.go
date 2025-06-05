@@ -8,6 +8,7 @@ import (
 	"gostc-sub/gui/global"
 	"gostc-sub/internal/common"
 	"gostc-sub/internal/service"
+	rpcService "gostc-sub/internal/service/rpc"
 	"gostc-sub/pkg/env"
 	"gostc-sub/pkg/signal"
 	"gostc-sub/webui/backend/bootstrap"
@@ -153,9 +154,9 @@ func (p *program) run() {
 		var svc service.Service
 		switch mode {
 		case "server":
-			svc = service.NewServer(wsurl, key, proxyBaseUrl)
+			svc = rpcService.NewNode(wsurl, key, proxyBaseUrl)
 		case "client":
-			svc = service.NewClient(wsurl, key)
+			svc = rpcService.NewClient(wsurl, key)
 		}
 		if err := svc.Start(); err != nil {
 			log.Fatalln("启动失败", err)
