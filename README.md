@@ -21,7 +21,7 @@
 [地址](https://gost.sian.one)
 
 ## License
-This project is licensed under the [CC0-1.0 license](https://github.com/SianHH/gostc-open?tab=CC0-1.0-1-ov-file).
+This project is licensed under the [Apache-2.0 License](https://github.com/SianHH/gostc-open?tab=Apache-2.0-1-ov-file).
 
 ## 预览
 
