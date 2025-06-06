@@ -8,7 +8,7 @@ import (
 )
 
 func InitDashboard(group *gin.RouterGroup) {
-	g := group.Group("dashboard", middleware.Auth(global.Jwt), middleware.AuthAdmin())
+	g := group.Group("dashboard", middleware.Auth(global.Jwt))
 	g.POST("clientObsDate", dashboard.ClientObsDate)
 	g.POST("clientHostObsDate", dashboard.ClientHostObsDate)
 	g.POST("clientForwardObsDate", dashboard.ClientForwardObsDate)
