@@ -69,12 +69,14 @@ func (svc *Client) run() (err error) {
 	if err != nil {
 		return err
 	}
-	defer client.Stop()
 	client.Keepalive(time.Second * 15)
 	client.Handler.SetReadTimeout(time.Second * 50)
 	event, err := event_client.NewEvent(client, svc.key)
 	if err != nil {
 		return err
+	}
+	svc.stopFunc = func() {
+		client.Stop()
 	}
 	return event.Run()
 }

@@ -82,6 +82,7 @@ func InitGost(engine *gin.Engine, ln net.Listener) {
 		} else {
 			gost_engine.EngineRegistry.Set(clientEngine)
 		}
+		cache.SetClientLastTime(gostClient.Code)
 		cache.SetClientOnline(gostClient.Code, true, cache2.NoExpiration)
 		cache.SetClientVersion(gostClient.Code, version)
 		client.Set("code", gostClient.Code)
