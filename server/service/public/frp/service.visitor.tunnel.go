@@ -42,19 +42,19 @@ func (s *service) VisitorTunnel(key string) (TunnelConfig, error) {
 					UseEncryption:  true,
 					UseCompression: true,
 				},
-				SecretKey:  tunnel.VKey,
+				SecretKey:  tunnel.VKey + "_stcp",
 				ServerName: tunnel.Code + "_stcp",
 			},
 		},
 		SUDP: v1.SUDPVisitorConfig{
 			VisitorBaseConfig: v1.VisitorBaseConfig{
-				Name: tunnel.Code + "_visitorstudp",
+				Name: tunnel.Code + "_visitorsudp",
 				Type: "sudp",
 				Transport: v1.VisitorTransport{
 					UseEncryption:  true,
 					UseCompression: true,
 				},
-				SecretKey:  tunnel.VKey,
+				SecretKey:  tunnel.VKey + "_sudp",
 				ServerName: tunnel.Code + "_sudp",
 			},
 		},

@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-// {"version":"0.1.0","op":"NewProxy","content":{"user":{"user":"","metas":{"password":"2l5y63jh3r","user":"5gzxwh2ntg"},"run_id":"ade0a11d3c56d017"},"proxy_name":"bfe50ee4-72b7-495e-84a3-fe43b0a49321_proxy","proxy_type":"tcp","use_encryption":true,"use_compression":true,"bandwidth_limit":"256KB","metas":{"password":"2l5y63jh3r","user":"5gzxwh2ntg"},"remote_port":10064}}
 type NewProxyReq struct {
 	Version string `json:"version"`
 	Op      string `json:"op"`
@@ -37,6 +36,8 @@ type NewProxyReq struct {
 		Headers           struct {
 			XFromWhere string `json:"x-from-where"`
 		} `json:"headers"`
+		Sk         string   `json:"sk"`
+		AllowUsers []string `json:"allow_users"`
 	} `json:"content"`
 }
 

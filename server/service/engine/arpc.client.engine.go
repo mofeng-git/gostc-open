@@ -223,7 +223,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 						LocalPort: utils.StrMustInt(tunnel.TargetPort),
 					},
 				},
-				Secretkey: tunnel.VKey,
+				Secretkey:  tunnel.VKey + "_stcp",
+				AllowUsers: []string{"*"},
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,
@@ -246,7 +247,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 						LocalPort: utils.StrMustInt(tunnel.TargetPort),
 					},
 				},
-				Secretkey: tunnel.VKey,
+				Secretkey:  tunnel.VKey + "_sudp",
+				AllowUsers: []string{"*"},
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,
