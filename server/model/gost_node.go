@@ -51,6 +51,13 @@ func (n GostNode) GetAddress() (host string, port int) {
 	return splitHost, port
 }
 
+func (n GostNode) GetOriginAddress() (host string, port int) {
+	var address = n.Address
+	splitHost, splitPort, _ := net.SplitHostPort(address)
+	port, _ = strconv.Atoi(splitPort)
+	return splitHost, port
+}
+
 func (n GostNode) GetDomainFull(domainPrefix string, customDomain string, enableCustom bool) string {
 	if enableCustom && customDomain != "" {
 		if n.UrlTpl == "" {

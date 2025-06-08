@@ -41,7 +41,7 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 		return err
 	}
 
-	serverAddr, serverPort := node.GetAddress()
+	serverAddr, serverPort := node.GetOriginAddress()
 	var data = ServerConfig{
 		Key: node.Code,
 		ServerConfig: v1.ServerConfig{
