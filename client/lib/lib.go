@@ -5,6 +5,7 @@ import (
 	"gostc-sub/webui/backend/bootstrap"
 	_ "gostc-sub/webui/backend/router"
 	_ "gostc-sub/webui/backend/todo"
+	"runtime"
 )
 
 func init() {
@@ -36,6 +37,10 @@ func IsRunning() string {
 		return "1"
 	}
 	return "2"
+}
+
+func GetPlatform() string {
+	return runtime.GOOS
 }
 
 func GetErrMsg() string {

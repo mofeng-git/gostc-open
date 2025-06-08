@@ -88,7 +88,7 @@ func UserInfo(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	userInfo, err := svr.UserInfo(claims)
 	if err != nil {
-		bean.Response.Fail(c, err.Error())
+		bean.Response.AuthInvalid(c)
 		return
 	}
 	bean.Response.OkData(c, userInfo)
@@ -124,7 +124,6 @@ func OpenOtp(c *gin.Context) {
 	}
 	bean.Response.Ok(c)
 }
-
 func CloseOtp(c *gin.Context) {
 	if err := svr.CloseOtp(middleware.GetClaims(c)); err != nil {
 		bean.Response.Fail(c, err.Error())

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"server/bootstrap"
 	"server/global"
@@ -10,6 +11,7 @@ import (
 	"server/router/admin"
 	"server/router/auth"
 	"server/router/normal"
+	"server/router/open"
 	"server/router/public"
 	"server/router/rpc"
 	"strings"
@@ -17,6 +19,10 @@ import (
 
 func init() {
 	bootstrap.Route = func(engine *gin.Engine) {
+		// 使用GZIP压缩数据
+		engine.Use(gzip.Gzip(gzip.DefaultCompression))
+
+		// 记录HTTP请求日志
 		httpLog := logger.NewLogger(logger.Option{
 			To:         []string{global.BASE_PATH + "/data/httpLog/access.log"},
 			Level:      "debug",
@@ -49,8 +55,8 @@ func init() {
 
 		publicGroup := engine.Group("api/v1/public")
 		public.InitSystemConfig(publicGroup)
+		public.InitFrp(publicGroup)
 		public.InitGost(publicGroup)
-		public.InitP2P(publicGroup)
 
 		authGroup := engine.Group("api/v1/auth")
 		auth.InitAuth(authGroup)
@@ -68,11 +74,14 @@ func init() {
 		normal.InitSystemNotice(normalGroup)
 		normal.InitDashboard(normalGroup)
 
+		openGroup := engine.Group("api/v1/open")
+		open.InitAuth(openGroup.Group("auth"))
+
 		// RPC Server
 		ln, err := websocket.Listen(global.Config.Address, nil)
 		if err != nil {
 			panic("rpc server listen fail,err" + err.Error())
 		}
-		rpc.InitGost(engine, ln)
+		rpc.InitFrp(engine, ln)
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type DeleteReq struct {
@@ -35,7 +35,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 			log.Error("删除用户域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientRemoveHostConfig(tx, *host, host.Node)
+		engine.ClientRemoveHostConfig(tx, *host, host.Node)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

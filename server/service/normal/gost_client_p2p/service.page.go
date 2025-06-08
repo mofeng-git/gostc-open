@@ -85,9 +85,12 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			TargetPort: p2p.TargetPort,
 			VKey:       p2p.VKey,
 			Node: ItemNode{
-				Code:              p2p.NodeCode,
-				Name:              p2p.Node.Name,
-				Address:           p2p.Node.Address,
+				Code: p2p.NodeCode,
+				Name: p2p.Node.Name,
+				Address: func() string {
+					address, _ := p2p.Node.GetAddress()
+					return address
+				}(),
 				Online:            utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
 				P2PDisableForward: p2p.Node.P2PDisableForward,
 			},
@@ -103,9 +106,9 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Cycle:        p2p.Cycle,
 				Amount:       p2p.Amount.String(),
 				Limiter:      p2p.Limiter,
-				RLimiter:     p2p.RLimiter,
-				CLimiter:     p2p.CLimiter,
-				ExpAt:        time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     p2p.RLimiter,
+				//CLimiter:     p2p.CLimiter,
+				ExpAt: time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:    p2p.Enable,
 			WarnMsg:   warn_msg.GetP2PWarnMsg(*p2p),

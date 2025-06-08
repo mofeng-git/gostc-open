@@ -5,8 +5,10 @@ import (
 	"errors"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
+	service3 "gostc-sub/internal/service/visitor"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
+	"strconv"
 )
 
 type StatusReq struct {
@@ -25,15 +27,16 @@ func (*service) Status(req StatusReq) error {
 
 	svc, ok := global.P2PMap.Load(req.Key)
 	if !ok {
-		svc = service2.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, p2p.Port)
+		port, _ := strconv.Atoi(p2p.Port)
+		svc = service3.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, port)
 		global.P2PMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {
-		if err := svc.(*service2.P2P).Start(); err != nil {
+		if err := svc.(service2.Service).Start(); err != nil {
 			return err
 		}
 	} else {
-		svc.(*service2.P2P).Stop()
+		svc.(service2.Service).Stop()
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"gorm.io/gen"
+	"net"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -95,10 +96,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			TargetPort: p2p.TargetPort,
 			VKey:       p2p.VKey,
 			Node: ItemNode{
-				Code:    p2p.NodeCode,
-				Name:    p2p.Node.Name,
-				Address: p2p.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
+				Code: p2p.NodeCode,
+				Name: p2p.Node.Name,
+				Address: func() string {
+					address, _, _ := net.SplitHostPort(p2p.Node.Address)
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,
@@ -111,9 +115,9 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				Cycle:        p2p.Cycle,
 				Amount:       p2p.Amount.String(),
 				Limiter:      p2p.Limiter,
-				RLimiter:     p2p.RLimiter,
-				CLimiter:     p2p.CLimiter,
-				ExpAt:        time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     p2p.RLimiter,
+				//CLimiter:     p2p.CLimiter,
+				ExpAt: time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:    p2p.Enable,
 			WarnMsg:   warn_msg.GetP2PWarnMsg(*p2p),

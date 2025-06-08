@@ -35,22 +35,16 @@ type Item struct {
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
 	UrlTpl           string `json:"urlTpl"`
 	Address          string `json:"address"`
+	ReplaceAddress   string `json:"replaceAddress"`
 	Protocol         string `json:"protocol"`
-	TunnelConnPort   string `json:"tunnelConnPort"`
-	TunnelInPort     string `json:"tunnelInPort"`
-	TunnelMetadata   string `json:"tunnelMetadata"`
+	HttpPort         string `json:"httpPort"`
 
-	ForwardConnPort       string   `json:"forwardConnPort"`
-	ForwardPorts          string   `json:"forwardPorts"`
-	ForwardMetadata       string   `json:"forwardMetadata"`
-	Rules                 []string `json:"rules"`
-	RuleNames             []string `json:"ruleNames"`
-	Tags                  []string `json:"tags"`
-	IndexValue            int      `json:"indexValue"`
-	TunnelReplaceAddress  string   `json:"tunnelReplaceAddress"`
-	ForwardReplaceAddress string   `json:"forwardReplaceAddress"`
-	P2PPort               string   `json:"p2pPort"`
-	P2PDisableForward     int      `json:"p2pDisableForward"`
+	ForwardPorts      string   `json:"forwardPorts"`
+	Rules             []string `json:"rules"`
+	RuleNames         []string `json:"ruleNames"`
+	Tags              []string `json:"tags"`
+	IndexValue        int      `json:"indexValue"`
+	P2PDisableForward int      `json:"p2pDisableForward"`
 
 	Online      int    `json:"online"`
 	Version     string `json:"version"`
@@ -118,44 +112,38 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			}
 		}
 		list = append(list, Item{
-			Code:                  node.Code,
-			Key:                   node.Key,
-			Name:                  name,
-			Remark:                utils.TrinaryOperation(node.Remark == "", "暂无介绍", node.Remark),
-			UserAccount:           account,
-			Web:                   node.Web,
-			Tunnel:                node.Tunnel,
-			Forward:               node.Forward,
-			Proxy:                 node.Proxy,
-			P2P:                   node.P2P,
-			Domain:                node.Domain,
-			CustomDomain:          utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
-			DenyDomainPrefix:      node.DenyDomainPrefix,
-			UrlTpl:                node.UrlTpl,
-			Address:               node.Address,
-			Protocol:              node.Protocol,
-			TunnelConnPort:        node.TunnelConnPort,
-			TunnelInPort:          node.TunnelInPort,
-			TunnelMetadata:        node.TunnelMetadata,
-			ForwardConnPort:       node.ForwardConnPort,
-			ForwardPorts:          node.ForwardPorts,
-			ForwardMetadata:       node.ForwardMetadata,
-			Rules:                 node.GetRules(),
-			RuleNames:             ruleNames,
-			Tags:                  node.GetTags(),
-			IndexValue:            node.IndexValue,
-			TunnelReplaceAddress:  node.TunnelReplaceAddress,
-			ForwardReplaceAddress: node.ForwardReplaceAddress,
-			P2PPort:               node.P2PPort,
-			P2PDisableForward:     node.P2PDisableForward,
-			Online:                utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
-			Version:               cache.GetNodeVersion(node.Code),
-			InputBytes:            monthObsInfo.InputBytes,
-			OutputBytes:           monthObsInfo.OutputBytes,
-			LimitResetIndex:       node.LimitResetIndex,
-			LimitTotal:            node.LimitTotal,
-			LimitKind:             node.LimitKind,
-			LimitUseTotal:         obsUseTotal,
+			Code:              node.Code,
+			Key:               node.Key,
+			Name:              name,
+			Remark:            utils.TrinaryOperation(node.Remark == "", "暂无介绍", node.Remark),
+			UserAccount:       account,
+			Web:               node.Web,
+			Tunnel:            node.Tunnel,
+			Forward:           node.Forward,
+			Proxy:             node.Proxy,
+			P2P:               node.P2P,
+			Domain:            node.Domain,
+			CustomDomain:      utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
+			DenyDomainPrefix:  node.DenyDomainPrefix,
+			UrlTpl:            node.UrlTpl,
+			Address:           node.Address,
+			ReplaceAddress:    node.ReplaceAddress,
+			Protocol:          node.Protocol,
+			HttpPort:          node.HttpPort,
+			ForwardPorts:      node.ForwardPorts,
+			Rules:             node.GetRules(),
+			RuleNames:         ruleNames,
+			Tags:              node.GetTags(),
+			IndexValue:        node.IndexValue,
+			P2PDisableForward: node.P2PDisableForward,
+			Online:            utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
+			Version:           cache.GetNodeVersion(node.Code),
+			InputBytes:        monthObsInfo.InputBytes,
+			OutputBytes:       monthObsInfo.OutputBytes,
+			LimitResetIndex:   node.LimitResetIndex,
+			LimitTotal:        node.LimitTotal,
+			LimitUseTotal:     obsUseTotal,
+			LimitKind:         node.LimitKind,
 		})
 	}
 	return list, total

@@ -93,16 +93,16 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 		db.GostClientForward.Node,
 	).Where(where...).Order(db.GostClientForward.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, forward := range forwards {
-		var mathcers []ItemMatcher
-		for _, item := range forward.GetMatcher() {
-			mathcers = append(mathcers, ItemMatcher{
-				Host:       item.Host,
-				TargetIp:   item.TargetIp,
-				TargetPort: item.TargetPort,
-			})
-		}
-		tcpIp, tcpPort := forward.GetTcpMatcher()
-		sshIp, sshPort := forward.GetSSHMatcher()
+		//var mathcers []ItemMatcher
+		//for _, item := range forward.GetMatcher() {
+		//	mathcers = append(mathcers, ItemMatcher{
+		//		Host:       item.Host,
+		//		TargetIp:   item.TargetIp,
+		//		TargetPort: item.TargetPort,
+		//	})
+		//}
+		//tcpIp, tcpPort := forward.GetTcpMatcher()
+		//sshIp, sshPort := forward.GetSSHMatcher()
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, forward.Code)
 		list = append(list, Item{
 			Code:          forward.Code,
@@ -112,9 +112,12 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			ProxyProtocol: forward.ProxyProtocol,
 			Port:          forward.Port,
 			Node: ItemNode{
-				Code:         forward.NodeCode,
-				Name:         forward.Node.Name,
-				Address:      forward.Node.Address,
+				Code: forward.NodeCode,
+				Name: forward.Node.Name,
+				Address: func() string {
+					address, _ := forward.Node.GetAddress()
+					return address
+				}(),
 				Online:       utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
 				ForwardPorts: forward.Node.ForwardPorts,
 			},
@@ -128,29 +131,29 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Cycle:        forward.Cycle,
 				Amount:       forward.Amount.String(),
 				Limiter:      forward.Limiter,
-				RLimiter:     forward.RLimiter,
-				CLimiter:     forward.CLimiter,
-				ExpAt:        time.Unix(forward.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     forward.RLimiter,
+				//CLimiter:     forward.CLimiter,
+				ExpAt: time.Unix(forward.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:        forward.Enable,
-			WarnMsg:       warn_msg.GetForwardWarnMsg(*forward),
-			CreatedAt:     forward.CreatedAt.Format(time.DateTime),
-			InputBytes:    obsInfo.InputBytes,
-			OutputBytes:   obsInfo.OutputBytes,
-			MatcherEnable: forward.MatcherEnable,
-			Matchers:      mathcers,
-			TcpMatcher: ItemMatcher{
-				TargetIp:   tcpIp,
-				TargetPort: tcpPort,
-			},
-			SSHMatcher: ItemMatcher{
-				TargetIp:   sshIp,
-				TargetPort: sshPort,
-			},
-			WhiteEnable: forward.WhiteEnable,
-			BlackEnable: forward.BlackEnable,
-			WhiteList:   forward.GetWhiteList(),
-			BlackList:   forward.GetBlackList(),
+			Enable:      forward.Enable,
+			WarnMsg:     warn_msg.GetForwardWarnMsg(*forward),
+			CreatedAt:   forward.CreatedAt.Format(time.DateTime),
+			InputBytes:  obsInfo.InputBytes,
+			OutputBytes: obsInfo.OutputBytes,
+			//MatcherEnable: forward.MatcherEnable,
+			//Matchers: mathcers,
+			//TcpMatcher: ItemMatcher{
+			//	TargetIp:   tcpIp,
+			//	TargetPort: tcpPort,
+			//},
+			//SSHMatcher: ItemMatcher{
+			//	TargetIp:   sshIp,
+			//	TargetPort: sshPort,
+			//},
+			//WhiteEnable: forward.WhiteEnable,
+			//BlackEnable: forward.BlackEnable,
+			//WhiteList:   forward.GetWhiteList(),
+			//BlackList:   forward.GetBlackList(),
 		})
 	}
 	return list, total

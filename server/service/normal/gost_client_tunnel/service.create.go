@@ -11,7 +11,7 @@ import (
 	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/node_rule"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -124,9 +124,9 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				Cycle:        cfg.Cycle,
 				Amount:       cfg.Amount,
 				Limiter:      cfg.Limiter,
-				RLimiter:     cfg.RLimiter,
-				CLimiter:     cfg.CLimiter,
-				ExpAt:        expAt,
+				//RLimiter:     cfg.RLimiter,
+				//CLimiter:     cfg.CLimiter,
+				ExpAt: expAt,
 			},
 		}
 		if err := tx.GostClientTunnel.Create(&tunnel); err != nil {
@@ -144,7 +144,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		cache.SetGostAuth(auth.User, auth.Password, tunnel.Code)
-		gost_engine.ClientTunnelConfig(tx, tunnel.Code)
+		engine.ClientTunnelConfig(tx, tunnel.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        tunnel.Code,
 			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,

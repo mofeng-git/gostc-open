@@ -21,3 +21,7 @@ func GetLoginOtp(key string, remove bool) string {
 	}()
 	return global.Cache.GetString(auth_login_otp_key + key)
 }
+
+func DelLoginOtp(key string) {
+	global.Cache.Del(auth_login_otp_key + key)
+}

@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -54,14 +54,14 @@ func (service *service) Config(req ConfigReq) error {
 		tunnel.Cycle = req.Cycle
 		tunnel.Amount = amount
 		tunnel.Limiter = req.Limiter
-		tunnel.RLimiter = req.RLimiter
-		tunnel.CLimiter = req.CLimiter
+		//tunnel.RLimiter = req.RLimiter
+		//tunnel.CLimiter = req.CLimiter
 		tunnel.ExpAt = expAt.Unix()
 		if err = tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientTunnelConfig(tx, tunnel.Code)
+		engine.ClientTunnelConfig(tx, tunnel.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        tunnel.Code,
 			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,

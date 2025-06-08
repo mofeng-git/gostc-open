@@ -107,6 +107,9 @@ var MigrateCmd = cobra.Command{
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClientHost{}); err != nil {
 				return err
 			}
+			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClientHostDomain{}); err != nil {
+				return err
+			}
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.GostClientP2P{}); err != nil {
 				return err
 			}
@@ -143,10 +146,10 @@ var MigrateCmd = cobra.Command{
 			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUser{}); err != nil {
 				return err
 			}
-			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserCheckin{}); err != nil {
+			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserEmail{}); err != nil {
 				return err
 			}
-			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserEmail{}); err != nil {
+			if err := Migrate(dbMap[sourceDbType].GetDB(), tx, model.SystemUserCheckin{}); err != nil {
 				return err
 			}
 			return nil
@@ -162,6 +165,7 @@ func Migrate[Model model.GostAuth |
 	model.GostClient |
 	model.GostClientForward |
 	model.GostClientHost |
+	model.GostClientHostDomain |
 	model.GostClientP2P |
 	model.GostClientProxy |
 	model.GostClientTunnel |

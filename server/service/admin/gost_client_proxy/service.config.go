@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -55,14 +55,14 @@ func (service *service) Config(req ConfigReq) error {
 		proxy.Cycle = req.Cycle
 		proxy.Amount = amount
 		proxy.Limiter = req.Limiter
-		proxy.RLimiter = req.RLimiter
-		proxy.CLimiter = req.CLimiter
+		//proxy.RLimiter = req.RLimiter
+		//proxy.CLimiter = req.CLimiter
 		proxy.ExpAt = expAt.Unix()
 		if err = tx.GostClientProxy.Save(proxy); err != nil {
 			log.Error("修改代理隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientProxyConfig(tx, proxy.Code)
+		engine.ClientProxyConfig(tx, proxy.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        proxy.Code,
 			Type:        model.GOST_TUNNEL_TYPE_PROXY,

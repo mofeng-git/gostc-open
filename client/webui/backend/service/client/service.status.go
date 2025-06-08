@@ -5,7 +5,6 @@ import (
 	"errors"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
-	rpcService "gostc-sub/internal/service/rpc"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
 )
@@ -26,15 +25,15 @@ func (*service) Status(req StatusReq) error {
 
 	svc, ok := global.ClientMap.Load(req.Key)
 	if !ok {
-		svc = rpcService.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), req.Key)
+		svc = service2.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), common.GenerateHttpUrl(client.Tls == 1, client.Address), req.Key)
 		global.ClientMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {
-		if err := svc.(*service2.Client).Start(); err != nil {
+		if err := svc.(service2.Service).Start(); err != nil {
 			return err
 		}
 	} else {
-		svc.(*service2.Client).Stop()
+		svc.(service2.Service).Stop()
 	}
 	return nil
 }

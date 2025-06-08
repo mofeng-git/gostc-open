@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"gostc-sub/internal/common"
-	rpcService "gostc-sub/internal/service/rpc"
+	rpcService "gostc-sub/internal/service"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
 )
@@ -17,7 +17,7 @@ type UpdateReq struct {
 }
 
 func (*service) Update(req UpdateReq) error {
-	if common.State.Get(req.Key) {
+	if rpcService.State.Get(req.Key) {
 		return errors.New("客户端正在运行中，请停止运行后修改")
 	}
 	if err := global.ClientFS.Update(req.Key, model.Client{
@@ -29,7 +29,7 @@ func (*service) Update(req UpdateReq) error {
 	}); err != nil {
 		return err
 	}
-	client := rpcService.NewClient(common.GenerateWsUrl(req.Tls == 1, req.Address), req.Key)
+	client := rpcService.NewClient(common.GenerateWsUrl(req.Tls == 1, req.Address), common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key)
 	global.ClientMap.Store(req.Key, client)
 	return nil
 }

@@ -15,7 +15,7 @@ func (*service) Delete(req DeleteReq) error {
 	}
 	tunnel, ok := global.TunnelMap.Load(req.Key)
 	if ok {
-		tunnel.(*service2.Tunnel).Stop()
+		tunnel.(service2.Service).Stop()
 	}
 	return nil
 }

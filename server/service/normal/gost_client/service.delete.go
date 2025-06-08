@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/repository"
 	"server/repository/query"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type DeleteReq struct {
@@ -39,7 +39,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 			log.Error("删除客户端失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientStop(client.Code, "客户端已被删除")
+		engine.ClientStop(client.Code, "客户端已被删除")
 		return nil
 	})
 }

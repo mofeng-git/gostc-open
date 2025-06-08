@@ -9,14 +9,11 @@ import (
 	"server/pkg/orm"
 )
 
-var Logger *zap.Logger
-
-var Jwt *jwt.Tool
-
-var Cache memory.Interface
-
-var Config configs.Config
-
-var DB orm.Interface
-
-var Cron *cron.Cron
+var (
+	Logger *zap.Logger
+	Jwt    *jwt.Tool
+	Cache  memory.Interface
+	Config configs.Config
+	DB     orm.Interface
+	Cron   *cron.Cron
+)

@@ -22,7 +22,6 @@ func systemConfig() {
 	}
 	for _, item := range model.GenerateSystemConfigGost(
 		"v1.0.0",
-		"2",
 		"1",
 		"1",
 		"1",

@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	service2 "github.com/SianHH/frp-package/package"
 	system_service "github.com/kardianos/service"
 	"gostc-sub/cli/service_option"
 	"gostc-sub/gui/global"
 	"gostc-sub/internal/common"
 	"gostc-sub/internal/service"
-	rpcService "gostc-sub/internal/service/rpc"
 	"gostc-sub/pkg/env"
 	"gostc-sub/pkg/signal"
 	"gostc-sub/webui/backend/bootstrap"
@@ -28,12 +28,10 @@ var SvcCfg = &system_service.Config{
 var Program = &program{}
 
 type program struct {
+	stopFunc func()
 }
 
-func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string, tun bool) string {
-	if tun {
-		return "tun"
-	}
+func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string, tunCfg string) string {
 	if cfgFile != "" {
 		return "cfg"
 	}
@@ -48,6 +46,9 @@ func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string
 	}
 	if webAddress != "" {
 		return "ui"
+	}
+	if tunCfg != "" {
+		return "tunCfg"
 	}
 	return "client"
 }
@@ -70,8 +71,6 @@ func (p *program) run() {
 	flag.BoolVar(&visit, "v", false, "visit client")
 	var p2p bool
 	flag.BoolVar(&p2p, "p2p", false, "p2p client")
-	var tun bool
-	flag.BoolVar(&tun, "tun", false, "tun client")
 	var wAddress string
 	flag.StringVar(&wAddress, "web-addr", "", "web ui address,example: 0.0.0.0:18080")
 
@@ -80,6 +79,12 @@ func (p *program) run() {
 
 	var cfgFile string
 	flag.StringVar(&cfgFile, "cfg", "", "config file,example: /path/config.yaml")
+
+	// TUN CLI
+	var tunCfg string
+	flag.StringVar(&tunCfg, "tun-cfg", "", "direct tun by cfg, is internal")
+	var tunCfgType string
+	flag.StringVar(&tunCfgType, "tun-cfg-type", "", "tun cfg type, node/master, is internal")
 
 	// 其他参数
 	var proxyBaseUrl string
@@ -111,7 +116,7 @@ func (p *program) run() {
 	var wsurl = common.GenerateWsUrl(tlsEnable, address)
 	var apiurl = common.GenerateHttpUrl(tlsEnable, address)
 
-	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tun)
+	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tunCfg)
 
 	switch mode {
 	case "cfg":
@@ -132,11 +137,13 @@ func (p *program) run() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		p.stopFunc = func() {
+			bootstrap.Release()
+		}
 		<-signal.Free()
-		bootstrap.Release()
 	case "visit", "p2p":
 		runTunnels(mode, vTunnels, apiurl)
-	case "client", "server", "tun":
+	case "client", "server":
 		if key == "" {
 			if mode == "client" {
 				fmt.Println("load configuration file", global.BasePath+"/config.yaml")
@@ -154,12 +161,15 @@ func (p *program) run() {
 		var svc service.Service
 		switch mode {
 		case "server":
-			svc = rpcService.NewNode(wsurl, key, proxyBaseUrl)
+			svc = service.NewNode(wsurl, apiurl, key, proxyBaseUrl)
 		case "client":
-			svc = rpcService.NewClient(wsurl, key)
+			svc = service.NewClient(wsurl, apiurl, key)
 		}
 		if err := svc.Start(); err != nil {
 			log.Fatalln("启动失败", err)
+		}
+		p.stopFunc = func() {
+			svc.Stop()
 		}
 		for {
 			if !svc.IsRunning() {
@@ -180,5 +190,11 @@ func (p *program) Start(s system_service.Service) error {
 	return nil
 }
 func (p *program) Stop(s system_service.Service) error {
+	if p.stopFunc != nil {
+		p.stopFunc()
+	}
+	service2.Range(func(key string, value service2.Service) {
+		value.Stop()
+	})
 	return nil
 }

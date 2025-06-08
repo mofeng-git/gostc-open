@@ -16,7 +16,6 @@ type GostReq struct {
 	FuncTunnel  string `binding:"required" json:"funcTunnel"`
 	FuncP2P     string `binding:"required" json:"funcP2P"`
 	FuncProxy   string `binding:"required" json:"funcProxy"`
-	FuncTun     string `binding:"required" json:"funcTun"`
 	FuncNode    string `binding:"required" json:"funcNode"`
 }
 
@@ -32,7 +31,6 @@ func (service *service) Gost(req GostReq) error {
 			req.FuncTunnel,
 			req.FuncP2P,
 			req.FuncProxy,
-			req.FuncTun,
 			req.FuncNode,
 		)...); err != nil {
 			log.Error("修改系统GOST配置失败", zap.Error(err))
@@ -46,7 +44,6 @@ func (service *service) Gost(req GostReq) error {
 			FuncTunnel:  req.FuncTunnel,
 			FuncP2P:     req.FuncP2P,
 			FuncProxy:   req.FuncProxy,
-			FuncTun:     req.FuncTun,
 			FuncNode:    req.FuncNode,
 		})
 		return nil

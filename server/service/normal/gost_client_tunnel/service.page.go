@@ -87,10 +87,13 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			TargetPort: tunnel.TargetPort,
 			VKey:       tunnel.VKey,
 			Node: ItemNode{
-				Code:    tunnel.NodeCode,
-				Name:    tunnel.Node.Name,
-				Address: tunnel.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				Code: tunnel.NodeCode,
+				Name: tunnel.Node.Name,
+				Address: func() string {
+					address, _ := tunnel.Node.GetAddress()
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(tunnel.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   tunnel.ClientCode,
@@ -104,9 +107,9 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Cycle:        tunnel.Cycle,
 				Amount:       tunnel.Amount.String(),
 				Limiter:      tunnel.Limiter,
-				RLimiter:     tunnel.RLimiter,
-				CLimiter:     tunnel.CLimiter,
-				ExpAt:        time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     tunnel.RLimiter,
+				//CLimiter:     tunnel.CLimiter,
+				ExpAt: time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      tunnel.Enable,
 			WarnMsg:     warn_msg.GetTunnelWarnMsg(*tunnel),

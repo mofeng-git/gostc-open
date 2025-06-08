@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type EnableReq struct {
@@ -34,9 +34,9 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 		return errors.New("操作失败")
 	}
 	if tunnel.Enable == 1 {
-		gost_engine.ClientTunnelConfig(db, tunnel.Code)
+		engine.ClientTunnelConfig(db, tunnel.Code)
 	} else {
-		gost_engine.ClientRemoveTunnelConfig(db, *tunnel, tunnel.Node)
+		engine.ClientRemoveTunnelConfig(db, *tunnel, tunnel.Node)
 	}
 	return nil
 }

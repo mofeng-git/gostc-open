@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type MigrateReq struct {
@@ -35,7 +35,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			return nil
 		}
 		if p2p.Enable == 1 {
-			gost_engine.ClientRemoveP2PConfig(*p2p)
+			engine.ClientRemoveP2PConfig(*p2p)
 		}
 		p2p.ClientCode = req.ClientCode
 		if err := tx.GostClientP2P.Save(p2p); err != nil {
@@ -52,7 +52,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			ExpAt:       p2p.ExpAt,
 			Limiter:     p2p.Limiter,
 		})
-		gost_engine.ClientP2PConfig(tx, p2p.Code)
+		engine.ClientP2PConfig(tx, p2p.Code)
 		return nil
 	})
 }

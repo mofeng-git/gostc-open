@@ -23,6 +23,8 @@ type Item struct {
 	Name        string     `json:"name"`
 	Port        string     `json:"port"`
 	Protocol    string     `json:"protocol"`
+	AuthUser    string     `json:"authUser"`
+	AuthPwd     string     `json:"authPwd"`
 	Node        ItemNode   `json:"node"`
 	Client      ItemClient `json:"client"`
 	Config      ItemConfig `json:"config"`
@@ -40,10 +42,11 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Address      string `json:"address"`
+	Online       int    `json:"online"`
+	ForwardPorts string `json:"forwardPorts"`
 }
 
 type ItemConfig struct {
@@ -81,12 +84,18 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			Code:     proxy.Code,
 			Name:     proxy.Name,
 			Port:     proxy.Port,
+			AuthUser: proxy.AuthUser,
+			AuthPwd:  proxy.AuthPwd,
 			Protocol: proxy.Protocol,
 			Node: ItemNode{
-				Code:    proxy.NodeCode,
-				Name:    proxy.Node.Name,
-				Address: proxy.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
+				Code: proxy.NodeCode,
+				Name: proxy.Node.Name,
+				Address: func() string {
+					address, _ := proxy.Node.GetAddress()
+					return address
+				}(),
+				Online:       utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
+				ForwardPorts: proxy.Node.ForwardPorts,
 			},
 			Client: ItemClient{
 				Code:   proxy.ClientCode,
@@ -98,9 +107,9 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Cycle:        proxy.Cycle,
 				Amount:       proxy.Amount.String(),
 				Limiter:      proxy.Limiter,
-				RLimiter:     proxy.RLimiter,
-				CLimiter:     proxy.CLimiter,
-				ExpAt:        time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     proxy.RLimiter,
+				//CLimiter:     proxy.CLimiter,
+				ExpAt: time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      proxy.Enable,
 			WarnMsg:     warn_msg.GetProxyWarnMsg(*proxy),

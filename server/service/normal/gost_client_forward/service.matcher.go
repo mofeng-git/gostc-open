@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"go.uber.org/zap"
-	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
 	"server/repository/query"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type MatcherReq struct {
@@ -40,24 +39,24 @@ func (service *service) Matcher(claims jwt.Claims, req MatcherReq) error {
 			return errors.New("操作失败")
 		}
 
-		forward.MatcherEnable = req.Enable
-		var matchers []model.ForwardMatcher
-		for _, matcher := range req.Matchers {
-			matchers = append(matchers, model.ForwardMatcher{
-				Host:       matcher.Host,
-				TargetIp:   matcher.TargetIp,
-				TargetPort: matcher.TargetPort,
-			})
-		}
-		forward.SetMatcher(matchers)
-		forward.SetTcpMatcher(req.TcpMatcher.TargetIp, req.TcpMatcher.TargetPort)
-		forward.SetSSHMatcher(req.SSHMatcher.TargetIp, req.SSHMatcher.TargetPort)
+		//forward.MatcherEnable = req.Enable
+		//var matchers []model.ForwardMatcher
+		//for _, matcher := range req.Matchers {
+		//	matchers = append(matchers, model.ForwardMatcher{
+		//		Host:       matcher.Host,
+		//		TargetIp:   matcher.TargetIp,
+		//		TargetPort: matcher.TargetPort,
+		//	})
+		//}
+		//forward.SetMatcher(matchers)
+		//forward.SetTcpMatcher(req.TcpMatcher.TargetIp, req.TcpMatcher.TargetPort)
+		//forward.SetSSHMatcher(req.SSHMatcher.TargetIp, req.SSHMatcher.TargetPort)
 
 		if err := tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientForwardConfig(tx, forward.Code)
+		engine.ClientForwardConfig(tx, forward.Code)
 		return nil
 	})
 }

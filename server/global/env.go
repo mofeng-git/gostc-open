@@ -33,8 +33,8 @@ LOGGER_LEVEL=%s
 }
 
 var (
-	VERSION   = "v1.2.9" // 版本
-	BASE_PATH = ""       // 基础目录
+	VERSION   = "v2.0.0-pro" // 版本
+	BASE_PATH = ""           // 基础目录
 	/*
 		prod:生产模式，程序运行根路径和程序的所在目录保持一致
 		dev:开发模式，程序运行根路径和pwd输出的目录保持一致
@@ -43,4 +43,9 @@ var (
 	MODE             = "dev"
 	LOGGER_FILE_PATH = ""     // 日志文件路径
 	LOGGER_LEVEL     = "info" // 日志等级
+	MaxNodeNum       = 2      // 最大节点数量
+	LICENCE          string
+	LICENCE_URL      string
+	LICENCE_FILE     string
+	LICENCE_PROXY    string
 )

@@ -15,7 +15,7 @@ func (*service) Delete(req DeleteReq) error {
 	}
 	p2p, ok := global.P2PMap.Load(req.Key)
 	if ok {
-		p2p.(*service2.P2P).Stop()
+		p2p.(service2.Service).Stop()
 	}
 	return nil
 }

@@ -49,6 +49,7 @@ func InitPersistence() {
 
 	if err = autoMigrate(global.DB,
 		&model.SystemUser{},
+		&model.SystemUserEmail{},
 		&model.SystemUserCheckin{},
 		&model.SystemConfig{},
 		&model.SystemNotice{},
@@ -66,7 +67,6 @@ func InitPersistence() {
 		&model.GostNodeDomain{},
 		&model.GostNodePort{},
 		&model.GostNodeConfig{},
-		&model.SystemUserEmail{},
 	); err != nil {
 		global.Logger.Fatal("init table struct fail", zap.Error(err))
 		Release()

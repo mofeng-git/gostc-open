@@ -220,14 +220,6 @@ onBeforeMount(() => {
             <span>速率：</span>
             <span>{{ limiterText(state.config.limiter) }}</span>
           </n-space>
-          <n-space>
-            <span>并发数：</span>
-            <span>{{ rLimiterText(state.config.rLimiter) }}</span>
-          </n-space>
-          <n-space>
-            <span>连接数：</span>
-            <span>{{ cLimiterText(state.config.cLimiter) }}</span>
-          </n-space>
         </n-space>
 
         <n-h4 style="font-weight: bold">选择客户端：</n-h4>

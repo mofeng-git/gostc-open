@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -55,14 +55,14 @@ func (service *service) Config(req ConfigReq) error {
 		forward.Cycle = req.Cycle
 		forward.Amount = amount
 		forward.Limiter = req.Limiter
-		forward.RLimiter = req.RLimiter
-		forward.CLimiter = req.CLimiter
+		//forward.RLimiter = req.RLimiter
+		//forward.CLimiter = req.CLimiter
 		forward.ExpAt = expAt.Unix()
 		if err = tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientForwardConfig(tx, forward.Code)
+		engine.ClientForwardConfig(tx, forward.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        forward.Code,
 			Type:        model.GOST_TUNNEL_TYPE_FORWARD,

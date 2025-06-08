@@ -12,7 +12,7 @@ import (
 	"server/service/common/cache"
 	"server/service/common/node_port"
 	"server/service/common/node_rule"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -158,9 +158,9 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 				Cycle:        cfg.Cycle,
 				Amount:       cfg.Amount,
 				Limiter:      cfg.Limiter,
-				RLimiter:     cfg.RLimiter,
-				CLimiter:     cfg.CLimiter,
-				ExpAt:        expAt,
+				//RLimiter:     cfg.RLimiter,
+				//CLimiter:     cfg.CLimiter,
+				ExpAt: expAt,
 			},
 		}
 		if err = tx.GostClientForward.Create(&forward); err != nil {
@@ -180,7 +180,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 			return errors.New("操作失败")
 		}
 		cache.SetGostAuth(auth.User, auth.Password, forward.Code)
-		gost_engine.ClientForwardConfig(tx, forward.Code)
+		engine.ClientForwardConfig(tx, forward.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        forward.Code,
 			Type:        model.GOST_TUNNEL_TYPE_FORWARD,
@@ -195,24 +195,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 	})
 }
 
-const (
-	portCheckRetryInterval = 200 * time.Millisecond
-	maxPortCheckRetries    = 25 // 5*5
-)
-
 func validPortAvailable(tx *query.Query, nodeCode string, port string) bool {
-	async, allow := gost_engine.NodePortCheck(tx, nodeCode, port)
-	if async {
-		return allow
-	}
-	for retry := 0; retry < maxPortCheckRetries; retry++ {
-		time.Sleep(portCheckRetryInterval)
-		inUse, exists := cache.GetNodePortUse(nodeCode, port)
-		if exists {
-			return !inUse
-		}
-	}
-	return false
+	return engine.NodePortCheck(tx, nodeCode, port) == nil
 }
 func GetPort(tx *query.Query, node model.GostNode) (string, error) {
 	for {

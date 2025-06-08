@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type MigrateReq struct {
@@ -40,7 +40,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			return nil
 		}
 		if host.Enable == 1 {
-			gost_engine.ClientRemoveHostConfig(tx, *host, host.Node)
+			engine.ClientRemoveHostConfig(tx, *host, host.Node)
 		}
 		host.ClientCode = req.ClientCode
 		if err := tx.GostClientHost.Save(host); err != nil {
@@ -57,7 +57,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			ExpAt:       host.ExpAt,
 			Limiter:     host.Limiter,
 		})
-		gost_engine.ClientHostConfig(tx, host.Code)
+		engine.ClientHostConfig(tx, host.Code)
 		return nil
 	})
 }

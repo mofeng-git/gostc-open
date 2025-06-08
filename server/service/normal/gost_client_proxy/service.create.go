@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"server/model"
 	"server/pkg/jwt"
@@ -9,14 +10,17 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
+	"server/service/common/node_port"
 	"server/service/common/node_rule"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
 type CreateReq struct {
 	Name       string `binding:"required" json:"name" label:"名称"`
-	Port       string `binding:"required" json:"port" label:"本地端口"`
+	Port       string `json:"port" label:"本地端口"`
+	AuthUser   string `json:"authUser"`
+	AuthPwd    string `json:"authPwd"`
 	Protocol   string `binding:"required" json:"protocol" label:"协议"`
 	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
 	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
@@ -25,7 +29,7 @@ type CreateReq struct {
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	db, _, log := repository.Get("")
-	if !utils.ValidatePort(req.Port) {
+	if req.Port != "" && !utils.ValidatePort(req.Port) {
 		return errors.New("本地端口格式错误")
 	}
 
@@ -107,25 +111,53 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			}
 		}
 
-		if err := CheckPort(tx, *client, req.Port); err != nil {
-			return err
+		var err error
+		var port = req.Port
+		if port == "" {
+			port, err = GetPort(tx, *node)
+			if err != nil {
+				return err
+			}
+		} else {
+			if !node_port.ValidPort(node.Code, req.Port, true) {
+				return errors.New("端口未开放或已被占用")
+			}
+			if cache.GetNodeOnline(req.NodeCode) {
+				if !validPortAvailable(tx, node.Code, req.Port) {
+					return errors.New("端口已被占用")
+				}
+			}
+		}
+
+		if err = tx.GostNodePort.Create(&model.GostNodePort{
+			Port:     port,
+			NodeCode: node.Code,
+		}); err != nil {
+			node_port.ReleasePort(node.Code, port)
+			log.Error("端口转发，端口冲突", zap.Error(err))
+			return errors.New("操作失败")
 		}
 
 		var proxy = model.GostClientProxy{
 			Name:       req.Name,
 			Protocol:   req.Protocol,
-			Port:       req.Port,
+			Port:       port,
+			AuthUser:   req.AuthUser,
+			AuthPwd:    req.AuthPwd,
 			NodeCode:   req.NodeCode,
+			Node:       model.GostNode{},
 			ClientCode: req.ClientCode,
+			Client:     model.GostClient{},
 			UserCode:   claims.Code,
+			User:       model.SystemUser{},
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,
 				Amount:       cfg.Amount,
 				Limiter:      cfg.Limiter,
-				RLimiter:     cfg.RLimiter,
-				CLimiter:     cfg.CLimiter,
-				ExpAt:        expAt,
+				//RLimiter:     cfg.RLimiter,
+				//CLimiter:     cfg.CLimiter,
+				ExpAt: expAt,
 			},
 		}
 		if err := tx.GostClientProxy.Create(&proxy); err != nil {
@@ -143,7 +175,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		cache.SetGostAuth(auth.User, auth.Password, proxy.Code)
-		gost_engine.ClientProxyConfig(tx, proxy.Code)
+		engine.ClientProxyConfig(tx, proxy.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        proxy.Code,
 			Type:        model.GOST_TUNNEL_TYPE_PROXY,
@@ -158,33 +190,23 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	})
 }
 
-const (
-	checkInterval = 200 * time.Millisecond
-	maxRetries    = 25 // 5 seconds total (200ms * 25)
-)
-
-func CheckPort(tx *query.Query, client model.GostClient, port string) error {
-	// 判断客户端状态，离线则不检测端口
-	if !cache.GetClientOnline(client.Code) {
-		return nil
-	}
-	// 发送端口检测消息
-	async, allow := gost_engine.ClientPortCheck(tx, client.Code, port)
-	if async {
-		if allow {
-			return nil
-		} else {
-			return errors.New("端口已被占用")
+func validPortAvailable(tx *query.Query, nodeCode string, port string) bool {
+	return engine.NodePortCheck(tx, nodeCode, port) == nil
+}
+func GetPort(tx *query.Query, node model.GostNode) (string, error) {
+	for {
+		port, err := node_port.GetPort(node.Code)
+		if err != nil {
+			return "", fmt.Errorf("failed to get port: %w", err)
 		}
-	}
-	for retry := 0; retry < maxRetries; retry++ {
-		time.Sleep(checkInterval)
-		if use, ok := cache.GetClientPortUse(client.Code, port); ok {
-			if !use {
-				return nil
-			}
-			return errors.New("端口已被占用")
+		// 判断版本，对离线节点，不检查端口
+		if !cache.GetNodeOnline(node.Code) || cache.GetNodeVersion(node.Code) < "v1.1.7" {
+			return port, nil
 		}
+		// 检测端口
+		if validPortAvailable(tx, node.Code, port) {
+			return port, nil
+		}
+		// 如果端口不可用，则继续循环
 	}
-	return errors.New("验证端口超时")
 }

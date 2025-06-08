@@ -2,6 +2,7 @@ package service
 
 import (
 	"gorm.io/gen"
+	"net"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -97,10 +98,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			TargetPort: tunnel.TargetPort,
 			VKey:       tunnel.VKey,
 			Node: ItemNode{
-				Code:    tunnel.NodeCode,
-				Name:    tunnel.Node.Name,
-				Address: tunnel.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				Code: tunnel.NodeCode,
+				Name: tunnel.Node.Name,
+				Address: func() string {
+					address, _, _ := net.SplitHostPort(tunnel.Node.Address)
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(tunnel.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   tunnel.ClientCode,
@@ -113,9 +117,9 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				Cycle:        tunnel.Cycle,
 				Amount:       tunnel.Amount.String(),
 				Limiter:      tunnel.Limiter,
-				RLimiter:     tunnel.RLimiter,
-				CLimiter:     tunnel.CLimiter,
-				ExpAt:        time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     tunnel.RLimiter,
+				//CLimiter:     tunnel.CLimiter,
+				ExpAt: time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      tunnel.Enable,
 			WarnMsg:     warn_msg.GetTunnelWarnMsg(*tunnel),

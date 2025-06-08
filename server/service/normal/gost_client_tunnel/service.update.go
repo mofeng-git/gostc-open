@@ -7,7 +7,7 @@ import (
 	"server/pkg/utils"
 	"server/repository"
 	"server/repository/query"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type UpdateReq struct {
@@ -47,7 +47,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 			log.Error("修改私有隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientTunnelConfig(tx, tunnel.Code)
+		engine.ClientTunnelConfig(tx, tunnel.Code)
 		return nil
 	})
 }

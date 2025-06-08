@@ -12,11 +12,11 @@ func (u UserLevelRule) Code() string {
 }
 
 func (u UserLevelRule) Name() string {
-	return "账号等级限制1级"
+	return "账号等级限制1级(示例)"
 }
 
 func (u UserLevelRule) Description() string {
-	return "需要账号等级达到1级"
+	return "需要账号等级达到1级(示例)"
 }
 
 func (u UserLevelRule) Allow(tx *query.Query, userCode string) bool {

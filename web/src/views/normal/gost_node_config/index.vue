@@ -154,14 +154,6 @@ onBeforeMount(() => {
                 <span style="font-weight: bold;">速率：</span>
                 <span>{{ limiterText(row.limiter) }}</span>
               </div>
-              <div style="display: flex;justify-content: space-between">
-                <span style="font-weight: bold;">并发数：</span>
-                <span>{{ rLimiterText(row.rLimiter) }}</span>
-              </div>
-              <div style="display: flex;justify-content: space-between">
-                <span style="font-weight: bold;">连接数：</span>
-                <span>{{ cLimiterText(row.cLimiter) }}</span>
-              </div>
             </n-el>
           </n-grid-item>
         </n-grid>

@@ -2,7 +2,7 @@ package service
 
 import (
 	"encoding/json"
-	"gostc-sub/internal/common"
+	service2 "gostc-sub/internal/service"
 	"gostc-sub/pkg/utils"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
@@ -36,7 +36,7 @@ func (*service) List() (result []Item) {
 			Address:   p2p.Address,
 			Tls:       p2p.Tls,
 			AutoStart: p2p.AutoStart,
-			Status:    utils.TrinaryOperation(common.State.Get(key), 1, 2),
+			Status:    utils.TrinaryOperation(service2.State.Get(key), 1, 2),
 		})
 	}
 	return result

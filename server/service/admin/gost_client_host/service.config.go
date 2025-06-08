@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -55,14 +55,14 @@ func (service *service) Config(req ConfigReq) error {
 		host.Cycle = req.Cycle
 		host.Amount = amount
 		host.Limiter = req.Limiter
-		host.RLimiter = req.RLimiter
-		host.CLimiter = req.CLimiter
+		//host.RLimiter = req.RLimiter
+		//host.CLimiter = req.CLimiter
 		host.ExpAt = expAt.Unix()
 		if err = tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientHostConfig(tx, host.Code)
+		engine.ClientHostConfig(tx, host.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        host.Code,
 			Type:        model.GOST_TUNNEL_TYPE_HOST,

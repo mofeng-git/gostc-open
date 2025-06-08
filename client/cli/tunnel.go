@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	service2 "gostc-sub/internal/service"
+	service "gostc-sub/internal/service/visitor"
+	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Tunnel struct {
@@ -14,9 +14,8 @@ type Tunnel struct {
 	Port string
 }
 
-var tunnelMap = &sync.Map{}
-
 func runTunnels(mode string, vTunnels string, apiurl string) {
+	var wg = &sync.WaitGroup{}
 	var tunnelList []Tunnel
 	tunnels := strings.Split(vTunnels, ",")
 	for _, tunnel := range tunnels {
@@ -42,34 +41,33 @@ func runTunnels(mode string, vTunnels string, apiurl string) {
 	for _, tunnel := range tunnelList {
 		switch mode {
 		case "visit":
-			svc := service2.NewTunnel(apiurl, tunnel.VKey, tunnel.Bind, tunnel.Port)
+			port, err := strconv.Atoi(tunnel.Port)
+			if err != nil {
+				fmt.Println("私有隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
+				continue
+			}
+			svc := service.NewTunnel(apiurl, tunnel.VKey, tunnel.Bind, port)
 			if err := svc.Start(); err != nil {
 				fmt.Println("私有隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
 			fmt.Println("私有隧道启动成功", tunnel.VKey, tunnel.Bind+":"+tunnel.Port)
-			tunnelMap.Store(tunnel.VKey, svc)
+			go loop(wg, svc)
 		case "p2p":
-			svc := service2.NewP2P(apiurl, tunnel.VKey, tunnel.Bind, tunnel.Port)
+			port, err := strconv.Atoi(tunnel.Port)
+			if err != nil {
+				fmt.Println("P2P隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
+				continue
+			}
+			svc := service.NewP2P(apiurl, tunnel.VKey, tunnel.Bind, port)
 			if err := svc.Start(); err != nil {
 				fmt.Println("P2P隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
 			fmt.Println("P2P隧道启动成功", tunnel.VKey, tunnel.Bind+":"+tunnel.Port)
-			tunnelMap.Store(tunnel.VKey, svc)
+			wg.Add(1)
+			go loop(wg, svc)
 		}
 	}
-	for {
-		var isRunningCount = 0
-		tunnelMap.Range(func(key, value any) bool {
-			if value.(service2.Service).IsRunning() {
-				isRunningCount++
-			}
-			return true
-		})
-		if isRunningCount == 0 {
-			return
-		}
-		time.Sleep(time.Second * 3)
-	}
+	wg.Wait()
 }

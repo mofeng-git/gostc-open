@@ -320,18 +320,18 @@ const operatorOptions = [
     disabled: false,
     func: openObsModal,
   },
-  {
-    label: '黑/白名单',
-    key: 'admission',
-    disabled: false,
-    func: openAdmission,
-  },
-  {
-    label: '规则匹配',
-    key: 'matcher',
-    disabled: false,
-    func: openMatcher,
-  },
+  // {
+  //   label: '黑/白名单',
+  //   key: 'admission',
+  //   disabled: false,
+  //   func: openAdmission,
+  // },
+  // {
+  //   label: '规则匹配',
+  //   key: 'matcher',
+  //   disabled: false,
+  //   func: openMatcher,
+  // },
   {
     label: '转移隧道',
     key: 'migrate',
@@ -449,8 +449,6 @@ const operatorRenderLabel = (option) => {
               <span>内网目标：{{ row.targetIp + ':' + row.targetPort }}</span><br>
               <span>访问地址：{{ row.node.address + ':' + row.port }}</span><br>
               <span>速率：{{ limiterText(row.config.limiter) }}</span><br>
-              <span>并发数：{{ rLimiterText(row.config.rLimiter) }}</span><br>
-              <span>连接数：{{ cLimiterText(row.config.cLimiter) }}</span><br>
               <span>套餐：{{ configText(row.config) }}</span><br>
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>

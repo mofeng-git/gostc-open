@@ -8,6 +8,6 @@ import (
 
 func Free() <-chan os.Signal {
 	signalChan := make(chan os.Signal)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	return signalChan
 }

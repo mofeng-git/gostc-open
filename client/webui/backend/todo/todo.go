@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
-	rpcService "gostc-sub/internal/service/rpc"
+	service "gostc-sub/internal/service/visitor"
 	"gostc-sub/webui/backend/bootstrap"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
+	"strconv"
 )
 
 func init() {
@@ -20,7 +21,7 @@ func init() {
 			var client model.Client
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &client)
-			svc := rpcService.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), client.Key)
+			svc := service2.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), common.GenerateHttpUrl(client.Tls == 1, client.Address), client.Key)
 			global.ClientMap.Store(client.Key, svc)
 			if client.AutoStart == 1 {
 				_ = svc.Start()
@@ -35,7 +36,8 @@ func init() {
 			var p2p model.P2P
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &p2p)
-			svc := service2.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, p2p.Port)
+			port, _ := strconv.Atoi(p2p.Port)
+			svc := service.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, port)
 			global.P2PMap.Store(p2p.Key, svc)
 			if p2p.AutoStart == 1 {
 				_ = svc.Start()
@@ -50,7 +52,8 @@ func init() {
 			var tunnel model.Tunnel
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &tunnel)
-			svc := service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, tunnel.Port)
+			port, _ := strconv.Atoi(tunnel.Port)
+			svc := service.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, port)
 			global.TunnelMap.Store(tunnel.Key, svc)
 			if tunnel.AutoStart == 1 {
 				_ = svc.Start()

@@ -2,6 +2,7 @@ package service
 
 import (
 	"gorm.io/gen"
+	"net"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -101,16 +102,16 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		db.GostClientForward.Node,
 	).Where(where...).Order(db.GostClientForward.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, forward := range forwards {
-		var mathcers []ItemMatcher
-		for _, item := range forward.GetMatcher() {
-			mathcers = append(mathcers, ItemMatcher{
-				Host:       item.Host,
-				TargetIp:   item.TargetIp,
-				TargetPort: item.TargetPort,
-			})
-		}
-		tcpIp, tcpPort := forward.GetTcpMatcher()
-		sshIp, sshPort := forward.GetSSHMatcher()
+		//var mathcers []ItemMatcher
+		//for _, item := range forward.GetMatcher() {
+		//	mathcers = append(mathcers, ItemMatcher{
+		//		Host:       item.Host,
+		//		TargetIp:   item.TargetIp,
+		//		TargetPort: item.TargetPort,
+		//	})
+		//}
+		//tcpIp, tcpPort := forward.GetTcpMatcher()
+		//sshIp, sshPort := forward.GetSSHMatcher()
 		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, forward.Code)
 		list = append(list, Item{
 			UserAccount:   forward.User.Account,
@@ -121,10 +122,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			ProxyProtocol: forward.ProxyProtocol,
 			Port:          forward.Port,
 			Node: ItemNode{
-				Code:    forward.NodeCode,
-				Name:    forward.Node.Name,
-				Address: forward.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
+				Code: forward.NodeCode,
+				Name: forward.Node.Name,
+				Address: func() string {
+					address, _, _ := net.SplitHostPort(forward.Node.Address)
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   forward.ClientCode,
@@ -136,25 +140,25 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				Cycle:        forward.Cycle,
 				Amount:       forward.Amount.String(),
 				Limiter:      forward.Limiter,
-				RLimiter:     forward.RLimiter,
-				CLimiter:     forward.CLimiter,
-				ExpAt:        time.Unix(forward.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     forward.RLimiter,
+				//CLimiter:     forward.CLimiter,
+				ExpAt: time.Unix(forward.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:        forward.Enable,
-			WarnMsg:       warn_msg.GetForwardWarnMsg(*forward),
-			CreatedAt:     forward.CreatedAt.Format(time.DateTime),
-			InputBytes:    obsInfo.InputBytes,
-			OutputBytes:   obsInfo.OutputBytes,
-			MatcherEnable: forward.MatcherEnable,
-			Matchers:      mathcers,
-			TcpMatcher: ItemMatcher{
-				TargetIp:   tcpIp,
-				TargetPort: tcpPort,
-			},
-			SSHMatcher: ItemMatcher{
-				TargetIp:   sshIp,
-				TargetPort: sshPort,
-			},
+			Enable:      forward.Enable,
+			WarnMsg:     warn_msg.GetForwardWarnMsg(*forward),
+			CreatedAt:   forward.CreatedAt.Format(time.DateTime),
+			InputBytes:  obsInfo.InputBytes,
+			OutputBytes: obsInfo.OutputBytes,
+			//MatcherEnable: forward.MatcherEnable,
+			//Matchers:      mathcers,
+			//TcpMatcher: ItemMatcher{
+			//	TargetIp:   tcpIp,
+			//	TargetPort: tcpPort,
+			//},
+			//SSHMatcher: ItemMatcher{
+			//	TargetIp:   sshIp,
+			//	TargetPort: sshPort,
+			//},
 		})
 	}
 	return list, total

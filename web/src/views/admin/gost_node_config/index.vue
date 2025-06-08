@@ -296,14 +296,6 @@ onBeforeMount(() => {
                 <span style="font-weight: bold;">速率：</span>
                 <span>{{ limiterText(row.limiter) }}</span>
               </div>
-              <div style="display: flex;justify-content: space-between">
-                <span style="font-weight: bold;">并发数：</span>
-                <span>{{ rLimiterText(row.rLimiter) }}</span>
-              </div>
-              <div style="display: flex;justify-content: space-between">
-                <span style="font-weight: bold;">连接数：</span>
-                <span>{{ cLimiterText(row.cLimiter) }}</span>
-              </div>
               <n-space justify="end" style="width: 100%">
                 <n-button size="tiny" :focusable="false" quaternary type="success" @click="openUpdate(row)">
                   编辑
@@ -366,12 +358,6 @@ onBeforeMount(() => {
         <n-form-item path="limiter" label="速率(mbps)">
           <n-input-number v-model:value="state.create.data.limiter" :min="0"></n-input-number>
         </n-form-item>
-        <n-form-item path="rLimiter" label="并发数">
-          <n-input-number v-model:value="state.create.data.rLimiter" :min="0"></n-input-number>
-        </n-form-item>
-        <n-form-item path="cLimiter" label="连接数">
-          <n-input-number v-model:value="state.create.data.cLimiter" :min="0"></n-input-number>
-        </n-form-item>
         <n-form-item path="indexValue" label="排序(升序)">
           <n-input-number v-model:value="state.create.data.indexValue"></n-input-number>
         </n-form-item>
@@ -414,12 +400,6 @@ onBeforeMount(() => {
         </n-form-item>
         <n-form-item path="limiter" label="速率(mbps)">
           <n-input-number v-model:value="state.update.data.limiter" :min="0"></n-input-number>
-        </n-form-item>
-        <n-form-item path="rLimiter" label="并发数">
-          <n-input-number v-model:value="state.update.data.rLimiter" :min="0"></n-input-number>
-        </n-form-item>
-        <n-form-item path="cLimiter" label="连接数">
-          <n-input-number v-model:value="state.update.data.cLimiter" :min="0"></n-input-number>
         </n-form-item>
         <n-form-item path="indexValue" label="排序(升序)">
           <n-input-number v-model:value="state.update.data.indexValue"></n-input-number>

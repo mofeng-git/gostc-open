@@ -103,9 +103,12 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			CustomForceHttps: host.CustomForceHttps,
 			CustomEnable:     utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			Node: ItemNode{
-				Code:         host.NodeCode,
-				Name:         host.Node.Name,
-				Address:      host.Node.Address,
+				Code: host.NodeCode,
+				Name: host.Node.Name,
+				Address: func() string {
+					address, _ := host.Node.GetAddress()
+					return address
+				}(),
 				Online:       utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
 				Domain:       host.Node.Domain,
 				CustomDomain: utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
@@ -120,19 +123,19 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Cycle:        host.Cycle,
 				Amount:       host.Amount.String(),
 				Limiter:      host.Limiter,
-				RLimiter:     host.RLimiter,
-				CLimiter:     host.CLimiter,
-				ExpAt:        time.Unix(host.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     host.RLimiter,
+				//CLimiter:     host.CLimiter,
+				ExpAt: time.Unix(host.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      host.Enable,
 			WarnMsg:     warn_msg.GetHostWarnMsg(*host),
 			CreatedAt:   host.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,
-			WhiteEnable: host.WhiteEnable,
-			BlackEnable: host.BlackEnable,
-			WhiteList:   host.GetWhiteList(),
-			BlackList:   host.GetBlackList(),
+			//WhiteEnable:       host.WhiteEnable,
+			//BlackEnable:       host.BlackEnable,
+			//WhiteList:         host.GetWhiteList(),
+			//BlackList:         host.GetBlackList(),
 		})
 	}
 	return list, total

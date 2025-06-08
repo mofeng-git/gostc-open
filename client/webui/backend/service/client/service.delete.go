@@ -15,7 +15,7 @@ func (*service) Delete(req DeleteReq) error {
 	}
 	client, ok := global.ClientMap.Load(req.Key)
 	if ok {
-		client.(*service2.Client).Stop()
+		client.(service2.Service).Stop()
 	}
 	return nil
 }

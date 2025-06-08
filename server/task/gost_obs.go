@@ -82,5 +82,29 @@ func gostObs() {
 			})
 		}
 	}
+	{
+		var codes []string
+		_ = db.SystemUser.Pluck(db.SystemUser.Code, &codes)
+		for _, code := range codes {
+			info := cache.GetUserObs(prevDate, code)
+			obsList = append(obsList, &model.GostObs{
+				OriginKind:  model.GOST_OBS_ORIGIN_KIND_USER,
+				OriginCode:  code,
+				EventDate:   prevDate,
+				InputBytes:  info.InputBytes,
+				OutputBytes: info.OutputBytes,
+			})
+		}
+	}
 	_ = db.GostObs.CreateInBatches(obsList, 1000)
+
+	{
+		nodes, _ := db.GostNode.Select(
+			db.GostNode.Code,
+			db.GostNode.LimitResetIndex,
+		).Where().Find()
+		for _, node := range nodes {
+			cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+		}
+	}
 }

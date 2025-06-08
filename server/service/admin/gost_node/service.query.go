@@ -28,24 +28,16 @@ type QueryResp struct {
 	CustomDomain     int    `json:"customDomain"`
 	DenyDomainPrefix string `json:"denyDomainPrefix"`
 	Address          string `json:"address"`
+	ReplaceAddress   string `json:"replaceAddress"`
 	Protocol         string `json:"protocol"`
-	TunnelConnPort   string `json:"tunnelConnPort"`
-	TunnelInPort     string `json:"tunnelInPort"`
-	TunnelMetadata   string `json:"tunnelMetadata"`
+	HttpPort         string `json:"httpPort"`
 
-	ForwardConnPort string `json:"forwardConnPort"`
-	ForwardPorts    string `json:"forwardPorts"`
-	ForwardMetadata string `json:"forwardMetadata"`
+	ForwardPorts string   `json:"forwardPorts"`
+	Rules        []string `json:"rules"`
+	RuleNames    []string `json:"ruleNames"`
+	Tags         []string `json:"tags"`
 
-	P2PPort string `json:"p2pPort"`
-
-	Rules     []string `json:"rules"`
-	RuleNames []string `json:"ruleNames"`
-	Tags      []string `json:"tags"`
-
-	TunnelReplaceAddress  string `json:"tunnelReplaceAddress"`
-	ForwardReplaceAddress string `json:"forwardReplaceAddress"`
-	IndexValue            int    `json:"indexValue"`
+	IndexValue int `json:"indexValue"`
 }
 
 func (service *service) Query(req QueryReq) (QueryResp, error) {
@@ -59,32 +51,25 @@ func (service *service) Query(req QueryReq) (QueryResp, error) {
 		ruleNames = append(ruleNames, node_rule.RuleMap[rule].Name())
 	}
 	return QueryResp{
-		Code:                  node.Code,
-		Key:                   node.Key,
-		Name:                  node.Name,
-		Remark:                node.Remark,
-		Web:                   node.Web,
-		Tunnel:                node.Tunnel,
-		Forward:               node.Forward,
-		Proxy:                 node.Proxy,
-		P2P:                   node.P2P,
-		Domain:                node.Domain,
-		CustomDomain:          utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
-		DenyDomainPrefix:      node.DenyDomainPrefix,
-		Address:               node.Address,
-		Protocol:              node.Protocol,
-		TunnelConnPort:        node.TunnelConnPort,
-		TunnelInPort:          node.TunnelInPort,
-		TunnelMetadata:        node.TunnelMetadata,
-		ForwardConnPort:       node.ForwardConnPort,
-		ForwardPorts:          node.ForwardPorts,
-		ForwardMetadata:       node.ForwardMetadata,
-		P2PPort:               node.P2PPort,
-		Rules:                 node.GetRules(),
-		RuleNames:             ruleNames,
-		Tags:                  node.GetTags(),
-		TunnelReplaceAddress:  node.TunnelReplaceAddress,
-		ForwardReplaceAddress: node.ForwardReplaceAddress,
-		IndexValue:            node.IndexValue,
+		Code:             node.Code,
+		Key:              node.Key,
+		Name:             node.Name,
+		Remark:           node.Remark,
+		Web:              node.Web,
+		Tunnel:           node.Tunnel,
+		Forward:          node.Forward,
+		Proxy:            node.Proxy,
+		P2P:              node.P2P,
+		Domain:           node.Domain,
+		CustomDomain:     utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
+		DenyDomainPrefix: node.DenyDomainPrefix,
+		Address:          node.Address,
+		ReplaceAddress:   node.ReplaceAddress,
+		Protocol:         node.Protocol,
+		HttpPort:         node.HttpPort,
+		ForwardPorts:     node.ForwardPorts,
+		Rules:            node.GetRules(),
+		RuleNames:        ruleNames,
+		Tags:             node.GetTags(),
 	}, nil
 }

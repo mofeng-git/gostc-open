@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"gostc-sub/internal/common"
-	service2 "gostc-sub/internal/service"
+	service3 "gostc-sub/internal/service/visitor"
 	"gostc-sub/pkg/utils"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
@@ -42,7 +42,7 @@ func (*service) Create(req CreateReq) error {
 	}); err != nil {
 		return err
 	}
-	tunnel := service2.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, req.Port)
+	tunnel := service3.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, port)
 	global.TunnelMap.Store(req.Key, tunnel)
 	return nil
 }

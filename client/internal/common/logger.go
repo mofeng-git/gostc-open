@@ -2,40 +2,9 @@ package common
 
 import (
 	"fmt"
-	"github.com/go-gost/core/logger"
-	"github.com/go-gost/x/config/parsing"
-	xlogger "github.com/go-gost/x/logger"
-	arpcLog "github.com/lesismal/arpc/log"
-	frpLog "gostc-sub/pkg/p2p/pkg/util/log"
-	"log"
 	"sync"
 	"time"
 )
-
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
-	level := logger.InfoLevel
-	//switch logLevel {
-	//case "trace":
-	//	level = logger.TraceLevel
-	//case "debug":
-	//	level = logger.DebugLevel
-	//case "info":
-	//	level = logger.InfoLevel
-	//case "warn":
-	//	level = logger.WarnLevel
-	//case "error":
-	//	level = logger.ErrorLevel
-	//case "fatal":
-	//	level = logger.FatalLevel
-	//}
-	writer := NewLogWriter()
-	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level), xlogger.OutputOption(writer)))
-	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
-	parsing.SetDefaultTLSConfig(tlsConfig)
-	frpLog.RefreshDefault()
-	arpcLog.SetLevel(arpcLog.LevelError)
-}
 
 var Logger = NewCircularLogger(10000)
 
@@ -69,9 +38,6 @@ func (cl *CircularLogger) AddLog(tp, message string) {
 		Type:      tp,
 	}
 	if cl.console {
-		//fmt.Println("[LOG]", "Timestamp:", time.Now().Format(time.DateTime))
-		//fmt.Println("[LOG]", "Type:", tp)
-		//fmt.Println("[LOG]", "Message:", message)
 		fmt.Println(fmt.Sprintf("[LOG] %s %s: %s", time.Now().Format(time.DateTime), tp, message))
 	}
 

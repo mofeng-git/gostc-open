@@ -11,11 +11,11 @@ func IsUse(bind string, port int) error {
 	if err != nil {
 		return err // 端口被占用
 	}
-	defer listener.Close()
+	_ = listener.Close()
 	packetConn, err := net.ListenPacket("udp", address)
 	if err != nil {
 		return err // 端口被占用
 	}
-	defer packetConn.Close()
+	_ = packetConn.Close()
 	return nil
 }

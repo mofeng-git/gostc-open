@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type MigrateReq struct {
@@ -42,7 +42,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 		}
 
 		if tunnel.Enable == 1 {
-			gost_engine.ClientRemoveTunnelConfig(tx, *tunnel, tunnel.Node)
+			engine.ClientRemoveTunnelConfig(tx, *tunnel, tunnel.Node)
 		}
 
 		tunnel.ClientCode = req.ClientCode
@@ -60,7 +60,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			ExpAt:       tunnel.ExpAt,
 			Limiter:     tunnel.Limiter,
 		})
-		gost_engine.ClientTunnelConfig(tx, tunnel.Code)
+		engine.ClientTunnelConfig(tx, tunnel.Code)
 		return nil
 	})
 }

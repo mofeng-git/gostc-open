@@ -76,11 +76,10 @@ type SystemConfigGost struct {
 	FuncTunnel  string `json:"funcTunnel"`
 	FuncP2P     string `json:"funcP2P"`
 	FuncProxy   string `json:"funcProxy"`
-	FuncTun     string `json:"funcTun"`
 	FuncNode    string `json:"funcNode"`
 }
 
-func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForward, funcTunnel, funcP2P, funcProxy, funcTun, funcNode string) []*SystemConfig {
+func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForward, funcTunnel, funcP2P, funcProxy, funcNode string) []*SystemConfig {
 	return []*SystemConfig{
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "version", Value: version},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "logger", Value: logger},
@@ -89,7 +88,6 @@ func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForwar
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcTunnel", Value: funcTunnel},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcP2P", Value: funcP2P},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcProxy", Value: funcProxy},
-		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcTun", Value: funcTun},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcNode", Value: funcNode},
 	}
 }
@@ -111,8 +109,6 @@ func GetSystemConfigGost(list []*SystemConfig) (result SystemConfigGost) {
 			result.FuncP2P = item.Value
 		case "funcProxy":
 			result.FuncProxy = item.Value
-		case "funcTun":
-			result.FuncTun = item.Value
 		case "funcNode":
 			result.FuncNode = item.Value
 		}

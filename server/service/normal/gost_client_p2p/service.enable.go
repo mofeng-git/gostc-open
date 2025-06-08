@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type EnableReq struct {
@@ -34,9 +34,9 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 		return errors.New("操作失败")
 	}
 	if p2p.Enable == 1 {
-		gost_engine.ClientP2PConfig(db, p2p.Code)
+		engine.ClientP2PConfig(db, p2p.Code)
 	} else {
-		gost_engine.ClientRemoveP2PConfig(*p2p)
+		engine.ClientRemoveP2PConfig(*p2p)
 	}
 	return nil
 }

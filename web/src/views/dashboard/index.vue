@@ -402,15 +402,6 @@ const userInfoResize = (arg) => {
 
 <template>
   <div>
-    <AppCard :show-border="false" v-if="alertSystemConfigBaseUrl">
-      <n-alert type="warning">
-        系统配置基础ULR：{{ appStore().siteConfig.baseUrl }}<br>
-        当前访问基础ULR：{{ state.baseUrl }}<br>
-        配置的基础URL与当前访问地址不匹配
-      </n-alert>
-    </AppCard>
-
-
     <AppCard :show-border="false">
       <n-grid :cols="gridColsComputed" :x-gap="12" :y-gap="12">
         <n-grid-item>

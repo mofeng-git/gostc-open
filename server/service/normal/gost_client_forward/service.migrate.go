@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type MigrateReq struct {
@@ -39,7 +39,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			return nil
 		}
 		if forward.Enable == 1 {
-			gost_engine.ClientRemoveForwardConfig(*forward)
+			engine.ClientRemoveForwardConfig(*forward)
 		}
 
 		forward.ClientCode = req.ClientCode
@@ -57,7 +57,7 @@ func (service *service) Migrate(claims jwt.Claims, req MigrateReq) error {
 			ExpAt:       forward.ExpAt,
 			Limiter:     forward.Limiter,
 		})
-		gost_engine.ClientForwardConfig(tx, forward.Code)
+		engine.ClientForwardConfig(tx, forward.Code)
 		return nil
 	})
 }

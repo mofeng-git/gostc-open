@@ -2,7 +2,7 @@ package service
 
 import (
 	"gostc-sub/internal/common"
-	rpcService "gostc-sub/internal/service/rpc"
+	rpcService "gostc-sub/internal/service"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
 )
@@ -25,7 +25,7 @@ func (*service) Create(req CreateReq) error {
 	}); err != nil {
 		return err
 	}
-	client := rpcService.NewClient(common.GenerateWsUrl(req.Tls == 1, req.Address), req.Key)
+	client := rpcService.NewClient(common.GenerateWsUrl(req.Tls == 1, req.Address), common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key)
 	global.ClientMap.Store(req.Key, client)
 	return nil
 }

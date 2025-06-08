@@ -11,7 +11,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"strings"
 )
 
@@ -100,8 +100,8 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 			log.Error("保存用户域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey, host.CustomForceHttps)
-		gost_engine.NodeIngress(tx, host.NodeCode)
+		engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey, host.CustomForceHttps)
+		engine.NodeIngress(tx, host.NodeCode)
 		return nil
 	})
 }

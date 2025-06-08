@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/repository"
 	"server/repository/query"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type AdmissionReq struct {
@@ -33,16 +33,16 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			return errors.New("操作失败")
 		}
 
-		host.WhiteEnable = req.WhiteEnable
-		host.BlackEnable = req.BlackEnable
-		host.SetWhiteList(req.White)
-		host.SetBlackList(req.Black)
+		//host.WhiteEnable = req.WhiteEnable
+		//host.BlackEnable = req.BlackEnable
+		//host.SetWhiteList(req.White)
+		//host.SetBlackList(req.Black)
 
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientHostConfig(tx, host.Code)
+		engine.ClientHostConfig(tx, host.Code)
 		return nil
 	})
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"gorm.io/gen"
+	"net"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -96,10 +97,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Port:        proxy.Port,
 			Protocol:    proxy.Protocol,
 			Node: ItemNode{
-				Code:    proxy.NodeCode,
-				Name:    proxy.Node.Name,
-				Address: proxy.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
+				Code: proxy.NodeCode,
+				Name: proxy.Node.Name,
+				Address: func() string {
+					address, _, _ := net.SplitHostPort(proxy.Node.Address)
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   proxy.ClientCode,
@@ -111,9 +115,9 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				Cycle:        proxy.Cycle,
 				Amount:       proxy.Amount.String(),
 				Limiter:      proxy.Limiter,
-				RLimiter:     proxy.RLimiter,
-				CLimiter:     proxy.CLimiter,
-				ExpAt:        time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     proxy.RLimiter,
+				//CLimiter:     proxy.CLimiter,
+				ExpAt: time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      proxy.Enable,
 			WarnMsg:     warn_msg.GetProxyWarnMsg(*proxy),

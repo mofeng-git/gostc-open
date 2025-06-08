@@ -11,7 +11,7 @@ import (
 	"server/repository/query"
 	"server/service/common/cache"
 	"server/service/common/node_port"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type UpdateReq struct {
@@ -93,7 +93,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 			// 归还旧端口资源
 			node_port.ReleasePort(forward.NodeCode, oldPort)
 		}
-		gost_engine.ClientForwardConfig(tx, forward.Code)
+		engine.ClientForwardConfig(tx, forward.Code)
 		return nil
 	})
 }

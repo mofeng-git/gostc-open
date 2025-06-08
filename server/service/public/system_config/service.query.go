@@ -1,6 +1,7 @@
 package service
 
 import (
+	"server/global"
 	"server/model"
 	"server/service/common/cache"
 )
@@ -21,8 +22,13 @@ type QueryResp struct {
 	FuncTunnel  string `json:"funcTunnel"`
 	FuncP2P     string `json:"funcP2P"`
 	FuncProxy   string `json:"funcProxy"`
-	FuncTun     string `json:"funcTun"`
 	FuncNode    string `json:"funcNode"`
+
+	System QuerySystemInfo `json:"system"`
+}
+
+type QuerySystemInfo struct {
+	Version string `json:"version"`
 }
 
 func (service *service) Query() QueryResp {
@@ -45,7 +51,10 @@ func (service *service) Query() QueryResp {
 		FuncTunnel:  gostConfig.FuncTunnel,
 		FuncP2P:     gostConfig.FuncP2P,
 		FuncProxy:   gostConfig.FuncProxy,
-		FuncTun:     gostConfig.FuncTun,
 		FuncNode:    gostConfig.FuncNode,
+
+		System: QuerySystemInfo{
+			Version: global.VERSION,
+		},
 	}
 }

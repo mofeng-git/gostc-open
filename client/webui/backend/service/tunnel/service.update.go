@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
+	service3 "gostc-sub/internal/service/visitor"
 	"gostc-sub/pkg/utils"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
@@ -31,7 +32,7 @@ func (*service) Update(req UpdateReq) error {
 	if err := utils.IsUse(req.Bind, port); err != nil {
 		return err
 	}
-	if common.State.Get(req.Key) {
+	if service2.State.Get(req.Key) {
 		return errors.New("私有隧道正在运行中，请停止运行后修改")
 	}
 	if err := global.TunnelFS.Update(req.Key, model.Tunnel{
@@ -45,7 +46,7 @@ func (*service) Update(req UpdateReq) error {
 	}); err != nil {
 		return err
 	}
-	tunnel := service2.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, req.Port)
+	tunnel := service3.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, port)
 	global.TunnelMap.Store(req.Key, tunnel)
 	return nil
 }

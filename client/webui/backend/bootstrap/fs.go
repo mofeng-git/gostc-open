@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"go.uber.org/zap"
+	"gostc-sub/internal/service"
 	"gostc-sub/pkg/fs"
 	"gostc-sub/webui/backend/global"
 	"os"
@@ -42,6 +43,17 @@ func InitFS(basePath string) {
 		global.P2PFS.Close()
 	})
 	releaseFunc = append(releaseFunc, func() {
-		_ = global.Logger.Sync()
+		global.ClientMap.Range(func(key, value any) bool {
+			value.(service.Service).Stop()
+			return true
+		})
+		global.TunnelMap.Range(func(key, value any) bool {
+			value.(service.Service).Stop()
+			return true
+		})
+		global.P2PMap.Range(func(key, value any) bool {
+			value.(service.Service).Stop()
+			return true
+		})
 	})
 }

@@ -7,7 +7,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type DeleteReq struct {
@@ -50,7 +50,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 		_, _ = tx.GostNodeConfig.Where(tx.GostNodeConfig.NodeCode.Eq(node.Code)).Delete()
 		_, _ = tx.GostNodeBind.Where(tx.GostNodeBind.NodeCode.Eq(node.Code)).Delete()
 		cache.DelNodeInfo(node.Code)
-		gost_engine.NodeStop(node.Code, "节点已被删除")
+		engine.NodeStop(node.Code, "节点已被删除")
 		return nil
 	})
 }

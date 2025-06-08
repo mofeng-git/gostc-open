@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type EnableReq struct {
@@ -37,9 +37,9 @@ func (service *service) Enable(claims jwt.Claims, req EnableReq) error {
 		return errors.New("操作失败")
 	}
 	if forward.Enable == 1 {
-		gost_engine.ClientForwardConfig(db, forward.Code)
+		engine.ClientForwardConfig(db, forward.Code)
 	} else {
-		gost_engine.ClientRemoveForwardConfig(*forward)
+		engine.ClientRemoveForwardConfig(*forward)
 	}
 	return nil
 }

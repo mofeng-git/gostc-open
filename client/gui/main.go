@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"gioui.org/io/system"
+	service2 "github.com/SianHH/frp-package/package"
 	"github.com/energye/systray"
 	"gostc-sub/gui/global"
 	"gostc-sub/gui/registry"
@@ -96,5 +97,9 @@ func onExit() {
 	if WindowShow {
 		win.Close()
 	}
+	bootstrap.Release()
+	service2.Range(func(key string, value service2.Service) {
+		value.Stop()
+	})
 	fmt.Println("onExit")
 }

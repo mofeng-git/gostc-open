@@ -11,13 +11,15 @@ func (u UserQQGroupRule) Code() string {
 }
 
 func (u UserQQGroupRule) Name() string {
-	return "绑定QQ号"
+	return "绑定QQ号(示例)"
 }
 
 func (u UserQQGroupRule) Description() string {
-	return "需要绑定QQ号"
+	return "需要绑定QQ号(示例)"
 }
 
 func (u UserQQGroupRule) Allow(tx *query.Query, userCode string) bool {
+	//bindQQ, _ := tx.SystemUserQQ.Where(tx.SystemUserQQ.UserCode.Eq(userCode)).First()
+	//return bindQQ != nil
 	return true
 }

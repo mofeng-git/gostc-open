@@ -1,83 +1,125 @@
 package service
 
 import (
-	"crypto/tls"
 	"errors"
-	"github.com/lxzan/gws"
+	"github.com/SianHH/frp-package/package"
+	"github.com/lesismal/arpc"
 	"gostc-sub/internal/common"
-	"gostc-sub/internal/engine"
+	"gostc-sub/internal/service/event"
+	"gostc-sub/pkg/rpc_protocol/websocket"
+	"net"
 	"net/http"
+	"sync"
 	"time"
 )
 
 type Client struct {
-	key   string
-	wsUrl string
-	svc   *gws.Conn
+	key      string
+	wsUrl    string
+	apiUrl   string
+	core     service.Service
+	svcMap   *sync.Map
+	stopFunc func()
 }
 
-func NewClient(wsUrl, key string) *Client {
+func NewClient(wsUrl, apiUrl, key string) *Client {
 	return &Client{
-		key:   key,
-		wsUrl: wsUrl + "/api/v1/public/gost/client/ws",
+		key:    key,
+		wsUrl:  wsUrl,
+		apiUrl: apiUrl,
+		svcMap: &sync.Map{},
 	}
 }
 
 func (svc *Client) Start() (err error) {
-	if common.State.Get(svc.key) {
+	if State.Get(svc.key) {
 		return errors.New("客户端已在运行中")
 	}
 	go func() {
+		State.Set(svc.key, true)
 		err = svc.run()
-		for {
-			if !common.State.Get(svc.key) {
-				return
-			}
-			if err := svc.run(); err != nil {
+		for State.Get(svc.key) {
+			if err = svc.run(); err != nil {
 				common.Logger.AddLog("client", svc.key+"客户端连接异常断开，等待5秒重试，err:"+err.Error())
 				time.Sleep(time.Second * 5)
 			}
 		}
 	}()
 	time.Sleep(time.Second * 2)
-	if err != nil {
-		common.State.Set(svc.key, false)
-	} else {
-		common.State.Set(svc.key, true)
-	}
 	return err
 }
 
 func (svc *Client) Stop() {
-	common.State.Set(svc.key, false)
-	if svc.svc != nil {
-		_ = svc.svc.WriteClose(1000, nil)
+	State.Set(svc.key, false)
+	if svc.stopFunc != nil {
+		svc.stopFunc()
 	}
+	svc.svcMap.Range(func(key, value any) bool {
+		service.Del(key.(string))
+		return true
+	})
 }
 
 func (svc *Client) IsRunning() bool {
-	return common.State.Get(svc.key)
+	return State.Get(svc.key)
 }
 
 func (svc *Client) run() (err error) {
 	if svc.key == "" {
 		return errors.New("please entry key")
 	}
-	svc.svc, _, err = gws.NewClient(engine.NewEvent(svc.key, "", false), &gws.ClientOption{
-		Addr:      svc.wsUrl,
-		TlsConfig: &tls.Config{InsecureSkipVerify: true},
-		NewDialer: func() (gws.Dialer, error) {
-			return common.NewDialer(), nil
-		},
-		RequestHeader: http.Header{"key": []string{svc.key}},
-		PermessageDeflate: gws.PermessageDeflate{
-			Enabled: true,
-		},
+	client, err := arpc.NewClient(func() (net.Conn, error) {
+		return websocket.Dial(svc.wsUrl+"/rpc/ws", http.Header{
+			"key": []string{svc.key},
+		})
 	})
 	if err != nil {
-		common.Logger.AddLog("client", svc.key+"客户端启动失败，err:"+err.Error())
 		return err
 	}
-	svc.svc.ReadLoop()
-	return nil
+	client.Keepalive(time.Second * 15)
+	client.Handler.SetReadTimeout(time.Second * 50)
+	var stopChan = make(chan struct{})
+	client.Handler.HandleDisconnected(func(client *arpc.Client) {
+		stopChan <- struct{}{}
+	})
+	// 连接成功，发送注册请求
+	client.Handler.HandleConnected(func(client *arpc.Client) {
+		var data = map[string]string{
+			"key":     svc.key,
+			"version": common.VERSION,
+		}
+		var reply string
+		if err := client.Call("rpc/client/reg", data, &reply, time.Second*5); err != nil {
+			client.Stop()
+			return
+		}
+		if reply != "success" {
+			err = errors.New(reply)
+			common.Logger.AddLog("Client", reply)
+			client.Stop()
+			return
+		}
+	})
+
+	// 注册事件
+	var callback = func(key string) {
+		svc.svcMap.Store(key, true)
+	}
+	event.PortCheckHandle(client)
+	event.HostHandle(client, callback)
+	event.ForwardHandle(client, callback)
+	event.TunnelHandle(client, callback)
+	event.ProxyHandle(client, callback)
+	event.P2PHandle(client, callback)
+	event.StopHandle(client, func() {
+		svc.Stop()
+	})
+	event.RemoveHandle(client, func(key string) {
+		svc.svcMap.Delete(key)
+	})
+	svc.stopFunc = func() {
+		client.Stop()
+	}
+	<-stopChan
+	return err
 }

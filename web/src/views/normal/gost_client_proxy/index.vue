@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, ref, watch, h} from "vue";
+import {h, onBeforeMount, ref, watch} from "vue";
 import {
   apiNormalGostClientProxyDelete,
   apiNormalGostClientProxyEnable,
@@ -12,11 +12,10 @@ import SearchCard from "../../../layout/components/SearchCard.vue";
 import SearchItem from "../../../layout/components/SearchItem.vue";
 import router from "../../../router/index.js";
 import Modal from "../../../components/Modal.vue";
-import {regexpRule, requiredRule} from "../../../utils/formDataRule.js";
-import {regexpPort} from "../../../utils/regexp.js";
+import {requiredRule} from "../../../utils/formDataRule.js";
 import {NButton, NPopconfirm, NSpace} from "naive-ui";
 import Empty from "../../../components/Empty.vue";
-import {cLimiterText, configExpText, configText, limiterText, rLimiterText} from "./index.js";
+import {configExpText, configText, limiterText} from "./index.js";
 import Alert from "../../../icon/alert.vue";
 import Online from "../../../icon/online.vue";
 import {flowFormat} from "../../../utils/flow.js";
@@ -48,7 +47,6 @@ const state = ref({
     dataRules: {
       name: requiredRule('请输入名称'),
       protocol: requiredRule('请选择协议'),
-      port: regexpRule(regexpPort, '内网端口格式错误'),
     },
     open: false,
     loading: false,
@@ -196,26 +194,26 @@ const operatorOptions = [
     label: '流量',
     key: 'obs',
     disabled: false,
-    func:openObsModal,
+    func: openObsModal,
   },
 ]
-const operatorSelect = (key,row)=>{
-  for (let i=0;i<operatorOptions.length;i++){
-    if (operatorOptions[i].key===key){
+const operatorSelect = (key, row) => {
+  for (let i = 0; i < operatorOptions.length; i++) {
+    if (operatorOptions[i].key === key) {
       operatorOptions[i].func(row)
       return
     }
   }
 }
 
-const operatorRenderLabel = (option)=>{
-  return h(NButton,{
-    text:true,
-    size:"tiny",
-    focusable:false,
-    type:"info",
-  },{
-    default:()=> option.label,
+const operatorRenderLabel = (option) => {
+  return h(NButton, {
+    text: true,
+    size: "tiny",
+    focusable: false,
+    type: "info",
+  }, {
+    default: () => option.label,
   })
 }
 </script>
@@ -223,8 +221,8 @@ const operatorRenderLabel = (option)=>{
 <template>
   <div>
     <AppCard :show-border="false">
-      <n-alert type="warning">
-        在客户端的设备上运行HTTP/SOCKS5代理服务，访问客户端代理服务时，流量会转发至节点，客户端与节点之间数据加密传输（错误的使用方法，可能会导致节点被封，谨慎使用）
+      <n-alert type="info">
+        运行一个Socks5服务，可以通过此服务访问到客户端的内部网络
       </n-alert>
     </AppCard>
     <AppCard :show-border="false">
@@ -317,16 +315,15 @@ const operatorRenderLabel = (option)=>{
                   row.client.name
                 }}</span><br>
               <span>协议：{{ row.protocol }}</span><br>
-              <span>本地端口：{{ row.port }}</span><br>
+              <span>访问地址：{{ row.node.address + ':' + row.port }}</span><br>
               <span>速率：{{ limiterText(row.config.limiter) }}</span><br>
-              <span>并发数：{{ rLimiterText(row.config.rLimiter) }}</span><br>
-              <span>连接数：{{ cLimiterText(row.config.cLimiter) }}</span><br>
               <span>套餐：{{ configText(row.config) }}</span><br>
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
               <span>流量( IN | OUT )：{{ flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
-              <n-dropdown trigger="hover" size="small" :options="operatorOptions" @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
+              <n-dropdown trigger="hover" size="small" :options="operatorOptions"
+                          @select="value => operatorSelect(value,row)" :render-label="operatorRenderLabel">
                 <n-button size="tiny" :focusable="false" quaternary type="info">更多操作</n-button>
               </n-dropdown>
 
@@ -400,15 +397,22 @@ const operatorRenderLabel = (option)=>{
         </n-form-item>
         <n-form-item path="protocol" label="协议">
           <n-select
-              :options="[{label:'HTTP',value:'http'},{label:'SOCKS5',value:'socks5'}]"
+              :options="[{label:'SOCKS5',value:'socks5'}]"
               v-model:value="state.update.data.protocol"
           ></n-select>
         </n-form-item>
-        <n-form-item path="port" label="本地端口">
-          <n-input
-              v-model:value="state.update.data.port"
-              placeholder="7890"
-          ></n-input>
+        <n-form-item path="authUser" label="认证用户">
+          <n-input v-model:value="state.update.data.authUser"></n-input>
+        </n-form-item>
+        <n-form-item path="authPwd" label="认证密码">
+          <n-input type="password" show-password-on="click" v-model:value="state.update.data.authPwd"></n-input>
+        </n-form-item>
+        <n-alert type="info" :show-icon="true">
+          可选远程端口：{{ state.update.data.node.forwardPorts }}
+        </n-alert>
+        <p></p>
+        <n-form-item path="port" label="远程端口">
+          <n-input v-model:value="state.update.data.port" placeholder="10001"></n-input>
         </n-form-item>
       </n-form>
     </Modal>

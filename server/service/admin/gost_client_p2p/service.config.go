@@ -8,7 +8,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 	"time"
 )
 
@@ -54,14 +54,14 @@ func (service *service) Config(req ConfigReq) error {
 		p2p.Cycle = req.Cycle
 		p2p.Amount = amount
 		p2p.Limiter = req.Limiter
-		p2p.RLimiter = req.RLimiter
-		p2p.CLimiter = req.CLimiter
+		//p2p.RLimiter = req.RLimiter
+		//p2p.CLimiter = req.CLimiter
 		p2p.ExpAt = expAt.Unix()
 		if err = tx.GostClientP2P.Save(p2p); err != nil {
 			log.Error("修改P2P隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientP2PConfig(tx, p2p.Code)
+		engine.ClientP2PConfig(tx, p2p.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        p2p.Code,
 			Type:        model.GOST_TUNNEL_TYPE_P2P,

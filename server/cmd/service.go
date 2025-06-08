@@ -38,6 +38,7 @@ var ServiceCmd = cobra.Command{
 				os.Exit(1)
 			}
 			fmt.Println("install service success")
+			return
 		case "uninstall":
 			_ = svr.Stop()
 			if err := svr.Uninstall(); err != nil {
@@ -45,12 +46,14 @@ var ServiceCmd = cobra.Command{
 				os.Exit(1)
 			}
 			fmt.Println("uninstall service success")
+			return
 		case "start", "stop", "restart":
 			if err := service.Control(svr, args[0]); err != nil {
 				fmt.Println(args[0]+" service fail", err)
 				os.Exit(1)
 			}
 			fmt.Println(args[0] + " service success")
+			return
 		case "run":
 			_ = svr.Run()
 		default:

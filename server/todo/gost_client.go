@@ -1,6 +1,7 @@
 package todo
 
 import (
+	cache2 "github.com/patrickmn/go-cache"
 	"server/model"
 	"server/repository"
 	"server/service/common/cache"
@@ -8,6 +9,12 @@ import (
 
 func gostClient() {
 	db, _, _ := repository.Get("")
+	var clientCodes []string
+	_ = db.GostClient.Pluck(db.GostClient.Code, &clientCodes)
+	for _, code := range clientCodes {
+		cache.SetClientOnline(code, false, cache2.NoExpiration)
+	}
+
 	authList, _ := db.GostAuth.Find()
 	var authMap = make(map[string]model.GostAuth)
 	for _, item := range authList {

@@ -13,6 +13,7 @@ type CreateReq struct {
 	Account  string          `binding:"required" json:"account" label:"账号"`
 	Password string          `binding:"required" json:"password" label:"密码"`
 	Amount   decimal.Decimal `binding:"required" json:"amount" label:"积分"`
+	Admin    int             `binding:"required" json:"admin"`
 }
 
 func (service *service) Create(req CreateReq) error {
@@ -27,7 +28,7 @@ func (service *service) Create(req CreateReq) error {
 		Account:  req.Account,
 		Password: utils.MD5AndSalt(req.Password, salt),
 		Salt:     salt,
-		Admin:    model.SYSTEM_NO_ADMIN,
+		Admin:    req.Admin,
 		Amount:   req.Amount,
 	}); err != nil {
 		log.Error("新增用户失败", zap.Error(err))

@@ -13,6 +13,7 @@ type UpdateReq struct {
 	Account  string          `binding:"required" json:"account" label:"账号"`
 	Amount   decimal.Decimal `binding:"required" json:"amount" label:"积分"`
 	Password string          `json:"password" label:"密码"`
+	Admin    int             `binding:"required" json:"admin"`
 }
 
 func (service *service) Update(req UpdateReq) error {
@@ -21,6 +22,7 @@ func (service *service) Update(req UpdateReq) error {
 	if user == nil {
 		return errors.New("用户不存在")
 	}
+	user.Admin = req.Admin
 	user.Account = req.Account
 	user.Amount = req.Amount
 	if req.Password != "" {

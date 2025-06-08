@@ -266,8 +266,6 @@ const operatorRenderLabel = (option)=>{
                 }}</span><br>
               <span>内网目标：{{ row.targetIp + ':' + row.targetPort }}</span><br>
               <span>速率：{{ limiterText(row.config.limiter) }}</span><br>
-              <span>并发数：{{ rLimiterText(row.config.rLimiter) }}</span><br>
-              <span>连接数：{{ cLimiterText(row.config.cLimiter) }}</span><br>
               <span>套餐：{{ configText(row.config) }}</span><br>
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
             </div>
@@ -344,12 +342,6 @@ const operatorRenderLabel = (option)=>{
         </n-form-item>
         <n-form-item path="limiter" label="速率(mbps)">
           <n-input-number v-model:value="state.config.data.limiter" :min="0"></n-input-number>
-        </n-form-item>
-        <n-form-item path="rLimiter" label="并发数">
-          <n-input-number v-model:value="state.config.data.rLimiter" :min="0"></n-input-number>
-        </n-form-item>
-        <n-form-item path="cLimiter" label="连接数">
-          <n-input-number v-model:value="state.config.data.cLimiter" :min="0"></n-input-number>
         </n-form-item>
         <n-form-item path="expAt" label="到期时间" v-if="state.config.data.chargingType===2">
           <n-date-picker v-model:value="state.config.expAt" :default-value="state.config.expAt" type="datetime"/>

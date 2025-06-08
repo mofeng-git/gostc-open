@@ -2,6 +2,7 @@ package service
 
 import (
 	"gorm.io/gen"
+	"net"
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
@@ -102,11 +103,14 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			DomainPrefix: host.DomainPrefix,
 			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
 			Node: ItemNode{
-				Code:    host.NodeCode,
-				Name:    host.Node.Name,
-				Address: host.Node.Address,
-				Online:  utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
-				Domain:  host.Node.Domain,
+				Code: host.NodeCode,
+				Name: host.Node.Name,
+				Address: func() string {
+					address, _, _ := net.SplitHostPort(host.Node.Address)
+					return address
+				}(),
+				Online: utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
+				Domain: host.Node.Domain,
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,
@@ -118,9 +122,9 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 				Cycle:        host.Cycle,
 				Amount:       host.Amount.String(),
 				Limiter:      host.Limiter,
-				RLimiter:     host.RLimiter,
-				CLimiter:     host.CLimiter,
-				ExpAt:        time.Unix(host.ExpAt, 0).Format(time.DateTime),
+				//RLimiter:     host.RLimiter,
+				//CLimiter:     host.CLimiter,
+				ExpAt: time.Unix(host.ExpAt, 0).Format(time.DateTime),
 			},
 			Enable:      host.Enable,
 			WarnMsg:     warn_msg.GetHostWarnMsg(*host),

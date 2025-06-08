@@ -1,0 +1,1 @@
+go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe .

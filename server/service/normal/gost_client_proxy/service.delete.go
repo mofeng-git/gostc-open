@@ -7,7 +7,7 @@ import (
 	"server/repository"
 	"server/repository/query"
 	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type DeleteReq struct {
@@ -29,7 +29,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 			log.Error("删除用户代理隧道失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		gost_engine.ClientRemoveProxyConfig(*proxy)
+		engine.ClientRemoveProxyConfig(*proxy)
 		cache.DelTunnelInfo(req.Code)
 		return nil
 	})

@@ -8,8 +8,7 @@ import (
 	"server/pkg/utils"
 	"server/repository"
 	"server/repository/query"
-	"server/service/common/cache"
-	"server/service/gost_engine"
+	"server/service/engine"
 )
 
 type UpdateReq struct {
@@ -50,9 +49,9 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 				return errors.New("该域名前缀已被使用")
 			}
 			_, _ = tx.GostNodeDomain.Where(tx.GostNodeDomain.Prefix.Eq(host.DomainPrefix), tx.GostNodeDomain.NodeCode.Eq(host.NodeCode)).Delete()
-			// 清除旧缓存
-			cache.DelIngress(host.DomainPrefix + "." + host.Node.Domain)
-			cache.DelIngress(host.DomainPrefix + "." + host.Node.Domain + ":" + host.Node.TunnelInPort)
+			//清除旧缓存
+			//cache.DelIngress(host.DomainPrefix + "." + host.Node.Domain)
+			//cache.DelIngress(host.DomainPrefix + "." + host.Node.Domain + ":" + host.Node.TunnelInPort)
 		}
 
 		host.Name = req.Name
@@ -65,7 +64,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 			return errors.New("操作失败")
 		}
 
-		gost_engine.ClientHostConfig(tx, host.Code)
+		engine.ClientHostConfig(tx, host.Code)
 		return nil
 	})
 }

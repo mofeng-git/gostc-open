@@ -24,10 +24,11 @@ type LoginOtpResp struct {
 
 func (service *service) LoginOtp(ip string, req LoginOtpReq) (result LoginOtpResp, err error) {
 	db, _, _ := repository.Get("")
-	userCode := cache.GetLoginOtp(req.Key, true)
+	userCode := cache.GetLoginOtp(req.Key, false)
 	if userCode == "" {
 		return result, errors.New("登录失败")
 	}
+	cache.DelLoginOtp(req.Key)
 	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(userCode)).First()
 	if user == nil {
 		return result, errors.New("未查询到账户信息")

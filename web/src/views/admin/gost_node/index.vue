@@ -51,17 +51,11 @@ const state = ref({
       domain: '',
       denyDomainPrefix: '',
       address: '',
+      replaceAddress: '',
       protocol: protocols[0].value,
       urlTpl: '',
-      tunnelConnPort: '',
-      tunnelInPort: '',
-      tunnelMetadata: '',
-      forwardConnPort: '',
+      httpPort: '',
       forwardPorts: '',
-      forwardMetadata: '',
-      tunnelReplaceAddress: '',
-      forwardReplaceAddress: '',
-      p2pPort: '',
       p2pDisableForward: 0,
       rules: [],
       tags: [],
@@ -90,17 +84,11 @@ const state = ref({
       domain: '',
       denyDomainPrefix: '',
       address: '',
+      replaceAddress: '',
       protocol: protocols[0].value,
       urlTpl: '',
-      tunnelConnPort: '',
-      tunnelInPort: '',
-      tunnelMetadata: '',
-      forwardConnPort: '',
+      httpPort: '',
       forwardPorts: '',
-      forwardMetadata: '',
-      tunnelReplaceAddress: '',
-      forwardReplaceAddress: '',
-      p2pPort: '',
       p2pDisableForward: 0,
       rules: [],
       tags: [],
@@ -166,17 +154,11 @@ const openCreate = () => {
     domain: '',
     denyDomainPrefix: '',
     address: '',
+    replaceAddress: '',
     protocol: protocols[0].value,
     urlTpl: '',
-    tunnelConnPort: '',
-    tunnelInPort: '',
-    tunnelMetadata: '',
-    forwardConnPort: '',
+    httpPort: '',
     forwardPorts: '',
-    forwardMetadata: '',
-    tunnelReplaceAddress: '',
-    forwardReplaceAddress: '',
-    p2pPort: '',
     p2pDisableForward: 0,
     rules: [],
     tags: [],
@@ -367,12 +349,6 @@ onBeforeMount(() => {
 
 <template>
   <div>
-    <AppCard :show-border="false">
-      <n-alert type="warning">
-        不推荐启用节点的代理隧道功能，非正常用途，可能导致节点IP被墙
-      </n-alert>
-    </AppCard>
-
     <SearchCard :show-border="false" space>
       <SearchItem
           type="input"
@@ -436,19 +412,14 @@ onBeforeMount(() => {
               <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
                 <n-tab-pane name="web" tab="域名解析">
-                  <span>访问端口：{{ row.tunnelInPort }}</span><br>
+                  <span>访问端口：{{ row.httpPort }}</span><br>
                   <span>基础域名：{{ row.domain }}</span><br>
                   <span>不允许的域名前缀：{{ row.denyDomainPrefix || '暂无' }}</span><br>
                 </n-tab-pane>
-                <n-tab-pane name="tunnel" tab="私有隧道">
-                  <span>连接端口：{{ row.tunnelConnPort }}</span><br>
-                </n-tab-pane>
                 <n-tab-pane name="forward" tab="端口转发">
-                  <span>连接端口：{{ row.forwardConnPort }}</span><br>
                   <span>开放端口：{{ row.forwardPorts }}</span><br>
                 </n-tab-pane>
                 <n-tab-pane name="p2p" tab="P2P隧道">
-                  <span>连接端口：{{ row.p2pPort }}</span><br>
                   <span>中继转发：{{ row.p2pDisableForward === 0 ? '启用' : '禁用' }}</span><br>
                 </n-tab-pane>
               </n-tabs>
@@ -538,8 +509,11 @@ onBeforeMount(() => {
         <n-form-item path="indexValue" label="排序(升序)">
           <n-input-number v-model:value="state.create.data.indexValue"></n-input-number>
         </n-form-item>
-        <n-form-item path="address" label="地址(IP|HOST)">
-          <n-input v-model:value.trim="state.create.data.address"></n-input>
+        <n-form-item path="address" label="地址">
+          <n-input v-model:value.trim="state.create.data.address" placeholder="1.1.1.1:7000"></n-input>
+        </n-form-item>
+        <n-form-item path="replaceAddress" label="替换地址(一般留空)">
+          <n-input v-model:value.trim="state.create.data.replaceAddress" placeholder="www.example.com:443"></n-input>
         </n-form-item>
         <n-form-item path="tunnelProtocol" label="连接协议">
           <n-select
@@ -594,24 +568,16 @@ onBeforeMount(() => {
             </n-checkbox>
           </n-space>
         </n-form-item>
-        <n-alert type="warning" :show-icon="false"
-                 v-show="state.create.data.proxy===1 && state.create.data.forward!==1">
-          代理隧道，必须启用端口转发
-        </n-alert>
         <n-tabs type="line" animated>
           <n-tab-pane name="web" tab="域名解析">
-            <div v-show="state.create.data.tunnel!==1 || state.create.data.web !==1">
-              <n-alert type="warning" :show-icon="false" v-show="state.create.data.web!==1">
+            <div v-show="state.create.data.web !==1">
+              <n-alert type="warning" :show-icon="false">
                 未启用域名解析
-              </n-alert>
-              <n-alert type="warning" :show-icon="false"
-                       v-show="state.create.data.web===1 && state.create.data.tunnel!==1">
-                域名解析，必须启用私有隧道
               </n-alert>
               <br>
             </div>
-            <n-form-item path="tunnelInPort" label="访问端口">
-              <n-input v-model:value.trim="state.create.data.tunnelInPort" placeholder="3333"></n-input>
+            <n-form-item path="httpPort" label="访问端口">
+              <n-input v-model:value.trim="state.create.data.httpPort" placeholder="3333"></n-input>
             </n-form-item>
             <n-form-item path="domain" label="基础域名">
               <n-input v-model:value.trim="state.create.data.domain" placeholder="example.com"></n-input>
@@ -627,28 +593,6 @@ onBeforeMount(() => {
               ></n-input>
             </n-form-item>
           </n-tab-pane>
-          <n-tab-pane name="tunnel" tab="私有隧道">
-            <div v-show="state.create.data.tunnel!==1">
-              <n-alert type="warning" :show-icon="false">
-                未启用私有隧道
-              </n-alert>
-              <br>
-            </div>
-            <n-form-item path="tunnelConnPort" label="连接端口">
-              <n-input v-model:value="state.create.data.tunnelConnPort" placeholder="2096"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.tunnelReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.create.data.tunnelMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
-            </n-form-item>
-          </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">
             <div v-show="state.create.data.forward!==1">
               <n-alert type="warning" :show-icon="false">
@@ -656,22 +600,8 @@ onBeforeMount(() => {
               </n-alert>
               <br>
             </div>
-            <n-form-item path="forwardConnPort" label="连接端口">
-              <n-input v-model:value="state.create.data.forwardConnPort" placeholder="2097"></n-input>
-            </n-form-item>
             <n-form-item path="forwardPorts" label="端口配额">
               <n-input v-model:value="state.create.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
-            </n-form-item>
-            <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.create.data.forwardReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="forwardMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.create.data.forwardMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
             </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="p2p" tab="P2P隧道">
@@ -681,9 +611,6 @@ onBeforeMount(() => {
               </n-alert>
               <br>
             </div>
-            <n-form-item path="p2pPort" label="连接端口">
-              <n-input v-model:value="state.create.data.p2pPort" placeholder="7000"></n-input>
-            </n-form-item>
             <n-form-item path="p2pDisableForward" label="中继转发">
               <n-switch
                   :round="false"
@@ -762,8 +689,11 @@ onBeforeMount(() => {
         <n-form-item path="indexValue" label="排序(升序)">
           <n-input-number v-model:value="state.update.data.indexValue"></n-input-number>
         </n-form-item>
-        <n-form-item path="address" label="地址(IP|HOST)">
-          <n-input v-model:value.trim="state.update.data.address"></n-input>
+        <n-form-item path="address" label="地址">
+          <n-input v-model:value.trim="state.update.data.address" placeholder="1.1.1.1:7000"></n-input>
+        </n-form-item>
+        <n-form-item path="replaceAddress" label="替换地址(一般留空)">
+          <n-input v-model:value.trim="state.update.data.replaceAddress" placeholder="www.example.com:443"></n-input>
         </n-form-item>
         <n-form-item path="tunnelProtocol" label="连接协议">
           <n-select
@@ -818,24 +748,16 @@ onBeforeMount(() => {
             </n-checkbox>
           </n-space>
         </n-form-item>
-        <n-alert type="warning" :show-icon="false"
-                 v-show="state.update.data.proxy===1 && state.update.data.forward!==1">
-          代理隧道，必须启用端口转发
-        </n-alert>
         <n-tabs type="line" animated>
           <n-tab-pane name="web" tab="域名解析">
-            <div v-show="state.update.data.tunnel!==1 || state.update.data.web !==1">
-              <n-alert type="warning" :show-icon="false" v-show="state.update.data.web!==1">
+            <div v-show="state.update.data.web !==1">
+              <n-alert type="warning" :show-icon="false">
                 未启用域名解析
-              </n-alert>
-              <n-alert type="warning" :show-icon="false"
-                       v-show="state.update.data.web===1 && state.update.data.tunnel!==1">
-                域名解析，必须启用私有隧道
               </n-alert>
               <br>
             </div>
-            <n-form-item path="tunnelInPort" label="访问端口">
-              <n-input v-model:value.trim="state.update.data.tunnelInPort" placeholder="3333"></n-input>
+            <n-form-item path="httpPort" label="访问端口">
+              <n-input v-model:value.trim="state.update.data.httpPort" placeholder="3333"></n-input>
             </n-form-item>
             <n-form-item path="domain" label="基础域名">
               <n-input v-model:value.trim="state.update.data.domain" placeholder="example.com"></n-input>
@@ -851,28 +773,6 @@ onBeforeMount(() => {
               ></n-input>
             </n-form-item>
           </n-tab-pane>
-          <n-tab-pane name="tunnel" tab="私有隧道">
-            <div v-show="state.update.data.tunnel!==1">
-              <n-alert type="warning" :show-icon="false">
-                未启用私有隧道
-              </n-alert>
-              <br>
-            </div>
-            <n-form-item path="tunnelConnPort" label="连接端口">
-              <n-input v-model:value="state.update.data.tunnelConnPort" placeholder="2096"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.tunnelReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="tunnelMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.update.data.tunnelMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
-            </n-form-item>
-          </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">
             <div v-show="state.update.data.forward!==1">
               <n-alert type="warning" :show-icon="false">
@@ -880,22 +780,8 @@ onBeforeMount(() => {
               </n-alert>
               <br>
             </div>
-            <n-form-item path="forwardConnPort" label="连接端口">
-              <n-input v-model:value="state.update.data.forwardConnPort" placeholder="2097"></n-input>
-            </n-form-item>
             <n-form-item path="forwardPorts" label="端口配额">
               <n-input v-model:value="state.update.data.forwardPorts" placeholder="10001-11000,20000,30000"></n-input>
-            </n-form-item>
-            <n-form-item path="forwardReplaceAddress" label="替换地址(一般留空)">
-              <n-input v-model:value="state.update.data.forwardReplaceAddress"
-                       placeholder="grpc://1.1.1.1:8080"></n-input>
-            </n-form-item>
-            <n-form-item path="forwardMetadata" label="METADATA">
-              <n-input
-                  type="textarea"
-                  v-model:value.trim="state.update.data.forwardMetadata"
-                  placeholder="JSON格式"
-              ></n-input>
             </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="p2p" tab="P2P隧道">
@@ -905,9 +791,6 @@ onBeforeMount(() => {
               </n-alert>
               <br>
             </div>
-            <n-form-item path="p2pPort" label="连接端口">
-              <n-input v-model:value="state.update.data.p2pPort" placeholder="7000"></n-input>
-            </n-form-item>
             <n-form-item path="p2pDisableForward" label="中继转发">
               <n-switch
                   :round="false"

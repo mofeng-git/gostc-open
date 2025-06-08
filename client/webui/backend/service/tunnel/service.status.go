@@ -5,8 +5,10 @@ import (
 	"errors"
 	"gostc-sub/internal/common"
 	service2 "gostc-sub/internal/service"
+	service3 "gostc-sub/internal/service/visitor"
 	"gostc-sub/webui/backend/global"
 	"gostc-sub/webui/backend/model"
+	"strconv"
 )
 
 type StatusReq struct {
@@ -25,15 +27,16 @@ func (*service) Status(req StatusReq) error {
 
 	svc, ok := global.TunnelMap.Load(req.Key)
 	if !ok {
-		svc = service2.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, tunnel.Port)
+		port, _ := strconv.Atoi(tunnel.Port)
+		svc = service3.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, port)
 		global.TunnelMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {
-		if err := svc.(*service2.Tunnel).Start(); err != nil {
+		if err := svc.(service2.Service).Start(); err != nil {
 			return err
 		}
 	} else {
-		svc.(*service2.Tunnel).Stop()
+		svc.(service2.Service).Stop()
 	}
 	return nil
 }

@@ -6,7 +6,7 @@ import {regexpRule, requiredRule} from "../../../utils/formDataRule.js";
 import {regexpPort} from "../../../utils/regexp.js";
 import {apiNormalGostNodeList} from "../../../api/normal/gost_node.js";
 import {apiNormalGostClientList} from "../../../api/normal/gost_client.js";
-import {cLimiterText, configText, limiterText, rLimiterText} from "../gost_client_host/index.js";
+import {configText, limiterText} from "../gost_client_host/index.js";
 import AppCard from "../../../layout/components/AppCard.vue";
 import {NSpace} from "naive-ui";
 import Online from "../../../icon/online.vue";
@@ -22,15 +22,16 @@ const state = ref({
     clientCode: '',
     name: '',
     port: '',
-    protocol: 'http',
+    authUser: '',
+    authPwd: '',
+    protocol: 'socks5',
   },
   dataRules: {
     name: requiredRule('请输入名称'),
     configCode: requiredRule('请选择节点套餐'),
     nodeCode: requiredRule('请选择节点套餐'),
     clientCode: requiredRule('请选择客户端'),
-    protocol: requiredRule( '选择协议'),
-    port: regexpRule(regexpPort, '本地端口格式错误'),
+    protocol: requiredRule('选择协议'),
   },
   nodes: [],
   node: {},
@@ -78,7 +79,7 @@ const nodeListFunc = async () => {
     state.value.loading = true
     let res = await apiNormalGostNodeList(state.value.search)
     state.value.nodes = res.data || []
-    state.value.nodes = state.value.nodes.filter(item=>{
+    state.value.nodes = state.value.nodes.filter(item => {
       return item.proxy === 1
     })
     state.value.data.nodeCode = ''
@@ -222,14 +223,6 @@ onBeforeMount(() => {
             <span>速率：</span>
             <span>{{ limiterText(state.config.limiter) }}</span>
           </n-space>
-          <n-space>
-            <span>并发数：</span>
-            <span>{{ rLimiterText(state.config.rLimiter) }}</span>
-          </n-space>
-          <n-space>
-            <span>连接数：</span>
-            <span>{{ cLimiterText(state.config.cLimiter) }}</span>
-          </n-space>
         </n-space>
 
         <n-h4 style="font-weight: bold">选择客户端：</n-h4>
@@ -269,12 +262,22 @@ onBeforeMount(() => {
         </n-form-item>
         <n-form-item path="protocol" label="协议">
           <n-select
-              :options="[{label:'HTTP',value:'http'},{label:'SOCKS5',value:'socks5'}]"
+              :options="[{label:'SOCKS5',value:'socks5'}]"
               v-model:value="state.data.protocol"
           ></n-select>
         </n-form-item>
-        <n-form-item path="port" label="本地端口">
-          <n-input v-model:value="state.data.port" placeholder="80"></n-input>
+        <n-form-item path="authUser" label="认证用户">
+          <n-input v-model:value="state.data.authUser"></n-input>
+        </n-form-item>
+        <n-form-item path="authPwd" label="认证密码">
+          <n-input type="password" show-password-on="click" v-model:value="state.data.authPwd"></n-input>
+        </n-form-item>
+        <n-alert type="info" :show-icon="true">
+          可选远程端口：{{ state.node.forwardPorts }}
+        </n-alert>
+        <p></p>
+        <n-form-item path="port" label="远程端口(留空则自动分配)">
+          <n-input v-model:value="state.data.port" placeholder="10001"></n-input>
         </n-form-item>
       </n-form>
       <n-space>

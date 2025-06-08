@@ -12,13 +12,14 @@ func init() {
 		systemUser()
 		systemConfig()
 		gostClient()
+		gostNode()
 		gostNodePort()
 
 		// 需要先将obs回写到cache，在处理obs数据
 		gostObsWriteBack()
 		gostObs()
 
-		// 修复一些之前的数据错误
+		// 修复一些线上数据错误
 		//fix()
 	}
 }
