@@ -31,7 +31,12 @@ type NewProxyReq struct {
 			Password string `json:"password"`
 			User     string `json:"user"`
 		} `json:"metas"`
-		RemotePort int `json:"remote_port"`
+		RemotePort        int      `json:"remote_port"`
+		CustomDomains     []string `json:"custom_domains"`
+		HostHeaderRewrite string   `json:"host_header_rewrite"`
+		Headers           struct {
+			XFromWhere string `json:"x-from-where"`
+		} `json:"headers"`
 	} `json:"content"`
 }
 

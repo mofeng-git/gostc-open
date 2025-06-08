@@ -73,6 +73,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 						host.Node.GetDomainHost(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
 					},
 				},
+				HostHeaderRewrite: host.Node.GetDomainHost(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,
