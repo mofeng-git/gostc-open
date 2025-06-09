@@ -37,3 +37,5 @@ func NewDialer() *MyDialer {
 func (m *MyDialer) Dial(network, addr string) (c net.Conn, err error) {
 	return m.Resolver.Dial(m.ctx, network, addr)
 }
+
+var Dialer = NewDialer()

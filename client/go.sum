@@ -11,6 +11,8 @@ github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358/go.mod h1:chxPXzS
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/SianHH/frp-package v0.0.0-20250607103110-6e5849443a17 h1:PRDvoX6F3BGZ04u5EbZwrNO67CllwyHWAve0swfatjA=
 github.com/SianHH/frp-package v0.0.0-20250607103110-6e5849443a17/go.mod h1:jfnuhKDT5+ZRffxzri5wqoWd5fwBqKsz3fzGhcz22Kk=
+github.com/SianHH/frp-package v0.0.0-20250609033425-9203a5aa69a3 h1:dABV4ZYxy18qWyyJOVshdtHPaUHYdJqy/Tf+iLVKcYQ=
+github.com/SianHH/frp-package v0.0.0-20250609033425-9203a5aa69a3/go.mod h1:jfnuhKDT5+ZRffxzri5wqoWd5fwBqKsz3fzGhcz22Kk=
 github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da h1:KjTM2ks9d14ZYCvmHS9iAKVt9AyzRSqNU1qabPih5BY=
 github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da/go.mod h1:eHEWzANqSiWQsof+nXEI9bUVUyV6F53Fp89EuCh2EAA=
 github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 h1:s6gZFSlWYmbqAuRjVTiNNhvNRfY2Wxp9nhfyel4rklc=

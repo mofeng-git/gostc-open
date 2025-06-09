@@ -80,7 +80,10 @@ func (svc *P2P) run() (err error) {
 		config.XTCP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.XTCP)
 	}
-	srv := frpc.NewService(config.Common, nil, visitorCfgs)
+	srv, err := frpc.NewService(config.Common, nil, visitorCfgs)
+	if err != nil {
+		return err
+	}
 	if err := srv.Start(); err != nil {
 		return err
 	}

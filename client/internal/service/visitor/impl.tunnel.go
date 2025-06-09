@@ -82,7 +82,10 @@ func (svc *Tunnel) run() (err error) {
 		config.SUDP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.SUDP)
 	}
-	srv := frpc.NewService(config.Common, nil, visitorCfgs)
+	srv, err := frpc.NewService(config.Common, nil, visitorCfgs)
+	if err != nil {
+		return err
+	}
 	if err := srv.Start(); err != nil {
 		return err
 	}

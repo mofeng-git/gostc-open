@@ -22,7 +22,11 @@ func ForwardHandle(client *arpc.Client, callback func(key string)) {
 			proxyCfgs = append(proxyCfgs, req.UDP.To())
 		}
 		service.Del(req.Key)
-		svc := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
+		svc, err := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
+		if err != nil {
+			_ = c.Write(err.Error())
+			return
+		}
 		if err := svc.Start(); err != nil {
 			_ = c.Write(err.Error())
 			return

@@ -6,7 +6,7 @@ toolchain go1.23.4
 
 require (
 	gioui.org v0.8.0
-	github.com/SianHH/frp-package v0.0.0-20250607103110-6e5849443a17
+	github.com/SianHH/frp-package v0.0.0-20250609033425-9203a5aa69a3
 	github.com/energye/systray v1.0.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-gost/core v0.3.1

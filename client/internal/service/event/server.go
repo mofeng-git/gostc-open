@@ -17,7 +17,11 @@ func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)
 		for i := 0; i < len(req.ServerConfig.HTTPPlugins); i++ {
 			req.ServerConfig.HTTPPlugins[i].Addr = httpUrl
 		}
-		svc := frps.NewService(req.ServerConfig)
+		svc, err := frps.NewService(req.ServerConfig)
+		if err != nil {
+			_ = c.Write(err.Error())
+			return
+		}
 		if err := svc.Start(); err != nil {
 			_ = c.Write(err.Error())
 			return

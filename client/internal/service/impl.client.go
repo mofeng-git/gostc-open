@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/SianHH/frp-package/package"
+	websocket2 "github.com/gorilla/websocket"
 	"github.com/lesismal/arpc"
 	"gostc-sub/internal/common"
 	"gostc-sub/internal/service/event"
@@ -71,6 +72,8 @@ func (svc *Client) run() (err error) {
 	client, err := arpc.NewClient(func() (net.Conn, error) {
 		return websocket.Dial(svc.wsUrl+"/rpc/ws", http.Header{
 			"key": []string{svc.key},
+		}, &websocket2.Dialer{
+			NetDial: common.Dialer.Dial,
 		})
 	})
 	if err != nil {
@@ -111,6 +114,7 @@ func (svc *Client) run() (err error) {
 	event.TunnelHandle(client, callback)
 	event.ProxyHandle(client, callback)
 	event.P2PHandle(client, callback)
+	event.CustomCfgHandle(client, callback)
 	event.StopHandle(client, func() {
 		svc.Stop()
 	})
