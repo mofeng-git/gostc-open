@@ -117,14 +117,16 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 			},
 		},
 	}
-	//switch node.Protocol {
-	//case "quic":
-	//	data.ServerConfig.BindPort = 0
-	//	data.ServerConfig.QUICBindPort = serverPort
-	//case "kcp":
-	//	data.ServerConfig.BindPort = 0
-	//	data.ServerConfig.KCPBindPort = serverPort
-	//}
+	switch node.Protocol {
+	case "quic":
+		data.ServerConfig.BindPort = serverPort
+		data.ServerConfig.QUICBindPort = serverPort
+		data.ServerConfig.KCPBindPort = 0
+	case "kcp":
+		data.ServerConfig.BindPort = serverPort
+		data.ServerConfig.KCPBindPort = serverPort
+		data.ServerConfig.QUICBindPort = 0
+	}
 
 	var relay string
 	if err := e.client.Call("server_config", data, &relay, time.Second*5); err != nil {
