@@ -68,3 +68,10 @@ func GetP2PWarnMsg(p2p model.GostClientP2P) string {
 	}
 	return ""
 }
+
+func GetCfgWarnMsg(p2p model.FrpClientCfg) string {
+	if p2p.Enable != 1 {
+		return "已停用"
+	}
+	return ""
+}

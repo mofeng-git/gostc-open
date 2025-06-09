@@ -17,6 +17,7 @@ import (
 
 var (
 	Q                    = new(Query)
+	FrpClientCfg         *frpClientCfg
 	GostAuth             *gostAuth
 	GostClient           *gostClient
 	GostClientAdmission  *gostClientAdmission
@@ -42,6 +43,7 @@ var (
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	FrpClientCfg = &Q.FrpClientCfg
 	GostAuth = &Q.GostAuth
 	GostClient = &Q.GostClient
 	GostClientAdmission = &Q.GostClientAdmission
@@ -68,6 +70,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:                   db,
+		FrpClientCfg:         newFrpClientCfg(db, opts...),
 		GostAuth:             newGostAuth(db, opts...),
 		GostClient:           newGostClient(db, opts...),
 		GostClientAdmission:  newGostClientAdmission(db, opts...),
@@ -95,6 +98,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 type Query struct {
 	db *gorm.DB
 
+	FrpClientCfg         frpClientCfg
 	GostAuth             gostAuth
 	GostClient           gostClient
 	GostClientAdmission  gostClientAdmission
@@ -123,6 +127,7 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:                   db,
+		FrpClientCfg:         q.FrpClientCfg.clone(db),
 		GostAuth:             q.GostAuth.clone(db),
 		GostClient:           q.GostClient.clone(db),
 		GostClientAdmission:  q.GostClientAdmission.clone(db),
@@ -158,6 +163,7 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:                   db,
+		FrpClientCfg:         q.FrpClientCfg.replaceDB(db),
 		GostAuth:             q.GostAuth.replaceDB(db),
 		GostClient:           q.GostClient.replaceDB(db),
 		GostClientAdmission:  q.GostClientAdmission.replaceDB(db),
@@ -183,6 +189,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 }
 
 type queryCtx struct {
+	FrpClientCfg         IFrpClientCfgDo
 	GostAuth             IGostAuthDo
 	GostClient           IGostClientDo
 	GostClientAdmission  IGostClientAdmissionDo
@@ -208,6 +215,7 @@ type queryCtx struct {
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		FrpClientCfg:         q.FrpClientCfg.WithContext(ctx),
 		GostAuth:             q.GostAuth.WithContext(ctx),
 		GostClient:           q.GostClient.WithContext(ctx),
 		GostClientAdmission:  q.GostClientAdmission.WithContext(ctx),

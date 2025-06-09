@@ -42,6 +42,7 @@ func main() {
 		model.SystemUser{},
 		model.SystemUserCheckin{},
 		model.SystemUserEmail{},
+		model.FrpClientCfg{},
 	)
 	g.Execute()
 }

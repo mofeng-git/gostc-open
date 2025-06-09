@@ -95,7 +95,7 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		cache.SetClientOnline(gostClient.Code, true, cache2.NoExpiration)
 		cache.SetClientVersion(gostClient.Code, version)
 		client.Set("code", gostClient.Code)
-		clientTunnelInit(gostClient.Code)
+		engine.ClientAllConfigUpdateByClientCode(db, gostClient.Code)
 	})
 	rpcServer.Handler.Handle("rpc/node/reg", func(c *arpc.Context) {
 		var reply = make(map[string]string)
@@ -145,7 +145,7 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		cache.SetNodeCustomDomain(gostNode.Code, domain == "1")
 		cache.SetNodeCache(gostNode.Code, domainCache == "1")
 		client.Set("code", gostNode.Code)
-		nodeServerInit(gostNode.Code)
+		engine.NodeConfig(db, gostNode.Code)
 	})
 
 	rpcServer.Handler.Handle("rpc/metrics/input", func(c *arpc.Context) {
@@ -196,38 +196,4 @@ type TrafficOutput struct {
 	Name      string
 	ProxyType string
 	Total     int64
-}
-
-func clientTunnelInit(code string) {
-	db, _, _ := repository.Get("")
-	var hostCodes []string
-	_ = db.GostClientHost.Where(db.GostClientHost.ClientCode.Eq(code)).Pluck(db.GostClientHost.Code, &hostCodes)
-	for _, code := range hostCodes {
-		engine.ClientHostConfig(db, code)
-	}
-	var forwardCodes []string
-	_ = db.GostClientForward.Where(db.GostClientForward.ClientCode.Eq(code)).Pluck(db.GostClientForward.Code, &forwardCodes)
-	for _, code := range forwardCodes {
-		engine.ClientForwardConfig(db, code)
-	}
-	var tunnelCodes []string
-	_ = db.GostClientTunnel.Where(db.GostClientTunnel.ClientCode.Eq(code)).Pluck(db.GostClientTunnel.Code, &tunnelCodes)
-	for _, code := range tunnelCodes {
-		engine.ClientTunnelConfig(db, code)
-	}
-	var proxyCodes []string
-	_ = db.GostClientProxy.Where(db.GostClientProxy.ClientCode.Eq(code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
-	for _, code := range proxyCodes {
-		engine.ClientProxyConfig(db, code)
-	}
-	var p2pCodes []string
-	_ = db.GostClientP2P.Where(db.GostClientP2P.ClientCode.Eq(code)).Pluck(db.GostClientP2P.Code, &p2pCodes)
-	for _, code := range p2pCodes {
-		engine.ClientP2PConfig(db, code)
-	}
-}
-
-func nodeServerInit(code string) {
-	db, _, _ := repository.Get("")
-	engine.NodeConfig(db, code)
 }

@@ -73,6 +73,7 @@ func init() {
 		normal.InitGostObs(normalGroup)
 		normal.InitSystemNotice(normalGroup)
 		normal.InitDashboard(normalGroup)
+		normal.InitFrpClientCfg(normalGroup)
 
 		openGroup := engine.Group("api/v1/open")
 		open.InitAuth(openGroup.Group("auth"))

@@ -36,6 +36,8 @@ type IClient interface {
 	RemoveP2P(tx *query.Query, p2p model.GostClientP2P) error                               // 删除P2P隧道
 	ProxyConfig(tx *query.Query, proxyCode string) error                                    // 代理隧道配置
 	RemoveProxy(tx *query.Query, proxy model.GostClientProxy) error                         // 删除代理隧道
+	CustomCfgConfig(tx *query.Query, cfgCode string) error                                  // 自定义配置隧道
+	RemoveCustomCfg(tx *query.Query, cfgCode string) error                                  // 删除自定义配置
 }
 
 type INode interface {
@@ -108,6 +110,14 @@ func (reg EngineRegister) Get(code string) (*Engine, bool) {
 type DefaultClientImpl struct {
 }
 
+func (d DefaultClientImpl) CustomCfgConfig(tx *query.Query, cfgCode string) error {
+	return nil
+}
+
+func (d DefaultClientImpl) RemoveCustomCfg(tx *query.Query, cfgCode string) error {
+	return nil
+}
+
 func (d DefaultClientImpl) Stop(msg string) {
 }
 
@@ -155,14 +165,6 @@ func (d DefaultClientImpl) RemoveProxy(tx *query.Query, proxy model.GostClientPr
 	return nil
 }
 
-func (d DefaultClientImpl) TunConfig(tx *query.Query, tunCode string) error {
-	return nil
-}
-
-func (d DefaultClientImpl) RemoveTun(tx *query.Query, tunCode string) error {
-	return nil
-}
-
 type DefaultNodeImpl struct {
 }
 
@@ -182,13 +184,5 @@ func (d DefaultNodeImpl) Ingress(tx *query.Query) error {
 }
 
 func (d DefaultNodeImpl) CustomDomain(tx *query.Query, domain, cert, key string, forceHttps int) error {
-	return nil
-}
-
-func (d DefaultNodeImpl) DomainCache(tx *query.Query, hostCode string) error {
-	return nil
-}
-
-func (d DefaultNodeImpl) DomainCacheClean(tx *query.Query, hostCode string) error {
 	return nil
 }

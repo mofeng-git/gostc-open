@@ -246,3 +246,9 @@ type TunNodeConfig struct {
 	Service config.ServiceConfig
 	Chain   config.ChainConfig
 }
+
+type CustomCfgConfig struct {
+	Key     string
+	Type    string
+	Content string
+}

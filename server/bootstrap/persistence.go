@@ -67,6 +67,7 @@ func InitPersistence() {
 		&model.GostNodeDomain{},
 		&model.GostNodePort{},
 		&model.GostNodeConfig{},
+		&model.FrpClientCfg{},
 	); err != nil {
 		global.Logger.Fatal("init table struct fail", zap.Error(err))
 		Release()

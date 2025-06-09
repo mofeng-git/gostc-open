@@ -39,12 +39,12 @@ func (e *ARpcClientEngine) PortCheck(tx *query.Query, ip, port string) error {
 
 func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 	host, err := tx.GostClientHost.Preload(tx.GostClientHost.Node).Where(tx.GostClientHost.Code.Eq(hostCode)).First()
-	if host == nil {
+	if err != nil {
 		return err
 	}
 	warnMsg := warn_msg.GetHostWarnMsg(*host)
 	if warnMsg != "" {
-		ClientRemoveHostConfig(tx, *host, host.Node)
+		_ = e.RemoveHost(tx, *host, host.Node)
 		return errors.New(warnMsg)
 	}
 	auth, err := tx.GostAuth.Where(tx.GostAuth.TunnelCode.Eq(hostCode)).First()
@@ -79,6 +79,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", host.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -106,12 +107,12 @@ func (e *ARpcClientEngine) RemoveHost(tx *query.Query, host model.GostClientHost
 
 func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) error {
 	forward, err := tx.GostClientForward.Preload(tx.GostClientForward.Node).Where(tx.GostClientForward.Code.Eq(forwardCode)).First()
-	if forward == nil {
+	if err != nil {
 		return err
 	}
 	warnMsg := warn_msg.GetForwardWarnMsg(*forward)
 	if warnMsg != "" {
-		ClientRemoveForwardConfig(*forward)
+		_ = e.RemoveForward(tx, *forward)
 		return errors.New(warnMsg)
 	}
 
@@ -143,6 +144,7 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -166,6 +168,7 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -194,12 +197,12 @@ func (e *ARpcClientEngine) RemoveForward(tx *query.Query, forward model.GostClie
 
 func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) error {
 	tunnel, err := tx.GostClientTunnel.Preload(tx.GostClientTunnel.Node).Where(tx.GostClientTunnel.Code.Eq(tunnelCode)).First()
-	if tunnel == nil {
+	if err != nil {
 		return err
 	}
 	warnMsg := warn_msg.GetTunnelWarnMsg(*tunnel)
 	if warnMsg != "" {
-		ClientRemoveTunnelConfig(tx, *tunnel, tunnel.Node)
+		_ = e.RemoveTunnel(tx, *tunnel, tunnel.Node)
 		return errors.New(warnMsg)
 	}
 	auth, err := tx.GostAuth.Where(tx.GostAuth.TunnelCode.Eq(tunnelCode)).First()
@@ -223,13 +226,13 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 						LocalPort: utils.StrMustInt(tunnel.TargetPort),
 					},
 				},
-				Secretkey:  tunnel.VKey + "_stcp",
-				AllowUsers: []string{"*"},
+				Secretkey: tunnel.VKey + "_stcp",
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -247,13 +250,13 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 						LocalPort: utils.StrMustInt(tunnel.TargetPort),
 					},
 				},
-				Secretkey:  tunnel.VKey + "_sudp",
-				AllowUsers: []string{"*"},
+				Secretkey: tunnel.VKey + "_sudp",
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -282,12 +285,12 @@ func (e *ARpcClientEngine) RemoveTunnel(tx *query.Query, tunnel model.GostClient
 
 func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 	p2p, err := tx.GostClientP2P.Preload(tx.GostClientP2P.Node).Where(tx.GostClientP2P.Code.Eq(p2pCode)).First()
-	if p2p == nil {
+	if err != nil {
 		return err
 	}
 	warnMsg := warn_msg.GetP2PWarnMsg(*p2p)
 	if warnMsg != "" {
-		ClientRemoveP2PConfig(*p2p)
+		_ = e.RemoveP2P(tx, *p2p)
 		return errors.New(warnMsg)
 	}
 
@@ -342,6 +345,7 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 				UseEncryption:        true,
 				UseCompression:       true,
 				BandwidthLimit:       fmt.Sprintf("%dKB", p2p.Limiter*128),
+				BandwidthLimitMode:   "server",
 				ProxyProtocolVersion: "",
 			},
 		},
@@ -369,12 +373,12 @@ func (e *ARpcClientEngine) RemoveP2P(tx *query.Query, p2p model.GostClientP2P) e
 
 func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error {
 	proxy, err := tx.GostClientProxy.Preload(tx.GostClientProxy.Node).Where(tx.GostClientProxy.Code.Eq(proxyCode)).First()
-	if proxy == nil {
+	if err != nil {
 		return err
 	}
 	warnMsg := warn_msg.GetProxyWarnMsg(*proxy)
 	if warnMsg != "" {
-		ClientRemoveProxyConfig(*proxy)
+		_ = e.RemoveProxy(tx, *proxy)
 		return errors.New(warnMsg)
 	}
 
@@ -434,4 +438,39 @@ func (e *ARpcClientEngine) generateServerCommonCfg(node model.GostNode, auth mod
 		},
 		LoginFailExit: new(bool),
 	}
+}
+
+func (e *ARpcClientEngine) CustomCfgConfig(tx *query.Query, cfgCode string) error {
+	cfg, err := tx.FrpClientCfg.Where(tx.FrpClientCfg.Code.Eq(cfgCode)).First()
+	if err != nil {
+		return err
+	}
+	warnMsg := warn_msg.GetCfgWarnMsg(*cfg)
+	if warnMsg != "" {
+		_ = e.RemoveCustomCfg(tx, cfgCode)
+		return errors.New(warnMsg)
+	}
+	var relay string
+	if err := e.client.Call("custom_cfg_config", CustomCfgConfig{
+		Key:     cfg.Code,
+		Type:    cfg.ContentType,
+		Content: cfg.Content,
+	}, &relay, time.Second*5); err != nil {
+		return err
+	}
+	if relay != "success" {
+		return errors.New(relay)
+	}
+	return nil
+}
+
+func (e *ARpcClientEngine) RemoveCustomCfg(tx *query.Query, cfgCode string) error {
+	var relay string
+	if err := e.client.Call("remove_config", cfgCode, &relay, time.Second*5); err != nil {
+		return err
+	}
+	if relay != "success" {
+		return errors.New(relay)
+	}
+	return nil
 }

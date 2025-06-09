@@ -18,8 +18,6 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/kardianos/service v1.2.2
 	github.com/lesismal/arpc v1.2.16
-	github.com/lxzan/gws v1.8.8
-	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pquerna/otp v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -43,7 +41,6 @@ require (
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
-	github.com/dolthub/maphash v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatedier/golib v0.5.1 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
@@ -59,7 +56,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect

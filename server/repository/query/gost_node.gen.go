@@ -46,17 +46,11 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.Domain = field.NewString(tableName, "domain")
 	_gostNode.DenyDomainPrefix = field.NewString(tableName, "deny_domain_prefix")
 	_gostNode.UrlTpl = field.NewString(tableName, "url_tpl")
-	_gostNode.Address = field.NewString(tableName, "address")
 	_gostNode.Protocol = field.NewString(tableName, "protocol")
-	_gostNode.TunnelConnPort = field.NewString(tableName, "tunnel_conn_port")
-	_gostNode.TunnelInPort = field.NewString(tableName, "tunnel_in_port")
-	_gostNode.TunnelMetadata = field.NewString(tableName, "tunnel_metadata")
-	_gostNode.TunnelReplaceAddress = field.NewString(tableName, "tunnel_replace_address")
-	_gostNode.ForwardConnPort = field.NewString(tableName, "forward_conn_port")
+	_gostNode.Address = field.NewString(tableName, "address")
+	_gostNode.HttpPort = field.NewString(tableName, "http_port")
+	_gostNode.ReplaceAddress = field.NewString(tableName, "replace_address")
 	_gostNode.ForwardPorts = field.NewString(tableName, "forward_ports")
-	_gostNode.ForwardMetadata = field.NewString(tableName, "forward_metadata")
-	_gostNode.ForwardReplaceAddress = field.NewString(tableName, "forward_replace_address")
-	_gostNode.P2PPort = field.NewString(tableName, "p2p_port")
 	_gostNode.P2PDisableForward = field.NewInt(tableName, "p2p_disable_forward")
 	_gostNode.Rules = field.NewString(tableName, "rules")
 	_gostNode.Tags = field.NewString(tableName, "tags")
@@ -90,44 +84,38 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 type gostNode struct {
 	gostNodeDo
 
-	ALL                   field.Asterisk
-	Id                    field.Int
-	Code                  field.String
-	AllowEdit             field.Int
-	AllowDel              field.Int
-	Version               field.Int64
-	CreatedAt             field.Time
-	UpdatedAt             field.Time
-	IndexValue            field.Int
-	Key                   field.String
-	Name                  field.String
-	Remark                field.String
-	Web                   field.Int
-	Tunnel                field.Int
-	Forward               field.Int
-	Proxy                 field.Int
-	P2P                   field.Int
-	Domain                field.String
-	DenyDomainPrefix      field.String
-	UrlTpl                field.String
-	Address               field.String
-	Protocol              field.String
-	TunnelConnPort        field.String
-	TunnelInPort          field.String
-	TunnelMetadata        field.String
-	TunnelReplaceAddress  field.String
-	ForwardConnPort       field.String
-	ForwardPorts          field.String
-	ForwardMetadata       field.String
-	ForwardReplaceAddress field.String
-	P2PPort               field.String
-	P2PDisableForward     field.Int
-	Rules                 field.String
-	Tags                  field.String
-	LimitResetIndex       field.Int
-	LimitTotal            field.Int
-	LimitKind             field.Int
-	Configs               gostNodeHasManyConfigs
+	ALL               field.Asterisk
+	Id                field.Int
+	Code              field.String
+	AllowEdit         field.Int
+	AllowDel          field.Int
+	Version           field.Int64
+	CreatedAt         field.Time
+	UpdatedAt         field.Time
+	IndexValue        field.Int
+	Key               field.String
+	Name              field.String
+	Remark            field.String
+	Web               field.Int
+	Tunnel            field.Int
+	Forward           field.Int
+	Proxy             field.Int
+	P2P               field.Int
+	Domain            field.String
+	DenyDomainPrefix  field.String
+	UrlTpl            field.String
+	Protocol          field.String
+	Address           field.String
+	HttpPort          field.String
+	ReplaceAddress    field.String
+	ForwardPorts      field.String
+	P2PDisableForward field.Int
+	Rules             field.String
+	Tags              field.String
+	LimitResetIndex   field.Int
+	LimitTotal        field.Int
+	LimitKind         field.Int
+	Configs           gostNodeHasManyConfigs
 
 	fieldMap map[string]field.Expr
 }
@@ -163,17 +151,11 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.Domain = field.NewString(table, "domain")
 	g.DenyDomainPrefix = field.NewString(table, "deny_domain_prefix")
 	g.UrlTpl = field.NewString(table, "url_tpl")
-	g.Address = field.NewString(table, "address")
 	g.Protocol = field.NewString(table, "protocol")
-	g.TunnelConnPort = field.NewString(table, "tunnel_conn_port")
-	g.TunnelInPort = field.NewString(table, "tunnel_in_port")
-	g.TunnelMetadata = field.NewString(table, "tunnel_metadata")
-	g.TunnelReplaceAddress = field.NewString(table, "tunnel_replace_address")
-	g.ForwardConnPort = field.NewString(table, "forward_conn_port")
+	g.Address = field.NewString(table, "address")
+	g.HttpPort = field.NewString(table, "http_port")
+	g.ReplaceAddress = field.NewString(table, "replace_address")
 	g.ForwardPorts = field.NewString(table, "forward_ports")
-	g.ForwardMetadata = field.NewString(table, "forward_metadata")
-	g.ForwardReplaceAddress = field.NewString(table, "forward_replace_address")
-	g.P2PPort = field.NewString(table, "p2p_port")
 	g.P2PDisableForward = field.NewInt(table, "p2p_disable_forward")
 	g.Rules = field.NewString(table, "rules")
 	g.Tags = field.NewString(table, "tags")
@@ -196,7 +178,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 37)
+	g.fieldMap = make(map[string]field.Expr, 31)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -216,17 +198,11 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["domain"] = g.Domain
 	g.fieldMap["deny_domain_prefix"] = g.DenyDomainPrefix
 	g.fieldMap["url_tpl"] = g.UrlTpl
-	g.fieldMap["address"] = g.Address
 	g.fieldMap["protocol"] = g.Protocol
-	g.fieldMap["tunnel_conn_port"] = g.TunnelConnPort
-	g.fieldMap["tunnel_in_port"] = g.TunnelInPort
-	g.fieldMap["tunnel_metadata"] = g.TunnelMetadata
-	g.fieldMap["tunnel_replace_address"] = g.TunnelReplaceAddress
-	g.fieldMap["forward_conn_port"] = g.ForwardConnPort
+	g.fieldMap["address"] = g.Address
+	g.fieldMap["http_port"] = g.HttpPort
+	g.fieldMap["replace_address"] = g.ReplaceAddress
 	g.fieldMap["forward_ports"] = g.ForwardPorts
-	g.fieldMap["forward_metadata"] = g.ForwardMetadata
-	g.fieldMap["forward_replace_address"] = g.ForwardReplaceAddress
-	g.fieldMap["p2p_port"] = g.P2PPort
 	g.fieldMap["p2p_disable_forward"] = g.P2PDisableForward
 	g.fieldMap["rules"] = g.Rules
 	g.fieldMap["tags"] = g.Tags

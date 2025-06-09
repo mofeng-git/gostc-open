@@ -37,6 +37,8 @@ func newGostClientProxy(db *gorm.DB, opts ...gen.DOOption) gostClientProxy {
 	_gostClientProxy.Name = field.NewString(tableName, "name")
 	_gostClientProxy.Protocol = field.NewString(tableName, "protocol")
 	_gostClientProxy.Port = field.NewString(tableName, "port")
+	_gostClientProxy.AuthUser = field.NewString(tableName, "auth_user")
+	_gostClientProxy.AuthPwd = field.NewString(tableName, "auth_pwd")
 	_gostClientProxy.NodeCode = field.NewString(tableName, "node_code")
 	_gostClientProxy.ClientCode = field.NewString(tableName, "client_code")
 	_gostClientProxy.UserCode = field.NewString(tableName, "user_code")
@@ -112,6 +114,8 @@ type gostClientProxy struct {
 	Name         field.String
 	Protocol     field.String
 	Port         field.String
+	AuthUser     field.String
+	AuthPwd      field.String
 	NodeCode     field.String
 	ClientCode   field.String
 	UserCode     field.String
@@ -155,6 +159,8 @@ func (g *gostClientProxy) updateTableName(table string) *gostClientProxy {
 	g.Name = field.NewString(table, "name")
 	g.Protocol = field.NewString(table, "protocol")
 	g.Port = field.NewString(table, "port")
+	g.AuthUser = field.NewString(table, "auth_user")
+	g.AuthPwd = field.NewString(table, "auth_pwd")
 	g.NodeCode = field.NewString(table, "node_code")
 	g.ClientCode = field.NewString(table, "client_code")
 	g.UserCode = field.NewString(table, "user_code")
@@ -183,7 +189,7 @@ func (g *gostClientProxy) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (g *gostClientProxy) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 25)
+	g.fieldMap = make(map[string]field.Expr, 27)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -194,6 +200,8 @@ func (g *gostClientProxy) fillFieldMap() {
 	g.fieldMap["name"] = g.Name
 	g.fieldMap["protocol"] = g.Protocol
 	g.fieldMap["port"] = g.Port
+	g.fieldMap["auth_user"] = g.AuthUser
+	g.fieldMap["auth_pwd"] = g.AuthPwd
 	g.fieldMap["node_code"] = g.NodeCode
 	g.fieldMap["client_code"] = g.ClientCode
 	g.fieldMap["user_code"] = g.UserCode

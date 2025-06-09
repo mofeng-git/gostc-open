@@ -73,32 +73,7 @@ func (service *service) Update(req UpdateReq) error {
 		return errors.New("操作失败")
 	}
 	engine.NodeConfig(db, node.Code)
-
-	var hostCodes []string
-	_ = db.GostClientHost.Where(db.GostClientHost.NodeCode.Eq(node.Code)).Pluck(db.GostClientHost.Code, &hostCodes)
-	for _, code := range hostCodes {
-		engine.ClientHostConfig(db, code)
-	}
-	var forwardCodes []string
-	_ = db.GostClientForward.Where(db.GostClientForward.NodeCode.Eq(node.Code)).Pluck(db.GostClientForward.Code, &forwardCodes)
-	for _, code := range forwardCodes {
-		engine.ClientForwardConfig(db, code)
-	}
-	var tunnelCodes []string
-	_ = db.GostClientTunnel.Where(db.GostClientTunnel.NodeCode.Eq(node.Code)).Pluck(db.GostClientTunnel.Code, &tunnelCodes)
-	for _, code := range tunnelCodes {
-		engine.ClientTunnelConfig(db, code)
-	}
-	var proxyCodes []string
-	_ = db.GostClientProxy.Where(db.GostClientProxy.NodeCode.Eq(node.Code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
-	for _, code := range proxyCodes {
-		engine.ClientProxyConfig(db, code)
-	}
-	var p2pCodes []string
-	_ = db.GostClientP2P.Where(db.GostClientP2P.NodeCode.Eq(node.Code)).Pluck(db.GostClientP2P.Code, &p2pCodes)
-	for _, code := range p2pCodes {
-		engine.ClientP2PConfig(db, code)
-	}
+	engine.ClientAllConfigUpdateByNodeCode(db, node.Code)
 	cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
 	cache.SetNodeInfo(cache.NodeInfo{
 		Code:            node.Code,

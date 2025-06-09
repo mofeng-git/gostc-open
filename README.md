@@ -1,8 +1,8 @@
 # 介绍
 
-基于GOST开发的内网穿透管理平台，支持多用户、多节点，支持速率、连接数限制，中心化配置，通过网页修改配置，实时生效。
+基于Frp开发的内网穿透管理平台，支持多用户、多节点，支持速率，中心化配置，通过网页修改配置，实时生效。
 
-(为了弥补GOST不支持的P2P，采用了FRP的STCP和XTCP方案)
+(组网功能，采用GOST的TUN，组网暂未开源)
 
 **(此版本为开源版)**
 
@@ -270,7 +270,3 @@ go build -ldflags="-H windowsgui -w -s" -o gostc-gui.exe ./gui/
 ## 赞助
 <img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/zfb.png" alt=""/>
 <img style="width: 40%;display: inline-block" src="https://raw.githubusercontent.com/SianHH/gostc-open/main/images/wx.png" alt=""/>
-
-
-## Third-Party Licenses
-- [Library gws](https://github.com/lxzan/gws) - Apache-2.0 License

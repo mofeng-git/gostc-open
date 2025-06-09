@@ -120,3 +120,108 @@ func ClientPortCheck(tx *query.Query, code string, port string) error {
 	}
 	return engine.GetClient().PortCheck(tx, "", port)
 }
+
+func ClientCfgConfig(tx *query.Query, code string) error {
+	cfg, err := tx.FrpClientCfg.Where(tx.FrpClientCfg.Code.Eq(code)).First()
+	if err != nil || cfg == nil {
+		return nil
+	}
+	engine, ok := EngineRegistry.Get(cfg.ClientCode)
+	if !ok {
+		return nil
+	}
+	return engine.GetClient().CustomCfgConfig(tx, code)
+}
+
+func ClientCfgRemove(clientCode, code string) {
+	engine, ok := EngineRegistry.Get(clientCode)
+	if !ok {
+		return
+	}
+	_ = engine.GetClient().RemoveCustomCfg(nil, code)
+}
+
+// 将客户端的所有隧道下发到客户端上
+func ClientAllConfigUpdateByClientCode(tx *query.Query, clientCode string) {
+	var hostCodes []string
+	_ = tx.GostClientHost.Where(
+		tx.GostClientHost.ClientCode.Eq(clientCode),
+	).Pluck(tx.GostClientHost.Code, &hostCodes)
+	for _, code := range hostCodes {
+		ClientHostConfig(tx, code)
+	}
+	var forwardCodes []string
+	_ = tx.GostClientForward.Where(
+		tx.GostClientForward.ClientCode.Eq(clientCode),
+	).Pluck(tx.GostClientForward.Code, &forwardCodes)
+	for _, code := range forwardCodes {
+		ClientForwardConfig(tx, code)
+	}
+	var tunnelCodes []string
+	_ = tx.GostClientTunnel.Where(
+		tx.GostClientTunnel.ClientCode.Eq(clientCode),
+	).Pluck(tx.GostClientTunnel.Code, &tunnelCodes)
+	for _, code := range tunnelCodes {
+		ClientTunnelConfig(tx, code)
+	}
+	var proxyCodes []string
+	_ = tx.GostClientProxy.Where(
+		tx.GostClientProxy.ClientCode.Eq(clientCode),
+	).Pluck(tx.GostClientProxy.Code, &proxyCodes)
+	for _, code := range proxyCodes {
+		ClientProxyConfig(tx, code)
+	}
+	var p2pCodes []string
+	_ = tx.GostClientP2P.Where(
+		tx.GostClientP2P.ClientCode.Eq(clientCode),
+	).Pluck(tx.GostClientP2P.Code, &p2pCodes)
+	for _, code := range p2pCodes {
+		ClientP2PConfig(tx, code)
+	}
+	var cfgsCode []string
+	_ = tx.FrpClientCfg.Where(
+		tx.FrpClientCfg.ClientCode.Eq(clientCode),
+	).Pluck(tx.FrpClientCfg.Code, &cfgsCode)
+	for _, code := range cfgsCode {
+		ClientCfgConfig(tx, code)
+	}
+}
+
+// 将节点的所有隧道下发到客户端上
+func ClientAllConfigUpdateByNodeCode(tx *query.Query, nodeCode string) {
+	var hostCodes []string
+	_ = tx.GostClientHost.Where(
+		tx.GostClientHost.NodeCode.Eq(nodeCode),
+	).Pluck(tx.GostClientHost.Code, &hostCodes)
+	for _, code := range hostCodes {
+		ClientHostConfig(tx, code)
+	}
+	var forwardCodes []string
+	_ = tx.GostClientForward.Where(
+		tx.GostClientForward.NodeCode.Eq(nodeCode),
+	).Pluck(tx.GostClientForward.Code, &forwardCodes)
+	for _, code := range forwardCodes {
+		ClientForwardConfig(tx, code)
+	}
+	var tunnelCodes []string
+	_ = tx.GostClientTunnel.Where(
+		tx.GostClientTunnel.NodeCode.Eq(nodeCode),
+	).Pluck(tx.GostClientTunnel.Code, &tunnelCodes)
+	for _, code := range tunnelCodes {
+		ClientTunnelConfig(tx, code)
+	}
+	var proxyCodes []string
+	_ = tx.GostClientProxy.Where(
+		tx.GostClientProxy.NodeCode.Eq(nodeCode),
+	).Pluck(tx.GostClientProxy.Code, &proxyCodes)
+	for _, code := range proxyCodes {
+		ClientProxyConfig(tx, code)
+	}
+	var p2pCodes []string
+	_ = tx.GostClientP2P.Where(
+		tx.GostClientP2P.NodeCode.Eq(nodeCode),
+	).Pluck(tx.GostClientP2P.Code, &p2pCodes)
+	for _, code := range p2pCodes {
+		ClientP2PConfig(tx, code)
+	}
+}

@@ -41,14 +41,14 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 		return err
 	}
 
-	serverAddr, serverPort := node.GetOriginAddress()
+	_, serverPort := node.GetOriginAddress()
 	var data = ServerConfig{
 		Key: node.Code,
 		ServerConfig: v1.ServerConfig{
 			Auth: v1.AuthServerConfig{
 				Token: node.Code,
 			},
-			BindAddr:                        serverAddr,
+			BindAddr:                        "0.0.0.0",
 			BindPort:                        serverPort,
 			KCPBindPort:                     0,
 			QUICBindPort:                    0,
