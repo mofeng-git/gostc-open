@@ -99,7 +99,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				tx.SystemUser.Code.Eq(user.Code),
 				tx.SystemUser.Version.Eq(user.Version),
 			).UpdateSimple(
-				tx.SystemUser.Amount.Value(user.Amount.Sub(user.Amount.Sub(cfg.Amount))),
+				tx.SystemUser.Amount.Value(user.Amount.Sub(cfg.Amount)),
 				tx.SystemUser.Version.Value(user.Version+1),
 			); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
@@ -113,7 +113,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 				tx.SystemUser.Code.Eq(user.Code),
 				tx.SystemUser.Version.Eq(user.Version),
 			).UpdateSimple(
-				tx.SystemUser.Amount.Value(user.Amount.Sub(user.Amount.Sub(cfg.Amount))),
+				tx.SystemUser.Amount.Value(user.Amount.Sub(cfg.Amount)),
 				tx.SystemUser.Version.Value(user.Version+1),
 			); err != nil {
 				log.Error("扣减积分失败", zap.Error(err))
