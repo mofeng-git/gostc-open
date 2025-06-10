@@ -430,7 +430,8 @@ func (e *ARpcClientEngine) generateServerCommonCfg(node model.GostNode, auth mod
 		ServerAddr: serverAddr,
 		ServerPort: serverPort,
 		Transport: v1.ClientTransportConfig{
-			Protocol: node.Protocol,
+			Protocol:  node.Protocol,
+			PoolCount: 10,
 		},
 		Metadatas: map[string]string{
 			"user":     auth.User,
