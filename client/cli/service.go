@@ -21,7 +21,7 @@ import (
 var SvcCfg = &system_service.Config{
 	Name:        "gostc",
 	DisplayName: "GOSTC",
-	Description: "基于GOST开发的内网穿透 客户端/节点",
+	Description: "基于FRP开发的内网穿透 客户端/节点",
 	Option:      service_option.MakeOptions(),
 }
 

@@ -10,7 +10,7 @@ import (
 var SvcCfg = &service.Config{
 	Name:        "gostc-admin",
 	DisplayName: "GOSTC-ADMIN",
-	Description: "基于GOST开发的内网穿透",
+	Description: "基于FRP开发的内网穿透",
 	Option:      service_option.MakeOptions(),
 }
 
