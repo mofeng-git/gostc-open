@@ -39,9 +39,9 @@ jobs:
       - name: Move dist.zip to backend directory
         run: mv web/dist.zip server/web/
 
-    - uses: actions/setup-go@v4
-      with:
-        go-version: '1.23'
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
 
       - name: Build backend
         uses: goreleaser/goreleaser-action@v4
