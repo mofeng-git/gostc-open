@@ -326,12 +326,12 @@ const operatorOptions = [
   //   disabled: false,
   //   func: openAdmission,
   // },
-  // {
-  //   label: '自定义域名',
-  //   key: 'domain',
-  //   disabled: false,
-  //   func: openDomainModal,
-  // },
+  {
+    label: '自定义域名',
+    key: 'domain',
+    disabled: false,
+    func: openDomainModal,
+  },
   {
     label: '转移隧道',
     key: 'migrate',
