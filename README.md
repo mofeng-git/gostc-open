@@ -40,6 +40,8 @@ This project is licensed under the [Apache-2.0 License](https://github.com/SianH
 
 ## 一键安装脚本
 
+**一键脚本安装，推荐用国外网络环境的脚本，下载的是github最新的release，国内网络环境脚本安装会存在版本落后的情况**
+
 ### 服务端安装
 
 国外网络环境
