@@ -1,9 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"github.com/go-gost/core/logger"
 	"github.com/go-gost/x/config/parsing"
 	xlogger "github.com/go-gost/x/logger"
+	"gostc-sub/internal/common"
 	"log"
 
 	// Register connectors
@@ -119,4 +121,5 @@ func init() {
 	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level)))
 	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
 	parsing.SetDefaultTLSConfig(tlsConfig)
+	fmt.Println("VERSION：", common.VERSION)
 }
