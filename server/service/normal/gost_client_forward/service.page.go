@@ -38,9 +38,7 @@ type Item struct {
 	TcpMatcher    ItemMatcher   `json:"tcpMatcher"`
 	SSHMatcher    ItemMatcher   `json:"sshMatcher"`
 	WhiteEnable   int           `json:"whiteEnable"`
-	BlackEnable   int           `json:"blackEnable"`
 	WhiteList     []string      `json:"whiteList"`
-	BlackList     []string      `json:"blackList"`
 }
 
 type ItemMatcher struct {
@@ -150,10 +148,8 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			//	TargetIp:   sshIp,
 			//	TargetPort: sshPort,
 			//},
-			//WhiteEnable: forward.WhiteEnable,
-			//BlackEnable: forward.BlackEnable,
-			//WhiteList:   forward.GetWhiteList(),
-			//BlackList:   forward.GetBlackList(),
+			WhiteEnable: forward.WhiteEnable,
+			WhiteList:   forward.GetWhiteList(),
 		})
 	}
 	return list, total

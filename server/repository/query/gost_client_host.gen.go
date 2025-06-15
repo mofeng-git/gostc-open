@@ -48,9 +48,7 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.Enable = field.NewInt(tableName, "enable")
 	_gostClientHost.Status = field.NewInt(tableName, "status")
 	_gostClientHost.WhiteEnable = field.NewInt(tableName, "white_enable")
-	_gostClientHost.BlackEnable = field.NewInt(tableName, "black_enable")
 	_gostClientHost.WhiteList = field.NewString(tableName, "white_list")
-	_gostClientHost.BlackList = field.NewString(tableName, "black_list")
 	_gostClientHost.ChargingType = field.NewInt(tableName, "charging_type")
 	_gostClientHost.Cycle = field.NewInt(tableName, "cycle")
 	_gostClientHost.Amount = field.NewField(tableName, "amount")
@@ -132,9 +130,7 @@ type gostClientHost struct {
 	Enable           field.Int
 	Status           field.Int
 	WhiteEnable      field.Int
-	BlackEnable      field.Int
 	WhiteList        field.String
-	BlackList        field.String
 	ChargingType     field.Int
 	Cycle            field.Int
 	Amount           field.Field
@@ -184,9 +180,7 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.Enable = field.NewInt(table, "enable")
 	g.Status = field.NewInt(table, "status")
 	g.WhiteEnable = field.NewInt(table, "white_enable")
-	g.BlackEnable = field.NewInt(table, "black_enable")
 	g.WhiteList = field.NewString(table, "white_list")
-	g.BlackList = field.NewString(table, "black_list")
 	g.ChargingType = field.NewInt(table, "charging_type")
 	g.Cycle = field.NewInt(table, "cycle")
 	g.Amount = field.NewField(table, "amount")
@@ -210,7 +204,7 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 34)
+	g.fieldMap = make(map[string]field.Expr, 32)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -232,9 +226,7 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["enable"] = g.Enable
 	g.fieldMap["status"] = g.Status
 	g.fieldMap["white_enable"] = g.WhiteEnable
-	g.fieldMap["black_enable"] = g.BlackEnable
 	g.fieldMap["white_list"] = g.WhiteList
-	g.fieldMap["black_list"] = g.BlackList
 	g.fieldMap["charging_type"] = g.ChargingType
 	g.fieldMap["cycle"] = g.Cycle
 	g.fieldMap["amount"] = g.Amount

@@ -12,9 +12,7 @@ import (
 type AdmissionReq struct {
 	Code        string   `binding:"required" json:"code"`
 	WhiteEnable int      `json:"whiteEnable"`
-	BlackEnable int      `json:"blackEnable"`
 	White       []string `json:"white"`
-	Black       []string `json:"black"`
 }
 
 func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
@@ -34,9 +32,7 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 		}
 
 		forward.WhiteEnable = req.WhiteEnable
-		forward.BlackEnable = req.BlackEnable
 		forward.SetWhiteList(req.White)
-		forward.SetBlackList(req.Black)
 
 		if err := tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发失败", zap.Error(err))
@@ -46,8 +42,6 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			Code:        forward.Code,
 			WhiteEnable: req.WhiteEnable,
 			WhiteList:   req.White,
-			BlackEnable: req.BlackEnable,
-			Blacklist:   req.Black,
 		})
 		return nil
 	})

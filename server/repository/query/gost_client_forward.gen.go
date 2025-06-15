@@ -49,9 +49,7 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 	_gostClientForward.TcpMatcher = field.NewString(tableName, "tcp_matcher")
 	_gostClientForward.SSHMatcher = field.NewString(tableName, "ssh_matcher")
 	_gostClientForward.WhiteEnable = field.NewInt(tableName, "white_enable")
-	_gostClientForward.BlackEnable = field.NewInt(tableName, "black_enable")
 	_gostClientForward.WhiteList = field.NewString(tableName, "white_list")
-	_gostClientForward.BlackList = field.NewString(tableName, "black_list")
 	_gostClientForward.ChargingType = field.NewInt(tableName, "charging_type")
 	_gostClientForward.Cycle = field.NewInt(tableName, "cycle")
 	_gostClientForward.Amount = field.NewField(tableName, "amount")
@@ -134,9 +132,7 @@ type gostClientForward struct {
 	TcpMatcher    field.String
 	SSHMatcher    field.String
 	WhiteEnable   field.Int
-	BlackEnable   field.Int
 	WhiteList     field.String
-	BlackList     field.String
 	ChargingType  field.Int
 	Cycle         field.Int
 	Amount        field.Field
@@ -187,9 +183,7 @@ func (g *gostClientForward) updateTableName(table string) *gostClientForward {
 	g.TcpMatcher = field.NewString(table, "tcp_matcher")
 	g.SSHMatcher = field.NewString(table, "ssh_matcher")
 	g.WhiteEnable = field.NewInt(table, "white_enable")
-	g.BlackEnable = field.NewInt(table, "black_enable")
 	g.WhiteList = field.NewString(table, "white_list")
-	g.BlackList = field.NewString(table, "black_list")
 	g.ChargingType = field.NewInt(table, "charging_type")
 	g.Cycle = field.NewInt(table, "cycle")
 	g.Amount = field.NewField(table, "amount")
@@ -213,7 +207,7 @@ func (g *gostClientForward) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (g *gostClientForward) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 35)
+	g.fieldMap = make(map[string]field.Expr, 33)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -236,9 +230,7 @@ func (g *gostClientForward) fillFieldMap() {
 	g.fieldMap["tcp_matcher"] = g.TcpMatcher
 	g.fieldMap["ssh_matcher"] = g.SSHMatcher
 	g.fieldMap["white_enable"] = g.WhiteEnable
-	g.fieldMap["black_enable"] = g.BlackEnable
 	g.fieldMap["white_list"] = g.WhiteList
-	g.fieldMap["black_list"] = g.BlackList
 	g.fieldMap["charging_type"] = g.ChargingType
 	g.fieldMap["cycle"] = g.Cycle
 	g.fieldMap["amount"] = g.Amount

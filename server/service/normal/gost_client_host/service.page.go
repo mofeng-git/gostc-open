@@ -39,9 +39,7 @@ type Item struct {
 	InputBytes       int64      `json:"inputBytes"`
 	OutputBytes      int64      `json:"outputBytes"`
 	WhiteEnable      int        `json:"whiteEnable"`
-	BlackEnable      int        `json:"blackEnable"`
 	WhiteList        []string   `json:"whiteList"`
-	BlackList        []string   `json:"blackList"`
 }
 
 type ItemClient struct {
@@ -132,10 +130,8 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			CreatedAt:   host.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,
-			//WhiteEnable:       host.WhiteEnable,
-			//BlackEnable:       host.BlackEnable,
-			//WhiteList:         host.GetWhiteList(),
-			//BlackList:         host.GetBlackList(),
+			WhiteEnable: host.WhiteEnable,
+			WhiteList:   host.GetWhiteList(),
 		})
 	}
 	return list, total

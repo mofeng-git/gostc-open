@@ -28,9 +28,7 @@ func newGostClientAdmission(db *gorm.DB, opts ...gen.DOOption) gostClientAdmissi
 	tableName := _gostClientAdmission.gostClientAdmissionDo.TableName()
 	_gostClientAdmission.ALL = field.NewAsterisk(tableName)
 	_gostClientAdmission.WhiteEnable = field.NewInt(tableName, "white_enable")
-	_gostClientAdmission.BlackEnable = field.NewInt(tableName, "black_enable")
 	_gostClientAdmission.WhiteList = field.NewString(tableName, "white_list")
-	_gostClientAdmission.BlackList = field.NewString(tableName, "black_list")
 
 	_gostClientAdmission.fillFieldMap()
 
@@ -42,9 +40,7 @@ type gostClientAdmission struct {
 
 	ALL         field.Asterisk
 	WhiteEnable field.Int
-	BlackEnable field.Int
 	WhiteList   field.String
-	BlackList   field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -62,9 +58,7 @@ func (g gostClientAdmission) As(alias string) *gostClientAdmission {
 func (g *gostClientAdmission) updateTableName(table string) *gostClientAdmission {
 	g.ALL = field.NewAsterisk(table)
 	g.WhiteEnable = field.NewInt(table, "white_enable")
-	g.BlackEnable = field.NewInt(table, "black_enable")
 	g.WhiteList = field.NewString(table, "white_list")
-	g.BlackList = field.NewString(table, "black_list")
 
 	g.fillFieldMap()
 
@@ -81,11 +75,9 @@ func (g *gostClientAdmission) GetFieldByName(fieldName string) (field.OrderExpr,
 }
 
 func (g *gostClientAdmission) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 4)
+	g.fieldMap = make(map[string]field.Expr, 2)
 	g.fieldMap["white_enable"] = g.WhiteEnable
-	g.fieldMap["black_enable"] = g.BlackEnable
 	g.fieldMap["white_list"] = g.WhiteList
-	g.fieldMap["black_list"] = g.BlackList
 }
 
 func (g gostClientAdmission) clone(db *gorm.DB) gostClientAdmission {

@@ -64,9 +64,7 @@ func (s *service) NewUserConn(req NewUserConnReq) (any, error) {
 	admissionInfo := cache2.GetAdmissionInfo(tunnelCode)
 	if admissionInfo.ValidWhiteIp(ip) {
 		return nil, nil
-	}
-	if admissionInfo.ValidBlackIp(ip) {
+	} else {
 		return nil, errors.New("reject connection")
 	}
-	return nil, nil
 }

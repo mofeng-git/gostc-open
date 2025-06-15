@@ -12,9 +12,7 @@ import (
 type AdmissionReq struct {
 	Code        string   `binding:"required" json:"code"`
 	WhiteEnable int      `json:"whiteEnable"`
-	BlackEnable int      `json:"blackEnable"`
 	White       []string `json:"white"`
-	Black       []string `json:"black"`
 }
 
 func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
@@ -33,10 +31,8 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			return errors.New("操作失败")
 		}
 
-		//host.WhiteEnable = req.WhiteEnable
-		//host.BlackEnable = req.BlackEnable
-		//host.SetWhiteList(req.White)
-		//host.SetBlackList(req.Black)
+		host.WhiteEnable = req.WhiteEnable
+		host.SetWhiteList(req.White)
 
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析失败", zap.Error(err))
@@ -46,8 +42,6 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			Code:        host.Code,
 			WhiteEnable: req.WhiteEnable,
 			WhiteList:   req.White,
-			BlackEnable: req.BlackEnable,
-			Blacklist:   req.Black,
 		})
 		return nil
 	})

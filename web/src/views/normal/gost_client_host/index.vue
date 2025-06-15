@@ -20,7 +20,7 @@ import Modal from "../../../components/Modal.vue";
 import Empty from "../../../components/Empty.vue";
 import Alert from "../../../icon/alert.vue";
 import Online from "../../../icon/online.vue";
-import {cLimiterText, configExpText, configText, limiterText, rLimiterText} from "./index.js";
+import {configExpText, configText, limiterText} from "./index.js";
 import {flowFormat} from "../../../utils/flow.js";
 import {NButton, NSpace} from "naive-ui";
 import moment from "moment/moment.js";
@@ -321,7 +321,7 @@ const operatorOptions = [
     func: openObsModal,
   },
   {
-    label: '黑/白名单',
+    label: '白名单',
     key: 'admission',
     disabled: false,
     func: openAdmission,
@@ -551,36 +551,18 @@ const operatorRenderLabel = (option) => {
         @on-cancel="closeAdmission"
         :confirm-loading="state.admission.loading"
     >
-      <n-tabs>
-        <n-tab-pane name="white" tab="白名单">
-          <n-alert type="info">
-            白名单：只允许配置的地址访问服务
-          </n-alert>
-          <p></p>
-          <n-switch v-model:value="state.admission.data.whiteEnable" :checked-value="1" :unchecked-value="2"
-                    :round="false">
-            <template #checked>开启白名单</template>
-            <template #unchecked>关闭白名单</template>
-          </n-switch>
-          <p></p>
-          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.white"
-                   :placeholder="`127.0.0.1\nxxx.xxx.xxx.xxx`"></n-input>
-        </n-tab-pane>
-        <n-tab-pane name="black" tab="黑名单">
-          <n-alert type="info">
-            黑名单：不允许配置的地址访问服务
-          </n-alert>
-          <p></p>
-          <n-switch v-model:value="state.admission.data.blackEnable" :checked-value="1" :unchecked-value="2"
-                    :round="false">
-            <template #checked>开启黑名单</template>
-            <template #unchecked>关闭黑名单</template>
-          </n-switch>
-          <p></p>
-          <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.black"
-                   :placeholder="`127.0.0.1\nxxx.xxx.xxx.xxx`"></n-input>
-        </n-tab-pane>
-      </n-tabs>
+      <n-alert type="info">
+        白名单：启用后，只有配置的IP允许访问
+      </n-alert>
+      <p></p>
+      <n-switch v-model:value="state.admission.data.whiteEnable" :checked-value="1" :unchecked-value="2"
+                :round="false">
+        <template #checked>开启白名单</template>
+        <template #unchecked>关闭白名单</template>
+      </n-switch>
+      <p></p>
+      <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.white"
+               :placeholder="`127.0.0.1\nxxx.xxx.xxx.xxx`"></n-input>
     </Modal>
 
     <Modal
