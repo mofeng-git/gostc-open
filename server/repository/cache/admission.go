@@ -13,23 +13,23 @@ type AdmissionInfo struct {
 	Code        string
 	WhiteEnable int
 	WhiteList   []string
-	whiteMap    map[string]struct{}
+	WhiteMap    map[string]struct{}
 }
 
 func (admission *AdmissionInfo) ValidWhiteIp(ip string) bool {
 	if admission.WhiteEnable != 1 {
 		return true
 	}
-	if _, ok := admission.whiteMap[ip]; ok {
+	if _, ok := admission.WhiteMap[ip]; ok {
 		return true
 	}
 	return false
 }
 
 func SetAdmissionInfo(info AdmissionInfo) {
-	info.whiteMap = make(map[string]struct{})
+	info.WhiteMap = make(map[string]struct{})
 	for _, item := range info.WhiteList {
-		info.whiteMap[item] = struct{}{}
+		info.WhiteMap[item] = struct{}{}
 	}
 	global.Cache.SetStruct(admission_key+info.Code, info, cache.NoExpiration)
 }

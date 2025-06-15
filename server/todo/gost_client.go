@@ -35,6 +35,11 @@ func gostClient() {
 		})
 		auth := authMap[host.Code]
 		cache3.SetGostAuth(auth.User, auth.Password, host.Code)
+		cache3.SetAdmissionInfo(cache3.AdmissionInfo{
+			Code:        host.Code,
+			WhiteEnable: host.WhiteEnable,
+			WhiteList:   host.GetWhiteList(),
+		})
 	}
 
 	forwards, _ := db.GostClientForward.Find()
@@ -51,6 +56,11 @@ func gostClient() {
 		})
 		auth := authMap[forward.Code]
 		cache3.SetGostAuth(auth.User, auth.Password, forward.Code)
+		cache3.SetAdmissionInfo(cache3.AdmissionInfo{
+			Code:        forward.Code,
+			WhiteEnable: forward.WhiteEnable,
+			WhiteList:   forward.GetWhiteList(),
+		})
 	}
 
 	tunnels, _ := db.GostClientTunnel.Find()
