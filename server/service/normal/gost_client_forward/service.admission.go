@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/engine"
 )
 
 type AdmissionReq struct {
@@ -33,16 +33,22 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			return errors.New("操作失败")
 		}
 
-		//forward.WhiteEnable = req.WhiteEnable
-		//forward.BlackEnable = req.BlackEnable
-		//forward.SetWhiteList(req.White)
-		//forward.SetBlackList(req.Black)
+		forward.WhiteEnable = req.WhiteEnable
+		forward.BlackEnable = req.BlackEnable
+		forward.SetWhiteList(req.White)
+		forward.SetBlackList(req.Black)
 
 		if err := tx.GostClientForward.Save(forward); err != nil {
 			log.Error("修改端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientForwardConfig(tx, forward.Code)
+		cache.SetAdmissionInfo(cache.AdmissionInfo{
+			Code:        forward.Code,
+			WhiteEnable: req.WhiteEnable,
+			WhiteList:   req.White,
+			BlackEnable: req.BlackEnable,
+			Blacklist:   req.Black,
+		})
 		return nil
 	})
 }

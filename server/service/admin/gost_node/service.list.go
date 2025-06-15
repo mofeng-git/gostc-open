@@ -4,7 +4,7 @@ import (
 	"gorm.io/gen"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 type ListReq struct {

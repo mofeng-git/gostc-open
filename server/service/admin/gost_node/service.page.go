@@ -6,7 +6,7 @@ import (
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/node_rule"
 	"time"
 )
@@ -87,21 +87,22 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 	for _, node := range nodes {
 		var ruleNames []string
 		for _, rule := range node.GetRules() {
-			ruleNames = append(ruleNames, node_rule.RuleMap[rule].Name())
+			getRule := node_rule.Registry.GetRule(rule)
+			ruleNames = append(ruleNames, getRule.Name())
 		}
 		name := node.Name
 		account := nodeBindAccountMap[node.Code]
 		// 获取最近30天的流量
-		monthObsInfo := cache.GetNodeObsDateRange(cache.MONTH_DATEONLY_LIST, node.Code)
+		monthObsInfo := cache2.GetNodeObsDateRange(cache2.MONTH_DATEONLY_LIST, node.Code)
 		// 获取今日的流量
 
 		// 获取循环日期的流量
 		var obsUseTotal int64
-		obsLimit := cache.GetNodeObsLimit(node.Code)
+		obsLimit := cache2.GetNodeObsLimit(node.Code)
 		if obsLimit.InputBytes == -1 && obsLimit.OutputBytes == -1 {
 			obsUseTotal = -1
 		} else {
-			nowObsInfo := cache.GetNodeObs(dateOnly, node.Code)
+			nowObsInfo := cache2.GetNodeObs(dateOnly, node.Code)
 			switch node.LimitKind {
 			case model.GOST_NODE_LIMIT_KIND_ALL:
 				obsUseTotal += obsLimit.InputBytes + obsLimit.OutputBytes + nowObsInfo.InputBytes + nowObsInfo.OutputBytes
@@ -123,7 +124,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Proxy:             node.Proxy,
 			P2P:               node.P2P,
 			Domain:            node.Domain,
-			CustomDomain:      utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
+			CustomDomain:      utils.TrinaryOperation(cache2.GetNodeCustomDomain(node.Code), 1, 2),
 			DenyDomainPrefix:  node.DenyDomainPrefix,
 			UrlTpl:            node.UrlTpl,
 			Address:           node.Address,
@@ -136,8 +137,8 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			Tags:              node.GetTags(),
 			IndexValue:        node.IndexValue,
 			P2PDisableForward: node.P2PDisableForward,
-			Online:            utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
-			Version:           cache.GetNodeVersion(node.Code),
+			Online:            utils.TrinaryOperation(cache2.GetNodeOnline(node.Code), 1, 2),
+			Version:           cache2.GetNodeVersion(node.Code),
 			InputBytes:        monthObsInfo.InputBytes,
 			OutputBytes:       monthObsInfo.OutputBytes,
 			LimitResetIndex:   node.LimitResetIndex,

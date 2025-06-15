@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 type AutherReq struct {

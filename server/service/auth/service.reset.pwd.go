@@ -8,8 +8,8 @@ import (
 	"server/pkg/email"
 	"server/pkg/utils"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"time"
 )
 
@@ -21,16 +21,16 @@ type ResetPwdReq struct {
 
 func (service *service) ResetPwd(req ResetPwdReq) error {
 	var cfg model.SystemConfigEmail
-	cache.GetSystemConfigEmail(&cfg)
+	cache2.GetSystemConfigEmail(&cfg)
 	if cfg.Enable != "1" {
 		return errors.New("管理员未启用邮件服务")
 	}
 
-	code := cache.GetResetPwdEmailCode(req.Key+req.Account, false)
+	code := cache2.GetResetPwdEmailCode(req.Key+req.Account, false)
 	if code != req.Code {
 		return errors.New("验证码错误")
 	}
-	cache.GetResetPwdEmailCode(req.Key+req.Account, true)
+	cache2.GetResetPwdEmailCode(req.Key+req.Account, true)
 
 	db, _, _ := repository.Get("")
 	user, err := db.SystemUser.Preload(db.SystemUser.BindEmail).Where(db.SystemUser.Account.Eq(req.Account)).First()

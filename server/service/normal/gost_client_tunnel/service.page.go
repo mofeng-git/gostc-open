@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -79,7 +79,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 		db.GostClientTunnel.Node,
 	).Where(where...).Order(db.GostClientTunnel.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, tunnel := range tunnels {
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, tunnel.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, tunnel.Code)
 		list = append(list, Item{
 			Code:       tunnel.Code,
 			Name:       tunnel.Name,
@@ -93,12 +93,12 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := tunnel.Node.GetAddress()
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetNodeOnline(tunnel.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   tunnel.ClientCode,
 				Name:   tunnel.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(tunnel.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(tunnel.ClientCode), 1, 2),
 			},
 			UserCode:    tunnel.UserCode,
 			UserAccount: tunnel.User.Account,

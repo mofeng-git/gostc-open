@@ -4,8 +4,8 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/engine"
 )
 

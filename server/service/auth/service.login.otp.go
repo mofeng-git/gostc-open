@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 	"server/global"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"strconv"
 	"time"
 )
@@ -24,11 +24,11 @@ type LoginOtpResp struct {
 
 func (service *service) LoginOtp(ip string, req LoginOtpReq) (result LoginOtpResp, err error) {
 	db, _, _ := repository.Get("")
-	userCode := cache.GetLoginOtp(req.Key, false)
+	userCode := cache2.GetLoginOtp(req.Key, false)
 	if userCode == "" {
 		return result, errors.New("登录失败")
 	}
-	cache.DelLoginOtp(req.Key)
+	cache2.DelLoginOtp(req.Key)
 	user, _ := db.SystemUser.Where(db.SystemUser.Code.Eq(userCode)).First()
 	if user == nil {
 		return result, errors.New("未查询到账户信息")
@@ -48,7 +48,7 @@ func (service *service) LoginOtp(ip string, req LoginOtpReq) (result LoginOtpRes
 		global.Logger.Error("生成Token失败", zap.Error(err))
 		return result, errors.New("登录失败，请联系管理员")
 	}
-	cache.SetIpSecurity(ip, true)
+	cache2.SetIpSecurity(ip, true)
 	return LoginOtpResp{
 		Token: token,
 		ExpAt: time.Now().Add(global.Config.AuthExp).Unix(),

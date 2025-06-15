@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -79,7 +79,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 		db.GostClientProxy.Node,
 	).Where(where...).Order(db.GostClientProxy.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, proxy := range proxys {
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, proxy.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, proxy.Code)
 		list = append(list, Item{
 			Code:     proxy.Code,
 			Name:     proxy.Name,
@@ -94,13 +94,13 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := proxy.Node.GetAddress()
 					return address
 				}(),
-				Online:       utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
+				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(proxy.NodeCode), 1, 2),
 				ForwardPorts: proxy.Node.ForwardPorts,
 			},
 			Client: ItemClient{
 				Code:   proxy.ClientCode,
 				Name:   proxy.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(proxy.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(proxy.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: proxy.ChargingType,

@@ -5,7 +5,7 @@ import (
 	"server/model"
 	"server/pkg/email"
 	"server/pkg/utils"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 type EmailVerifyReq struct {

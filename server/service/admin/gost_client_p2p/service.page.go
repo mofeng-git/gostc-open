@@ -6,7 +6,7 @@ import (
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -102,12 +102,12 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 					address, _, _ := net.SplitHostPort(p2p.Node.Address)
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetNodeOnline(p2p.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,
 				Name:   p2p.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(p2p.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(p2p.ClientCode), 1, 2),
 			},
 			UserAccount: p2p.User.Account,
 			Config: ItemConfig{

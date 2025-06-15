@@ -3,7 +3,7 @@ package service
 import (
 	"server/global"
 	"server/model"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 type QueryResp struct {

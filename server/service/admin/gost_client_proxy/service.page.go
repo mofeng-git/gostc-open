@@ -6,7 +6,7 @@ import (
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -89,7 +89,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		db.GostClientProxy.Node,
 	).Where(where...).Order(db.GostClientProxy.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, proxy := range proxys {
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, proxy.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, proxy.Code)
 		list = append(list, Item{
 			UserAccount: proxy.User.Account,
 			Code:        proxy.Code,
@@ -103,12 +103,12 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 					address, _, _ := net.SplitHostPort(proxy.Node.Address)
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache.GetNodeOnline(proxy.NodeCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetNodeOnline(proxy.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   proxy.ClientCode,
 				Name:   proxy.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(proxy.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(proxy.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: proxy.ChargingType,

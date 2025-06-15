@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -91,13 +91,13 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := p2p.Node.GetAddress()
 					return address
 				}(),
-				Online:            utils.TrinaryOperation(cache.GetNodeOnline(p2p.NodeCode), 1, 2),
+				Online:            utils.TrinaryOperation(cache2.GetNodeOnline(p2p.NodeCode), 1, 2),
 				P2PDisableForward: p2p.Node.P2PDisableForward,
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,
 				Name:   p2p.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(p2p.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(p2p.ClientCode), 1, 2),
 			},
 			UserCode:    p2p.UserCode,
 			UserAccount: p2p.User.Account,

@@ -3,7 +3,7 @@ package todo
 import (
 	"server/model"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 // 从数据库回写流量数据到cache

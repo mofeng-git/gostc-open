@@ -5,7 +5,10 @@ import (
 )
 
 func init() {
+	Registry.SetRule(defaultRule)
 }
+
+var defaultRule = &DefaultRule{}
 
 type DefaultRule struct{}
 

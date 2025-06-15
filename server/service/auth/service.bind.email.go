@@ -7,8 +7,8 @@ import (
 	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 )
 
 type BindEmailReq struct {
@@ -19,16 +19,16 @@ type BindEmailReq struct {
 
 func (service *service) BindEmail(claims jwt.Claims, req BindEmailReq) error {
 	var cfg model.SystemConfigEmail
-	cache.GetSystemConfigEmail(&cfg)
+	cache2.GetSystemConfigEmail(&cfg)
 	if cfg.Enable != "1" {
 		return errors.New("管理员未启用邮件服务")
 	}
 
-	code := cache.GetBindEmailCode(req.Key, false)
+	code := cache2.GetBindEmailCode(req.Key, false)
 	if code != req.Code {
 		return errors.New("验证码错误")
 	}
-	cache.GetBindEmailCode(req.Key, true)
+	cache2.GetBindEmailCode(req.Key, true)
 
 	db, _, _ := repository.Get("")
 	return db.Transaction(func(tx *query.Query) error {

@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -103,7 +103,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 		//}
 		//tcpIp, tcpPort := forward.GetTcpMatcher()
 		//sshIp, sshPort := forward.GetSSHMatcher()
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, forward.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, forward.Code)
 		list = append(list, Item{
 			Code:          forward.Code,
 			Name:          forward.Name,
@@ -118,13 +118,13 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := forward.Node.GetAddress()
 					return address
 				}(),
-				Online:       utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
+				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(forward.NodeCode), 1, 2),
 				ForwardPorts: forward.Node.ForwardPorts,
 			},
 			Client: ItemClient{
 				Code:   forward.ClientCode,
 				Name:   forward.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(forward.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(forward.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: forward.ChargingType,

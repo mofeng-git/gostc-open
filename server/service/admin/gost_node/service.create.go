@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"server/model"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/node_port"
 	"strings"
 )
@@ -68,8 +68,8 @@ func (service *service) Create(req CreateReq) error {
 		log.Error("新增节点失败", zap.Error(err))
 		return errors.New("操作失败")
 	}
-	cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
-	cache.SetNodeInfo(cache.NodeInfo{
+	cache2.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+	cache2.SetNodeInfo(cache2.NodeInfo{
 		Code:            node.Code,
 		LimitResetIndex: node.LimitResetIndex,
 		LimitTotal:      node.LimitTotal,

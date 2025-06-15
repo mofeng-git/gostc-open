@@ -4,7 +4,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"sort"
 	"time"
 )
@@ -23,11 +23,11 @@ func (service *service) ClientObsDate(claims jwt.Claims, date string) (result []
 	).Where(db.GostClient.UserCode.Eq(claims.Code)).Find()
 	var clientObsMap = make(map[string]ClientObsItem)
 	for _, item := range forwards {
-		obsInfo := cache.GetClientObs(dateOnlyString, item.Code)
+		obsInfo := cache2.GetClientObs(dateOnlyString, item.Code)
 		obs := clientObsMap[item.Code]
 		obs.Code = item.Code
 		obs.Name = item.Name
-		obs.Online = utils.TrinaryOperation(cache.GetClientOnline(item.Code), 1, 2)
+		obs.Online = utils.TrinaryOperation(cache2.GetClientOnline(item.Code), 1, 2)
 		obs.InputBytes += obsInfo.InputBytes
 		obs.OutputBytes += obsInfo.OutputBytes
 		clientObsMap[item.Code] = obs

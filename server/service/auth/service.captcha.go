@@ -7,7 +7,7 @@ import (
 	"server/pkg/captcha"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -27,7 +27,7 @@ func (service *service) Captcha(ip string) (result CaptchaResp, err error) {
 	}
 	result.Bs64 = base64.StdEncoding.EncodeToString(bytes)
 	result.Key = utils.RandStr(16, utils.AllDict)
-	cache.SetCaptcha(result.Key, code, time.Minute*5)
-	result.Security = cache.GetIpSecurity(ip)
+	cache2.SetCaptcha(result.Key, code, time.Minute*5)
+	result.Security = cache2.GetIpSecurity(ip)
 	return result, nil
 }

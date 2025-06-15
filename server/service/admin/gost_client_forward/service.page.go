@@ -6,7 +6,7 @@ import (
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -112,7 +112,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		//}
 		//tcpIp, tcpPort := forward.GetTcpMatcher()
 		//sshIp, sshPort := forward.GetSSHMatcher()
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, forward.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, forward.Code)
 		list = append(list, Item{
 			UserAccount:   forward.User.Account,
 			Code:          forward.Code,
@@ -128,12 +128,12 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 					address, _, _ := net.SplitHostPort(forward.Node.Address)
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache.GetNodeOnline(forward.NodeCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetNodeOnline(forward.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   forward.ClientCode,
 				Name:   forward.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(forward.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(forward.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: forward.ChargingType,

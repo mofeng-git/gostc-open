@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"server/model"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"strings"
 	"time"
 )
@@ -44,20 +44,20 @@ type NewProxyReq struct {
 func (s *service) NewProxy(req NewProxyReq) (any, error) {
 	now := time.Now()
 	reqCode := strings.Split(req.Content.ProxyName, "_")[0]
-	tunnelCode := cache.GetGostAuth(req.Content.Metas.User, req.Content.Metas.Password)
+	tunnelCode := cache2.GetGostAuth(req.Content.Metas.User, req.Content.Metas.Password)
 	if reqCode != tunnelCode || tunnelCode == "" {
 		return nil, errors.New("unauthorized")
 	}
-	result := cache.GetTunnelInfo(tunnelCode)
+	result := cache2.GetTunnelInfo(tunnelCode)
 	if result.Code == "" || (result.ExpAt < now.Unix() && result.ChargingTye == model.GOST_CONFIG_CHARGING_CUCLE_DAY) {
 		return nil, errors.New("expired")
 	}
 
-	nodeInfo := cache.GetNodeInfo(result.NodeCode)
+	nodeInfo := cache2.GetNodeInfo(result.NodeCode)
 	if nodeInfo.LimitResetIndex != 0 && nodeInfo.LimitTotal > 0 {
 		var obsUseTotal int64
-		obsLimit := cache.GetNodeObsLimit(nodeInfo.Code)
-		obsInfo := cache.GetTunnelObs(now.Format(time.DateOnly), result.Code)
+		obsLimit := cache2.GetNodeObsLimit(nodeInfo.Code)
+		obsInfo := cache2.GetTunnelObs(now.Format(time.DateOnly), result.Code)
 		switch nodeInfo.LimitKind {
 		case model.GOST_NODE_LIMIT_KIND_ALL:
 			obsUseTotal += obsInfo.InputBytes + obsInfo.OutputBytes + obsLimit.InputBytes + obsLimit.OutputBytes

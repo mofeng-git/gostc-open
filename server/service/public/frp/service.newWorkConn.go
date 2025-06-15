@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"server/model"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -26,20 +26,20 @@ type NewWorkConnReq struct {
 
 func (s *service) NewWorkConn(req NewWorkConnReq) (any, error) {
 	now := time.Now()
-	tunnelCode := cache.GetGostAuth(req.Content.User.Metas.User, req.Content.User.Metas.Password)
+	tunnelCode := cache2.GetGostAuth(req.Content.User.Metas.User, req.Content.User.Metas.Password)
 	if tunnelCode == "" {
 		return nil, errors.New("unauthorized")
 	}
-	result := cache.GetTunnelInfo(tunnelCode)
+	result := cache2.GetTunnelInfo(tunnelCode)
 	if result.Code == "" || (result.ExpAt < now.Unix() && result.ChargingTye == model.GOST_CONFIG_CHARGING_CUCLE_DAY) {
 		return nil, errors.New("expired")
 	}
 
-	nodeInfo := cache.GetNodeInfo(result.NodeCode)
+	nodeInfo := cache2.GetNodeInfo(result.NodeCode)
 	if nodeInfo.LimitResetIndex != 0 && nodeInfo.LimitTotal > 0 {
 		var obsUseTotal int64
-		obsLimit := cache.GetNodeObsLimit(nodeInfo.Code)
-		obsInfo := cache.GetTunnelObs(now.Format(time.DateOnly), result.Code)
+		obsLimit := cache2.GetNodeObsLimit(nodeInfo.Code)
+		obsInfo := cache2.GetTunnelObs(now.Format(time.DateOnly), result.Code)
 		switch nodeInfo.LimitKind {
 		case model.GOST_NODE_LIMIT_KIND_ALL:
 			obsUseTotal += obsInfo.InputBytes + obsInfo.OutputBytes + obsLimit.InputBytes + obsLimit.OutputBytes

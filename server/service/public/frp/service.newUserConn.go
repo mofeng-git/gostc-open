@@ -2,8 +2,9 @@ package service
 
 import (
 	"errors"
+	"net"
 	"server/model"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"strings"
 	"time"
 )
@@ -30,19 +31,19 @@ type NewUserConnReq struct {
 func (s *service) NewUserConn(req NewUserConnReq) (any, error) {
 	now := time.Now()
 	reqCode := strings.Split(req.Content.ProxyName, "_")[0]
-	tunnelCode := cache.GetGostAuth(req.Content.User.Metas.User, req.Content.User.Metas.Password)
+	tunnelCode := cache2.GetGostAuth(req.Content.User.Metas.User, req.Content.User.Metas.Password)
 	if tunnelCode == "" || reqCode != tunnelCode {
 		return nil, errors.New("unauthorized")
 	}
-	result := cache.GetTunnelInfo(tunnelCode)
+	result := cache2.GetTunnelInfo(tunnelCode)
 	if result.Code == "" || (result.ExpAt < now.Unix() && result.ChargingTye == model.GOST_CONFIG_CHARGING_CUCLE_DAY) {
 		return nil, errors.New("expired")
 	}
-	nodeInfo := cache.GetNodeInfo(result.NodeCode)
+	nodeInfo := cache2.GetNodeInfo(result.NodeCode)
 	if nodeInfo.LimitResetIndex != 0 && nodeInfo.LimitTotal > 0 {
 		var obsUseTotal int64
-		obsLimit := cache.GetNodeObsLimit(nodeInfo.Code)
-		obsInfo := cache.GetTunnelObs(now.Format(time.DateOnly), result.Code)
+		obsLimit := cache2.GetNodeObsLimit(nodeInfo.Code)
+		obsInfo := cache2.GetTunnelObs(now.Format(time.DateOnly), result.Code)
 		switch nodeInfo.LimitKind {
 		case model.GOST_NODE_LIMIT_KIND_ALL:
 			obsUseTotal += obsInfo.InputBytes + obsInfo.OutputBytes + obsLimit.InputBytes + obsLimit.OutputBytes
@@ -54,6 +55,18 @@ func (s *service) NewUserConn(req NewUserConnReq) (any, error) {
 		if obsUseTotal >= int64(nodeInfo.LimitTotal)*1024*1024*1024 {
 			return nil, errors.New("insufficient node traffic")
 		}
+	}
+
+	ip, _, _ := net.SplitHostPort(req.Content.RemoteAddr)
+	if ip == "" {
+		return nil, nil
+	}
+	admissionInfo := cache2.GetAdmissionInfo(tunnelCode)
+	if admissionInfo.ValidWhiteIp(ip) {
+		return nil, nil
+	}
+	if admissionInfo.ValidBlackIp(ip) {
+		return nil, errors.New("reject connection")
 	}
 	return nil, nil
 }

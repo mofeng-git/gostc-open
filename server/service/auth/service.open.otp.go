@@ -6,8 +6,8 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 )
 
 type OpenOtpReq struct {

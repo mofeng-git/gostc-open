@@ -2,7 +2,7 @@ package service
 
 import (
 	"server/model"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 type QueryReq struct {

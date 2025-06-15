@@ -2,7 +2,7 @@ package todo
 
 import (
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 func gostObs() {

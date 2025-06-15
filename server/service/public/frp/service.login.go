@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"server/model"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -31,11 +31,11 @@ type LoginReq struct {
 
 func (s *service) Login(req LoginReq) (any, error) {
 	now := time.Now()
-	code := cache.GetGostAuth(req.Content.Metas.User, req.Content.Metas.Password)
+	code := cache2.GetGostAuth(req.Content.Metas.User, req.Content.Metas.Password)
 	if code == "" {
 		return nil, errors.New("unauthorized")
 	}
-	result := cache.GetTunnelInfo(code)
+	result := cache2.GetTunnelInfo(code)
 	if result.Code == "" || (result.ExpAt < now.Unix() && result.ChargingTye == model.GOST_CONFIG_CHARGING_CUCLE_DAY) {
 		return nil, errors.New("expired")
 	}

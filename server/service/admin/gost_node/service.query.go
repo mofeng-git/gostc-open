@@ -4,7 +4,7 @@ import (
 	"errors"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 	"server/service/common/node_rule"
 )
 
@@ -48,7 +48,8 @@ func (service *service) Query(req QueryReq) (QueryResp, error) {
 	}
 	var ruleNames []string
 	for _, rule := range node.GetRules() {
-		ruleNames = append(ruleNames, node_rule.RuleMap[rule].Name())
+		getRule := node_rule.Registry.GetRule(rule)
+		ruleNames = append(ruleNames, getRule.Name())
 	}
 	return QueryResp{
 		Code:             node.Code,

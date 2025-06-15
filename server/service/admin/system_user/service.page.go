@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"server/pkg/bean"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 	"time"
 )
 

@@ -6,7 +6,7 @@ import (
 	"server/pkg/bean"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -93,7 +93,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		db.GostClientHost.Node,
 	).Where(where...).Order(db.GostClientHost.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, host := range hosts {
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, host.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, host.Code)
 		list = append(list, Item{
 			UserAccount:  host.User.Account,
 			Code:         host.Code,
@@ -101,7 +101,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			TargetIp:     host.TargetIp,
 			TargetPort:   host.TargetPort,
 			DomainPrefix: host.DomainPrefix,
-			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache2.GetNodeCustomDomain(host.NodeCode)),
 			Node: ItemNode{
 				Code: host.NodeCode,
 				Name: host.Node.Name,
@@ -109,13 +109,13 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 					address, _, _ := net.SplitHostPort(host.Node.Address)
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetNodeOnline(host.NodeCode), 1, 2),
 				Domain: host.Node.Domain,
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,
 				Name:   host.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(host.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(host.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: host.ChargingType,

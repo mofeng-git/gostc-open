@@ -320,12 +320,12 @@ const operatorOptions = [
     disabled: false,
     func: openObsModal,
   },
-  // {
-  //   label: '黑/白名单',
-  //   key: 'admission',
-  //   disabled: false,
-  //   func: openAdmission,
-  // },
+  {
+    label: '黑/白名单',
+    key: 'admission',
+    disabled: false,
+    func: openAdmission,
+  },
   {
     label: '自定义域名',
     key: 'domain',
@@ -564,7 +564,7 @@ const operatorRenderLabel = (option) => {
           </n-switch>
           <p></p>
           <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.white"
-                   :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
+                   :placeholder="`127.0.0.1\nxxx.xxx.xxx.xxx`"></n-input>
         </n-tab-pane>
         <n-tab-pane name="black" tab="黑名单">
           <n-alert type="info">
@@ -578,7 +578,7 @@ const operatorRenderLabel = (option) => {
           </n-switch>
           <p></p>
           <n-input type="textarea" :autosize="{minRows:5,maxRows:20}" v-model:value="state.admission.black"
-                   :placeholder="`127.0.0.1\n192.168.0.0/16`"></n-input>
+                   :placeholder="`127.0.0.1\nxxx.xxx.xxx.xxx`"></n-input>
         </n-tab-pane>
       </n-tabs>
     </Modal>

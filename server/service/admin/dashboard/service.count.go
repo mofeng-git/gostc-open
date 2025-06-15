@@ -2,7 +2,7 @@ package service
 
 import (
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -33,10 +33,10 @@ func (service *service) Count() (result CountResp) {
 	_ = db.GostNode.Pluck(db.GostNode.Code, &nodeCodes)
 	result.Node = int64(len(nodeCodes))
 	for _, nodeCode := range nodeCodes {
-		obs := cache.GetNodeObs(dateOnly, nodeCode)
+		obs := cache2.GetNodeObs(dateOnly, nodeCode)
 		result.InputBytes += obs.InputBytes
 		result.OutputBytes += obs.OutputBytes
-		if cache.GetNodeOnline(nodeCode) {
+		if cache2.GetNodeOnline(nodeCode) {
 			result.NodeOnline++
 		}
 	}
@@ -45,7 +45,7 @@ func (service *service) Count() (result CountResp) {
 	_ = db.GostClient.Pluck(db.GostClient.Code, &clientCodes)
 	result.Client = int64(len(clientCodes))
 	for _, clientCode := range clientCodes {
-		if cache.GetClientOnline(clientCode) {
+		if cache2.GetClientOnline(clientCode) {
 			result.ClientOnline++
 		}
 	}

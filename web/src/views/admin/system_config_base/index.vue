@@ -60,7 +60,7 @@ onBeforeMount(() => {
         <n-form-item label="Favicon">
           <n-input v-model:value="state.data.favicon"></n-input>
         </n-form-item>
-        <n-form-item label="基础URL">
+        <n-form-item label="基础URL(暂无实际作用，预留)">
           <n-input v-model:value="state.data.baseUrl"></n-input>
         </n-form-item>
         <n-form-item label="注册">

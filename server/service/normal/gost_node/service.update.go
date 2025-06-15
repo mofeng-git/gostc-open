@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/node_port"
 	"server/service/engine"
 	"strings"
@@ -82,8 +82,8 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	engine.NodeConfig(db, node.Code)
 	engine.ClientAllConfigUpdateByNodeCode(db, node.Code)
 	node_port.Arrange(db, node.Code)
-	cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
-	cache.SetNodeInfo(cache.NodeInfo{
+	cache2.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+	cache2.SetNodeInfo(cache2.NodeInfo{
 		Code:            node.Code,
 		LimitResetIndex: node.LimitResetIndex,
 		LimitTotal:      node.LimitTotal,

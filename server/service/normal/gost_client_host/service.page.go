@@ -6,7 +6,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -89,19 +89,19 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 		db.GostClientHost.Node,
 	).Where(where...).Order(db.GostClientHost.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, host := range hosts {
-		obsInfo := cache.GetTunnelObsDateRange(cache.MONTH_DATEONLY_LIST, host.Code)
+		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, host.Code)
 		list = append(list, Item{
 			Code:             host.Code,
 			Name:             host.Name,
 			TargetIp:         host.TargetIp,
 			TargetPort:       host.TargetPort,
 			DomainPrefix:     host.DomainPrefix,
-			DomainFull:       host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+			DomainFull:       host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache2.GetNodeCustomDomain(host.NodeCode)),
 			CustomDomain:     host.CustomDomain,
 			CustomCert:       host.CustomCert,
 			CustomKey:        host.CustomKey,
 			CustomForceHttps: host.CustomForceHttps,
-			CustomEnable:     utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
+			CustomEnable:     utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			Node: ItemNode{
 				Code: host.NodeCode,
 				Name: host.Node.Name,
@@ -109,14 +109,14 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := host.Node.GetAddress()
 					return address
 				}(),
-				Online:       utils.TrinaryOperation(cache.GetNodeOnline(host.NodeCode), 1, 2),
+				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(host.NodeCode), 1, 2),
 				Domain:       host.Node.Domain,
-				CustomDomain: utils.TrinaryOperation(cache.GetNodeCustomDomain(host.NodeCode), 1, 2),
+				CustomDomain: utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,
 				Name:   host.Client.Name,
-				Online: utils.TrinaryOperation(cache.GetClientOnline(host.ClientCode), 1, 2),
+				Online: utils.TrinaryOperation(cache2.GetClientOnline(host.ClientCode), 1, 2),
 			},
 			Config: ItemConfig{
 				ChargingType: host.ChargingType,

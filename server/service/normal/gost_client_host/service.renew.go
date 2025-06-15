@@ -6,8 +6,8 @@ import (
 	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/engine"
 	"time"
 )

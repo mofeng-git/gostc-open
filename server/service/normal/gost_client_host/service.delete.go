@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/engine"
 )
 
@@ -37,6 +37,7 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 		}
 		engine.ClientRemoveHostConfig(tx, *host, host.Node)
 		cache.DelTunnelInfo(req.Code)
+		cache.DelAdmissionInfo(req.Code)
 		return nil
 	})
 }

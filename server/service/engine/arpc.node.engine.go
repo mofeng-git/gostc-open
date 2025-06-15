@@ -26,7 +26,7 @@ type ARpcNodeEngine struct {
 
 func (e *ARpcNodeEngine) PortCheck(tx *query.Query, ip, port string) error {
 	var relay string
-	if err := e.client.Call("port_check", port, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("port_check", port, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -131,7 +131,7 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 	}
 
 	var relay string
-	if err := e.client.Call("server_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("server_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -156,7 +156,7 @@ func (e *ARpcNodeEngine) CustomDomain(tx *query.Query, domain, cert, key string,
 		Cert:       cert,
 		Key:        key,
 		ForceHttps: forceHttps,
-	}, &relay, time.Second*5); err != nil {
+	}, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -166,5 +166,5 @@ func (e *ARpcNodeEngine) CustomDomain(tx *query.Query, domain, cert, key string,
 }
 
 func (e *ARpcNodeEngine) Stop(msg string) {
-	_ = e.client.Notify("stop", msg, time.Second*5)
+	_ = e.client.Notify("stop", msg, time.Second*30)
 }

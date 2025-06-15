@@ -7,8 +7,8 @@ import (
 	"server/model"
 	"server/pkg/jwt"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/common/node_port"
 	"strings"
 )
@@ -43,7 +43,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	db, _, log := repository.Get("")
 
 	var cfg model.SystemConfigGost
-	cache.GetSystemConfigGost(&cfg)
+	cache2.GetSystemConfigGost(&cfg)
 	if cfg.FuncNode != "1" {
 		return errors.New("管理员未启用该功能")
 	}
@@ -95,8 +95,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("操作失败")
 		}
 		node_port.Arrange(tx, node.Code)
-		cache.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
-		cache.SetNodeInfo(cache.NodeInfo{
+		cache2.RefreshNodeObsLimit(node.Code, node.LimitResetIndex)
+		cache2.SetNodeInfo(cache2.NodeInfo{
 			Code:            node.Code,
 			LimitResetIndex: node.LimitResetIndex,
 			LimitTotal:      node.LimitTotal,

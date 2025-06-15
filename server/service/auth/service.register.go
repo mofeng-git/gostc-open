@@ -6,8 +6,8 @@ import (
 	"server/model"
 	"server/pkg/utils"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 )
 
 type RegisterReq struct {
@@ -19,13 +19,13 @@ type RegisterReq struct {
 
 func (service *service) Register(ip string, req RegisterReq) (err error) {
 	var cfg model.SystemConfigBase
-	cache.GetSystemConfigBase(&cfg)
+	cache2.GetSystemConfigBase(&cfg)
 	if cfg.Register != "1" {
 		return errors.New("未启用注册功能")
 	}
 
 	db, _, log := repository.Get("")
-	if !cache.GetIpSecurity(ip) && !cache.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
+	if !cache2.GetIpSecurity(ip) && !cache2.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
 		return errors.New("验证码错误")
 	}
 

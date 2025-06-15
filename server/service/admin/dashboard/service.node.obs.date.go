@@ -3,7 +3,7 @@ package service
 import (
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"sort"
 	"time"
 )
@@ -22,11 +22,11 @@ func (service *service) NodeObsDate(date string) (result []NodeObsItem) {
 	).Find()
 	var nodeObsMap = make(map[string]NodeObsItem)
 	for _, node := range nodes {
-		obsInfo := cache.GetNodeObs(dateOnlyString, node.Code)
+		obsInfo := cache2.GetNodeObs(dateOnlyString, node.Code)
 		obs := nodeObsMap[node.Code]
 		obs.Code = node.Code
 		obs.Name = node.Name
-		obs.Online = utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2)
+		obs.Online = utils.TrinaryOperation(cache2.GetNodeOnline(node.Code), 1, 2)
 		obs.InputBytes += obsInfo.InputBytes
 		obs.OutputBytes += obsInfo.OutputBytes
 		nodeObsMap[node.Code] = obs

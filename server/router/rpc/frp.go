@@ -12,7 +12,7 @@ import (
 	"server/model"
 	"server/pkg/rpc_protocol/websocket"
 	"server/repository"
-	"server/service/common/cache"
+	cache3 "server/repository/cache"
 	"server/service/engine"
 	"strings"
 	"time"
@@ -43,8 +43,8 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		fmt.Println("HandleDisconnected")
 		code, ok := client.Get("code")
 		if ok {
-			cache.SetClientOnline(code.(string), false, cache2.NoExpiration)
-			cache.SetNodeOnline(code.(string), false, cache2.NoExpiration)
+			cache3.SetClientOnline(code.(string), false, cache2.NoExpiration)
+			cache3.SetNodeOnline(code.(string), false, cache2.NoExpiration)
 		}
 	})
 	rpcServer.Handler.HandleMessageDone(func(c *arpc.Client, m *arpc.Message) {
@@ -52,6 +52,20 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 	})
 
 	// 路由
+	rpcServer.Handler.Handle("rpc/client/ping", func(c *arpc.Context) {
+		code, ok := c.Client.Get("code")
+		if ok {
+			cache3.SetClientOnline(code.(string), true, cache2.NoExpiration)
+		}
+		_ = c.Write("success")
+	})
+	rpcServer.Handler.Handle("rpc/node/ping", func(c *arpc.Context) {
+		code, ok := c.Client.Get("code")
+		if ok {
+			cache3.SetNodeOnline(code.(string), true, cache2.NoExpiration)
+		}
+		_ = c.Write("success")
+	})
 	rpcServer.Handler.Handle("rpc/client/reg", func(c *arpc.Context) {
 		var reply = make(map[string]string)
 		if err := c.Bind(&reply); err != nil {
@@ -91,9 +105,9 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 			engine.EngineRegistry.Set(clientEngine)
 		}
 		_ = c.Write("success")
-		cache.SetClientLastTime(gostClient.Code)
-		cache.SetClientOnline(gostClient.Code, true, cache2.NoExpiration)
-		cache.SetClientVersion(gostClient.Code, version)
+		cache3.SetClientLastTime(gostClient.Code)
+		cache3.SetClientOnline(gostClient.Code, true, cache2.NoExpiration)
+		cache3.SetClientVersion(gostClient.Code, version)
 		client.Set("code", gostClient.Code)
 		engine.ClientAllConfigUpdateByClientCode(db, gostClient.Code)
 	})
@@ -140,10 +154,10 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 			engine.EngineRegistry.Set(clientEngine)
 		}
 		_ = c.Write("success")
-		cache.SetNodeOnline(gostNode.Code, true, cache2.NoExpiration)
-		cache.SetNodeVersion(gostNode.Code, version)
-		cache.SetNodeCustomDomain(gostNode.Code, domain == "1")
-		cache.SetNodeCache(gostNode.Code, domainCache == "1")
+		cache3.SetNodeOnline(gostNode.Code, true, cache2.NoExpiration)
+		cache3.SetNodeVersion(gostNode.Code, version)
+		cache3.SetNodeCustomDomain(gostNode.Code, domain == "1")
+		cache3.SetNodeCache(gostNode.Code, domainCache == "1")
 		client.Set("code", gostNode.Code)
 		engine.NodeConfig(db, gostNode.Code)
 	})
@@ -155,8 +169,8 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 			return
 		}
 		code := strings.Split(req.Name, "_")[0]
-		tunnelInfo := cache.GetTunnelInfo(code)
-		go cache.IncreaseObs(time.Now().Format(time.DateOnly), tunnelInfo.Code, tunnelInfo.ClientCode, tunnelInfo.NodeCode, tunnelInfo.UserCode, cache.TunnelObs{
+		tunnelInfo := cache3.GetTunnelInfo(code)
+		go cache3.IncreaseObs(time.Now().Format(time.DateOnly), tunnelInfo.Code, tunnelInfo.ClientCode, tunnelInfo.NodeCode, tunnelInfo.UserCode, cache3.TunnelObs{
 			InputBytes:  req.Total,
 			OutputBytes: 0,
 		})
@@ -169,8 +183,8 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 			return
 		}
 		code := strings.Split(req.Name, "_")[0]
-		tunnelInfo := cache.GetTunnelInfo(code)
-		go cache.IncreaseObs(time.Now().Format(time.DateOnly), tunnelInfo.Code, tunnelInfo.ClientCode, tunnelInfo.NodeCode, tunnelInfo.UserCode, cache.TunnelObs{
+		tunnelInfo := cache3.GetTunnelInfo(code)
+		go cache3.IncreaseObs(time.Now().Format(time.DateOnly), tunnelInfo.Code, tunnelInfo.ClientCode, tunnelInfo.NodeCode, tunnelInfo.UserCode, cache3.TunnelObs{
 			InputBytes:  0,
 			OutputBytes: req.Total,
 		})

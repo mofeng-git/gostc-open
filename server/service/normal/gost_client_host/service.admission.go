@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"server/pkg/jwt"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/engine"
 )
 
 type AdmissionReq struct {
@@ -42,7 +42,13 @@ func (service *service) Admission(claims jwt.Claims, req AdmissionReq) error {
 			log.Error("修改域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientHostConfig(tx, host.Code)
+		cache.SetAdmissionInfo(cache.AdmissionInfo{
+			Code:        host.Code,
+			WhiteEnable: req.WhiteEnable,
+			WhiteList:   req.White,
+			BlackEnable: req.BlackEnable,
+			Blacklist:   req.Black,
+		})
 		return nil
 	})
 }

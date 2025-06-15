@@ -9,7 +9,7 @@ type Item struct {
 }
 
 func (*service) List() (list []Item) {
-	for _, v := range node_rule.RuleList {
+	for _, v := range node_rule.Registry.GetRules() {
 		list = append(list, Item{
 			Code:        v.Code(),
 			Name:        v.Name(),

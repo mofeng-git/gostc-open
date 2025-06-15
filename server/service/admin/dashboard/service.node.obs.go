@@ -3,7 +3,7 @@ package service
 import (
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"sort"
 )
 
@@ -14,13 +14,13 @@ func (service *service) NodeObs() (result []NodeObsItem) {
 		db.GostNode.Name,
 	).Find()
 	var nodeObsMap = make(map[string]NodeObsItem)
-	for _, dateOnly := range cache.MONTH_DATEONLY_LIST {
+	for _, dateOnly := range cache2.MONTH_DATEONLY_LIST {
 		for _, node := range nodes {
-			obsInfo := cache.GetNodeObs(dateOnly, node.Code)
+			obsInfo := cache2.GetNodeObs(dateOnly, node.Code)
 			obs := nodeObsMap[node.Code]
 			obs.Code = node.Code
 			obs.Name = node.Name
-			obs.Online = utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2)
+			obs.Online = utils.TrinaryOperation(cache2.GetNodeOnline(node.Code), 1, 2)
 			obs.InputBytes += obsInfo.InputBytes
 			obs.OutputBytes += obsInfo.OutputBytes
 			nodeObsMap[node.Code] = obs

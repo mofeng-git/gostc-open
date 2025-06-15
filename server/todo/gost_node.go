@@ -3,7 +3,7 @@ package todo
 import (
 	cache2 "github.com/patrickmn/go-cache"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 func gostNode() {

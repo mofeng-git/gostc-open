@@ -2,7 +2,7 @@ package service
 
 import (
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 	"sort"
 )
 

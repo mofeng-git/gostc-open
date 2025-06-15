@@ -8,8 +8,8 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"time"
 )
 
@@ -19,12 +19,12 @@ type GenBindEmailCodeReq struct {
 
 func (service *service) GenBindEmailCode(claims jwt.Claims, req GenBindEmailCodeReq) (string, error) {
 	var cfg model.SystemConfigEmail
-	cache.GetSystemConfigEmail(&cfg)
+	cache2.GetSystemConfigEmail(&cfg)
 	if cfg.Enable != "1" {
 		return "", errors.New("管理员未启用邮件服务")
 	}
 
-	lastTime := cache.GetBindEmailLastTime(claims.Code)
+	lastTime := cache2.GetBindEmailLastTime(claims.Code)
 	space := lastTime.Add(time.Minute).Sub(time.Now()).Milliseconds()
 	if space > 0 {
 		return "", fmt.Errorf("请等待%d秒后再尝试", space/1000)
@@ -51,7 +51,7 @@ func (service *service) GenBindEmailCode(claims jwt.Claims, req GenBindEmailCode
 
 	str := utils.RandStr(32, utils.AllDict)
 	code := utils.RandStr(6, utils.NumDict)
-	cache.SetBindEmailCode(str, code, time.Minute*5)
+	cache2.SetBindEmailCode(str, code, time.Minute*5)
 	if err := email.Send(email.Config{
 		Host: cfg.Host,
 		Port: utils.StrMustInt(cfg.Port),
@@ -65,6 +65,6 @@ func (service *service) GenBindEmailCode(claims jwt.Claims, req GenBindEmailCode
 	}); err != nil {
 		return "", err
 	}
-	cache.SetBindEmailLastTime(claims.Code)
+	cache2.SetBindEmailLastTime(claims.Code)
 	return str, nil
 }

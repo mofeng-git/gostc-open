@@ -4,8 +4,8 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"server/repository"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/engine"
 )
 
@@ -36,6 +36,7 @@ func (service *service) Delete(req DeleteReq) error {
 		}
 		engine.ClientRemoveHostConfig(tx, *host, host.Node)
 		cache.DelTunnelInfo(req.Code)
+		cache.DelAdmissionInfo(req.Code)
 		return nil
 	})
 }

@@ -6,7 +6,7 @@ import (
 	"server/global"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"strconv"
 	"time"
 )
@@ -27,11 +27,11 @@ type LoginResp struct {
 func (service *service) Login(ip string, req LoginReq) (result LoginResp, err error) {
 	defer func() {
 		if err != nil {
-			cache.SetIpSecurity(ip, false)
+			cache2.SetIpSecurity(ip, false)
 		}
 	}()
 	db, _, _ := repository.Get("")
-	if !cache.GetIpSecurity(ip) && !cache.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
+	if !cache2.GetIpSecurity(ip) && !cache2.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
 		return result, errors.New("验证码错误")
 	}
 
@@ -59,8 +59,8 @@ func (service *service) Login(ip string, req LoginReq) (result LoginResp, err er
 		}
 	} else {
 		key := utils.RandStr(32, utils.AllDict)
-		cache.SetLoginOtp(key, user.Code, time.Minute*5)
-		cache.SetIpSecurity(ip, true)
+		cache2.SetLoginOtp(key, user.Code, time.Minute*5)
+		cache2.SetIpSecurity(ip, true)
 		result = LoginResp{
 			Otp:   1,
 			Token: key,

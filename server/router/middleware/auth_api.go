@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"server/model"
 	"server/pkg/bean"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 func AuthApi() gin.HandlerFunc {

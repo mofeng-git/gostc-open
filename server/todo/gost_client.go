@@ -4,7 +4,7 @@ import (
 	cache2 "github.com/patrickmn/go-cache"
 	"server/model"
 	"server/repository"
-	"server/service/common/cache"
+	cache3 "server/repository/cache"
 )
 
 func gostClient() {
@@ -12,7 +12,7 @@ func gostClient() {
 	var clientCodes []string
 	_ = db.GostClient.Pluck(db.GostClient.Code, &clientCodes)
 	for _, code := range clientCodes {
-		cache.SetClientOnline(code, false, cache2.NoExpiration)
+		cache3.SetClientOnline(code, false, cache2.NoExpiration)
 	}
 
 	authList, _ := db.GostAuth.Find()
@@ -23,7 +23,7 @@ func gostClient() {
 
 	hosts, _ := db.GostClientHost.Find()
 	for _, host := range hosts {
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache3.SetTunnelInfo(cache3.TunnelInfo{
 			Code:        host.Code,
 			Type:        model.GOST_TUNNEL_TYPE_HOST,
 			ClientCode:  host.ClientCode,
@@ -34,12 +34,12 @@ func gostClient() {
 			Limiter:     host.Limiter,
 		})
 		auth := authMap[host.Code]
-		cache.SetGostAuth(auth.User, auth.Password, host.Code)
+		cache3.SetGostAuth(auth.User, auth.Password, host.Code)
 	}
 
 	forwards, _ := db.GostClientForward.Find()
 	for _, forward := range forwards {
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache3.SetTunnelInfo(cache3.TunnelInfo{
 			Code:        forward.Code,
 			Type:        model.GOST_TUNNEL_TYPE_FORWARD,
 			ClientCode:  forward.ClientCode,
@@ -50,12 +50,12 @@ func gostClient() {
 			Limiter:     forward.Limiter,
 		})
 		auth := authMap[forward.Code]
-		cache.SetGostAuth(auth.User, auth.Password, forward.Code)
+		cache3.SetGostAuth(auth.User, auth.Password, forward.Code)
 	}
 
 	tunnels, _ := db.GostClientTunnel.Find()
 	for _, tunnel := range tunnels {
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache3.SetTunnelInfo(cache3.TunnelInfo{
 			Code:        tunnel.Code,
 			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,
 			ClientCode:  tunnel.ClientCode,
@@ -66,12 +66,12 @@ func gostClient() {
 			Limiter:     tunnel.Limiter,
 		})
 		auth := authMap[tunnel.Code]
-		cache.SetGostAuth(auth.User, auth.Password, tunnel.Code)
+		cache3.SetGostAuth(auth.User, auth.Password, tunnel.Code)
 	}
 
 	proxys, _ := db.GostClientProxy.Find()
 	for _, proxy := range proxys {
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache3.SetTunnelInfo(cache3.TunnelInfo{
 			Code:        proxy.Code,
 			Type:        model.GOST_TUNNEL_TYPE_PROXY,
 			ClientCode:  proxy.ClientCode,
@@ -82,12 +82,12 @@ func gostClient() {
 			Limiter:     proxy.Limiter,
 		})
 		auth := authMap[proxy.Code]
-		cache.SetGostAuth(auth.User, auth.Password, proxy.Code)
+		cache3.SetGostAuth(auth.User, auth.Password, proxy.Code)
 	}
 
 	p2ps, _ := db.GostClientP2P.Find()
 	for _, p2p := range p2ps {
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache3.SetTunnelInfo(cache3.TunnelInfo{
 			Code:        p2p.Code,
 			Type:        model.GOST_TUNNEL_TYPE_P2P,
 			ClientCode:  p2p.ClientCode,
@@ -98,6 +98,6 @@ func gostClient() {
 			Limiter:     p2p.Limiter,
 		})
 		auth := authMap[p2p.Code]
-		cache.SetGostAuth(auth.User, auth.Password, p2p.Code)
+		cache3.SetGostAuth(auth.User, auth.Password, p2p.Code)
 	}
 }

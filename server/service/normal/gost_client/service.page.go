@@ -5,7 +5,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -29,14 +29,14 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 	db, _, _ := repository.Get("")
 	clients, total, _ := db.GostClient.Where(db.GostClient.UserCode.Eq(claims.Code)).Order(db.GostClient.Id.Desc()).FindByPage(req.GetOffset(), req.GetLimit())
 	for _, client := range clients {
-		obsInfo := cache.GetClientObsDateRange(cache.MONTH_DATEONLY_LIST, client.Code)
+		obsInfo := cache2.GetClientObsDateRange(cache2.MONTH_DATEONLY_LIST, client.Code)
 		list = append(list, Item{
 			Code:        client.Code,
 			Name:        client.Name,
 			Key:         client.Key,
-			Online:      utils.TrinaryOperation(cache.GetClientOnline(client.Code), 1, 2),
-			LastTime:    cache.GetClientLastTime(client.Code),
-			Version:     cache.GetClientVersion(client.Code),
+			Online:      utils.TrinaryOperation(cache2.GetClientOnline(client.Code), 1, 2),
+			LastTime:    cache2.GetClientLastTime(client.Code),
+			Version:     cache2.GetClientVersion(client.Code),
 			CreatedAt:   client.CreatedAt.Format(time.DateTime),
 			InputBytes:  obsInfo.InputBytes,
 			OutputBytes: obsInfo.OutputBytes,

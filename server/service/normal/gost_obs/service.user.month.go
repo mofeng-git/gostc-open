@@ -3,7 +3,7 @@ package service
 import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
-	"server/service/common/cache"
+	"server/repository/cache"
 	"time"
 )
 

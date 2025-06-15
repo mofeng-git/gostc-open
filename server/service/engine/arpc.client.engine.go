@@ -7,8 +7,8 @@ import (
 	"github.com/lesismal/arpc"
 	"server/model"
 	"server/pkg/utils"
+	"server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/common/warn_msg"
 	"time"
 )
@@ -23,12 +23,12 @@ func NewARpcClientEngine(code string, client *arpc.Client) *ARpcClientEngine {
 }
 
 func (e *ARpcClientEngine) Stop(msg string) {
-	_ = e.client.Notify("stop", msg, time.Second*5)
+	_ = e.client.Notify("stop", msg, time.Second*30)
 }
 
 func (e *ARpcClientEngine) PortCheck(tx *query.Query, ip, port string) error {
 	var relay string
-	if err := e.client.Call("port_check", port, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("port_check", port, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -85,7 +85,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 		},
 	}
 	var relay string
-	if err := e.client.Call("host_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("host_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -96,7 +96,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 
 func (e *ARpcClientEngine) RemoveHost(tx *query.Query, host model.GostClientHost, node model.GostNode) error {
 	var relay string
-	if err := e.client.Call("remove_config", host.Code, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", host.Code, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -175,7 +175,7 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 	}
 
 	var relay string
-	if err := e.client.Call("forward_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("forward_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -186,7 +186,7 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 
 func (e *ARpcClientEngine) RemoveForward(tx *query.Query, forward model.GostClientForward) error {
 	var relay string
-	if err := e.client.Call("remove_config", forward.Code, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", forward.Code, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -263,7 +263,7 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 	}
 
 	var relay string
-	if err := e.client.Call("tunnel_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("tunnel_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -274,7 +274,7 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 
 func (e *ARpcClientEngine) RemoveTunnel(tx *query.Query, tunnel model.GostClientTunnel, node model.GostNode) error {
 	var relay string
-	if err := e.client.Call("remove_config", tunnel.Code, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", tunnel.Code, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -351,7 +351,7 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 		},
 	}
 	var relay string
-	if err := e.client.Call("p2p_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("p2p_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -362,7 +362,7 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 
 func (e *ARpcClientEngine) RemoveP2P(tx *query.Query, p2p model.GostClientP2P) error {
 	var relay string
-	if err := e.client.Call("remove_config", p2p.Code, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", p2p.Code, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -401,7 +401,7 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 		Limiter: fmt.Sprintf("%dKB", proxy.Limiter*128),
 	}
 	var relay string
-	if err := e.client.Call("proxy_config", data, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("proxy_config", data, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -412,7 +412,7 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 
 func (e *ARpcClientEngine) RemoveProxy(tx *query.Query, proxy model.GostClientProxy) error {
 	var relay string
-	if err := e.client.Call("remove_config", proxy.Code, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", proxy.Code, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -456,7 +456,7 @@ func (e *ARpcClientEngine) CustomCfgConfig(tx *query.Query, cfgCode string) erro
 		Key:     cfg.Code,
 		Type:    cfg.ContentType,
 		Content: cfg.Content,
-	}, &relay, time.Second*5); err != nil {
+	}, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -467,7 +467,7 @@ func (e *ARpcClientEngine) CustomCfgConfig(tx *query.Query, cfgCode string) erro
 
 func (e *ARpcClientEngine) RemoveCustomCfg(tx *query.Query, cfgCode string) error {
 	var relay string
-	if err := e.client.Call("remove_config", cfgCode, &relay, time.Second*5); err != nil {
+	if err := e.client.Call("remove_config", cfgCode, &relay, time.Second*30); err != nil {
 		return err
 	}
 	if relay != "success" {

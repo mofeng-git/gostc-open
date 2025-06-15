@@ -12,7 +12,7 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
-	"server/service/common/cache"
+	cache2 "server/repository/cache"
 	"time"
 )
 
@@ -32,7 +32,7 @@ func (service *service) GenOtp(claims jwt.Claims) (result GenOtpResp, err error)
 	}
 
 	var systemConfig model.SystemConfigBase
-	cache.GetSystemConfigBase(&systemConfig)
+	cache2.GetSystemConfigBase(&systemConfig)
 
 	result.Key = utils.RandStr(32, utils.AllDict)
 	optKey, err := totp.Generate(totp.GenerateOpts{
@@ -52,6 +52,6 @@ func (service *service) GenOtp(claims jwt.Claims) (result GenOtpResp, err error)
 		return result, errors.New("生成二维码失败")
 	}
 	result.Img = base64.StdEncoding.EncodeToString(imgBuf.Bytes())
-	cache.SetBindOtp(result.Key, optKey.Secret(), time.Minute*5)
+	cache2.SetBindOtp(result.Key, optKey.Secret(), time.Minute*5)
 	return result, nil
 }

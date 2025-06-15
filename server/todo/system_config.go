@@ -3,7 +3,7 @@ package todo
 import (
 	"server/model"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 )
 
 func systemConfig() {

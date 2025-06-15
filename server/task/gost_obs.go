@@ -3,7 +3,7 @@ package task
 import (
 	"server/model"
 	"server/repository"
-	"server/service/common/cache"
+	"server/repository/cache"
 	"time"
 )
 

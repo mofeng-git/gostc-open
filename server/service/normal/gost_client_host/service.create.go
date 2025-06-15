@@ -7,8 +7,8 @@ import (
 	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
+	cache2 "server/repository/cache"
 	"server/repository/query"
-	"server/service/common/cache"
 	"server/service/common/node_rule"
 	"server/service/engine"
 	"time"
@@ -33,7 +33,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 	}
 
 	var cfg model.SystemConfigGost
-	cache.GetSystemConfigGost(&cfg)
+	cache2.GetSystemConfigGost(&cfg)
 	if cfg.FuncWeb != "1" {
 		return errors.New("管理员未启用该功能")
 	}
@@ -57,7 +57,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		}
 
 		for _, ruleCode := range node.GetRules() {
-			rule := node_rule.RuleMap[ruleCode]
+			rule := node_rule.Registry.GetRule(ruleCode)
 			if rule.Code() == "" {
 				continue
 			}
@@ -153,9 +153,9 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			log.Error("生成授权信息失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		cache.SetGostAuth(auth.User, auth.Password, host.Code)
+		cache2.SetGostAuth(auth.User, auth.Password, host.Code)
 		engine.ClientHostConfig(tx, host.Code)
-		cache.SetTunnelInfo(cache.TunnelInfo{
+		cache2.SetTunnelInfo(cache2.TunnelInfo{
 			Code:        host.Code,
 			Type:        model.GOST_TUNNEL_TYPE_HOST,
 			ClientCode:  host.ClientCode,
