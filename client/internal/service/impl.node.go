@@ -81,7 +81,7 @@ func (svc *Node) run() (err error) {
 		return err
 	}
 	defer client.Stop()
-	client.Keepalive(time.Second * 15)
+	//client.Keepalive(time.Second * 15)
 	client.Handler.SetReadTimeout(time.Second * 50)
 	var stopChan = make(chan struct{})
 	client.Handler.HandleDisconnected(func(client *arpc.Client) {
@@ -120,9 +120,23 @@ func (svc *Node) run() (err error) {
 	event.ServerHandle(client, svc.apiUrl, callback)
 	event.PortCheckHandle(client)
 	event.ServerDomainHandle(client, svc.proxyBaseUrl)
+	go svc.ping(client)
 	event.StopHandle(client, func() {
 		svc.Stop()
 	})
 	<-stopChan
 	return err
+}
+
+func (svc *Node) ping(client *arpc.Client) {
+	for {
+		time.Sleep(time.Second * 15)
+		if err := client.CheckState(); err != nil {
+			if !errors.Is(err, arpc.ErrClientReconnecting) {
+				return
+			}
+		} else {
+			_ = client.CallAsync("rpc/node/ping", nil, func(c *arpc.Context, err error) {}, time.Second*5)
+		}
+	}
 }

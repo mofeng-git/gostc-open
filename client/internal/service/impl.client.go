@@ -79,7 +79,7 @@ func (svc *Client) run() (err error) {
 	if err != nil {
 		return err
 	}
-	client.Keepalive(time.Second * 15)
+	//client.Keepalive(time.Second * 15)
 	client.Handler.SetReadTimeout(time.Second * 50)
 	var stopChan = make(chan struct{})
 	client.Handler.HandleDisconnected(func(client *arpc.Client) {
@@ -121,9 +121,23 @@ func (svc *Client) run() (err error) {
 	event.RemoveHandle(client, func(key string) {
 		svc.svcMap.Delete(key)
 	})
+	go svc.ping(client)
 	svc.stopFunc = func() {
 		client.Stop()
 	}
 	<-stopChan
 	return err
+}
+
+func (svc *Client) ping(client *arpc.Client) {
+	for {
+		time.Sleep(time.Second * 15)
+		if err := client.CheckState(); err != nil {
+			if !errors.Is(err, arpc.ErrClientReconnecting) {
+				return
+			}
+		} else {
+			_ = client.CallAsync("rpc/client/ping", nil, func(c *arpc.Context, err error) {}, time.Second*5)
+		}
+	}
 }
