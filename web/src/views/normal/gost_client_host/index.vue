@@ -320,12 +320,12 @@ const operatorOptions = [
     disabled: false,
     func: openObsModal,
   },
-  {
-    label: '白名单',
-    key: 'admission',
-    disabled: false,
-    func: openAdmission,
-  },
+  // {
+  //   label: '白名单',
+  //   key: 'admission',
+  //   disabled: false,
+  //   func: openAdmission,
+  // },
   {
     label: '自定义域名',
     key: 'domain',
