@@ -21,6 +21,11 @@ type CircularLogger struct {
 	console bool
 }
 
+func (cl *CircularLogger) Write(p []byte) (n int, err error) {
+	cl.AddLog("FRP", string(p))
+	return len(p), nil
+}
+
 func NewCircularLogger(maxSize int) *CircularLogger {
 	return &CircularLogger{
 		logs:    make([]LogEntry, 0, maxSize),

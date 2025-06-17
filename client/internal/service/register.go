@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	frpLog "github.com/SianHH/frp-package/pkg/util/log"
+	log2 "github.com/fatedier/golib/log"
 	"github.com/go-gost/core/logger"
 	"github.com/go-gost/x/config/parsing"
 	xlogger "github.com/go-gost/x/logger"
@@ -121,5 +123,6 @@ func init() {
 	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level)))
 	tlsConfig, _ := parsing.BuildDefaultTLSConfig(nil)
 	parsing.SetDefaultTLSConfig(tlsConfig)
+	frpLog.Logger = frpLog.Logger.WithOptions(log2.WithOutput(common.Logger))
 	fmt.Println("VERSION：", common.VERSION)
 }
