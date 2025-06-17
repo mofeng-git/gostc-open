@@ -15,6 +15,7 @@ import (
 	_ "gostc-sub/webui/backend/todo"
 	"log"
 	"net"
+	"os"
 	"os/exec"
 	"syscall"
 )
@@ -29,6 +30,8 @@ func main() {
 }
 
 func onReady() {
+	moveWebuiCfgDir(global.BasePath, global.BasePath+"/data") // 移动旧配置文件内容
+	global.BasePath = global.BasePath + "/data"
 	if err := global.LoadConfig(global.BasePath + "/config.yaml"); err != nil {
 		log.Fatalln(err)
 	}
@@ -102,4 +105,28 @@ func onExit() {
 		value.Stop()
 	})
 	fmt.Println("onExit")
+}
+
+func moveWebuiCfgDir(basePath string, targetPath string) {
+	_ = os.MkdirAll(targetPath, 0755)
+	if cfgData, err := os.ReadFile(basePath + "/config.yaml"); err == nil {
+		if err = os.WriteFile(targetPath+"/config.yaml", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/config.yaml")
+		}
+	}
+	if cfgData, err := os.ReadFile(basePath + "/client.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/client.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/client.json")
+		}
+	}
+	if cfgData, err := os.ReadFile(basePath + "/tunnel.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/tunnel.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/tunnel.json")
+		}
+	}
+	if cfgData, err := os.ReadFile(basePath + "/p2p.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/p2p.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/p2p.json")
+		}
+	}
 }

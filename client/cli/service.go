@@ -127,6 +127,7 @@ func (p *program) run() {
 	case "ui":
 		basePath, _ := os.Executable()
 		basePath = filepath.Dir(basePath)
+		moveWebuiCfgDir(basePath, basePath+"/data") // 移动旧配置文件路径
 		bootstrap.InitLogger()
 		bootstrap.InitFS(basePath)
 		bootstrap.InitTodo()
@@ -197,4 +198,23 @@ func (p *program) Stop(s system_service.Service) error {
 		value.Stop()
 	})
 	return nil
+}
+
+func moveWebuiCfgDir(basePath string, targetPath string) {
+	_ = os.MkdirAll(targetPath, 0755)
+	if cfgData, err := os.ReadFile(basePath + "/client.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/client.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/client.json")
+		}
+	}
+	if cfgData, err := os.ReadFile(basePath + "/tunnel.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/tunnel.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/tunnel.json")
+		}
+	}
+	if cfgData, err := os.ReadFile(basePath + "/p2p.json"); err == nil {
+		if err = os.WriteFile(targetPath+"/p2p.json", cfgData, 0644); err == nil {
+			_ = os.Remove(basePath + "/p2p.json")
+		}
+	}
 }
