@@ -1,7 +1,9 @@
 package sqlite
 
 import (
-	"github.com/glebarez/sqlite"
+	//"github.com/glebarez/sqlite"
+	_ "github.com/ncruces/go-sqlite3/embed"
+	"github.com/ncruces/go-sqlite3/gormlite"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -82,7 +84,7 @@ func NewDB(dbFile, logLevel string, toFile string, console bool) (*Sqlite, error
 		log.New(io.MultiWriter(writers...), "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
 		logConfig,
 	)
-	d, err := gorm.Open(sqlite.Open(dbFile), &gormConfig)
+	d, err := gorm.Open(gormlite.Open(dbFile), &gormConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +144,7 @@ func NewMemoryDB(logLevel string, toFile string, console bool) (*Sqlite, error) 
 		log.New(io.MultiWriter(writers...), "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
 		logConfig,
 	)
-	d, err := gorm.Open(sqlite.Open(":memory:"), &gormConfig)
+	d, err := gorm.Open(gormlite.Open(":memory:"), &gormConfig)
 	if err != nil {
 		return nil, err
 	}
