@@ -24,6 +24,7 @@ type Item struct {
 	TargetIp    string     `json:"targetIp"`
 	TargetPort  string     `json:"targetPort"`
 	VKey        string     `json:"vKey"`
+	Forward     int        `json:"forward"`
 	Node        ItemNode   `json:"node"`
 	Client      ItemClient `json:"client"`
 	UserCode    string     `json:"userCode"`
@@ -84,6 +85,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			TargetIp:   p2p.TargetIp,
 			TargetPort: p2p.TargetPort,
 			VKey:       p2p.VKey,
+			Forward:    p2p.Forward,
 			Node: ItemNode{
 				Code: p2p.NodeCode,
 				Name: p2p.Node.Name,

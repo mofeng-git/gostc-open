@@ -65,7 +65,8 @@ func (s *service) VisitorP2P(key string) (P2PConfig, error) {
 		},
 	}
 
-	if p2p.Node.P2PDisableForward == 1 {
+	// 判断是否需要中继
+	if p2p.Forward != 1 || p2p.Node.P2PDisableForward == 1 {
 		result.STCP = v1.STCPVisitorConfig{}
 		result.XTCP.FallbackTo = ""
 	}

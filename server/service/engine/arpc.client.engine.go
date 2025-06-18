@@ -350,6 +350,10 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 			},
 		},
 	}
+	// 判断是否需要中继
+	if p2p.Forward != 1 || p2p.Node.P2PDisableForward == 1 {
+		data.STCP = STCPProxyConfig{}
+	}
 	var relay string
 	if err := e.client.Call("p2p_config", data, &relay, time.Second*30); err != nil {
 		return err

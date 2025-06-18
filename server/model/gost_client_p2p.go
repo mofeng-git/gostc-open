@@ -6,6 +6,7 @@ type GostClientP2P struct {
 	TargetIp   string     `gorm:"column:target_ip;index;comment:内网IP"`
 	TargetPort string     `gorm:"column:target_port;index;comment:内网端口"`
 	VKey       string     `gorm:"column:v_key;comment:访问密钥"`
+	Forward    int        `gorm:"column:forward;size:1;default:0;comment:是否中继"`
 	NodeCode   string     `gorm:"column:node_code;index;comment:节点编号"`
 	Node       GostNode   `gorm:"foreignKey:NodeCode;references:Code"`
 	ClientCode string     `gorm:"column:client_code;index;comment:客户端编号"`

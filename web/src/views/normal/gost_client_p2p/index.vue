@@ -41,6 +41,7 @@ const state = ref({
       name: '',
       targetIp: '',
       targetPort: '',
+      forward: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -344,7 +345,7 @@ const operatorRenderLabel = (option)=>{
               <span>内网目标：{{ row.targetIp + ':' + row.targetPort }}</span><br>
               <span>速率：{{ limiterText(row.config.limiter) }}</span><br>
               <span>套餐：{{ configText(row.config) }}</span><br>
-              <span>中继转发：{{ row.node.p2pDisableForward === 0 ? '支持' : '不支持' }}</span><br>
+              <span>中继转发：{{ (row.node.p2pDisableForward !== 1 && row.forward === 1) ? '生效' : '失效' }}</span><br>
               <span>到期时间：{{ configExpText(row.config) }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
@@ -437,6 +438,20 @@ const operatorRenderLabel = (option)=>{
         <n-form-item path="targetPort" label="内网端口">
           <n-input v-model:value="state.update.data.targetPort" placeholder="80"></n-input>
         </n-form-item>
+        <n-form-item path="forward" label="是否中继">
+          <n-switch
+              v-model:value="state.update.data.forward"
+              :unchecked-value="0"
+              :checked-value="1"
+              :round="false"
+          >
+            <template #unchecked>禁用中继</template>
+            <template #checked>启用中继</template>
+          </n-switch>
+        </n-form-item>
+        <n-alert type="warning" v-if="state.update.data?.node?.p2pDisableForward===1">
+          该隧道使用的节点已禁止中继转发，启用中继无效
+        </n-alert>
       </n-form>
     </Modal>
 
