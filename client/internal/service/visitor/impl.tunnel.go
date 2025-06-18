@@ -55,6 +55,9 @@ func (svc *Tunnel) Start() (err error) {
 
 func (svc *Tunnel) Stop() {
 	service2.State.Set(svc.key, false)
+	if svc.core != nil {
+		svc.core.Stop()
+	}
 }
 
 func (svc *Tunnel) IsRunning() bool {
@@ -82,14 +85,14 @@ func (svc *Tunnel) run() (err error) {
 		config.SUDP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.SUDP)
 	}
-	srv, err := frpc.NewService(config.Common, nil, visitorCfgs)
+	svc.core, err = frpc.NewService(config.Common, nil, visitorCfgs)
 	if err != nil {
 		return err
 	}
-	if err := srv.Start(); err != nil {
+	if err := svc.core.Start(); err != nil {
 		return err
 	}
-	srv.Wait()
+	svc.core.Wait()
 	return nil
 }
 

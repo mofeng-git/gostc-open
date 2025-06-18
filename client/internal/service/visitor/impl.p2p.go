@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/SianHH/frp-package/package"
 	"github.com/SianHH/frp-package/package/frpc"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
@@ -55,6 +54,9 @@ func (svc *P2P) Start() (err error) {
 
 func (svc *P2P) Stop() {
 	service2.State.Set(svc.key, false)
+	if svc.core != nil {
+		svc.core.Stop()
+	}
 }
 
 func (svc *P2P) IsRunning() bool {
@@ -80,14 +82,14 @@ func (svc *P2P) run() (err error) {
 		config.XTCP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.XTCP)
 	}
-	srv, err := frpc.NewService(config.Common, nil, visitorCfgs)
+	svc.core, err = frpc.NewService(config.Common, nil, visitorCfgs)
 	if err != nil {
 		return err
 	}
-	if err := srv.Start(); err != nil {
+	if err := svc.core.Start(); err != nil {
 		return err
 	}
-	srv.Wait()
+	svc.core.Wait()
 	return nil
 }
 
@@ -102,6 +104,5 @@ func (svc *P2P) loadConfig(url string) (result P2PConfig, err error) {
 		return result, err
 	}
 	err = yaml.Unmarshal(bytes, &result)
-	fmt.Println(result)
 	return result, err
 }
