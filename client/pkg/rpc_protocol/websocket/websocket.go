@@ -5,6 +5,7 @@
 package websocket
 
 import (
+	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
@@ -152,6 +153,10 @@ func Listen(addr string, upgrader *websocket.Upgrader) (net.Listener, error) {
 // Dial wraps websocket dial
 func Dial(url string, header http.Header, args ...interface{}) (net.Conn, error) {
 	dialer := websocket.DefaultDialer
+	if dialer.TLSClientConfig == nil {
+		dialer.TLSClientConfig = &tls.Config{}
+	}
+	dialer.TLSClientConfig.InsecureSkipVerify = true
 	if len(args) > 0 {
 		d, ok := args[0].(*websocket.Dialer)
 		if ok {

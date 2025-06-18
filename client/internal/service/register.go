@@ -7,7 +7,11 @@ import (
 	"github.com/go-gost/core/logger"
 	"github.com/go-gost/x/config/parsing"
 	xlogger "github.com/go-gost/x/logger"
+	"github.com/lesismal/arpc/codec"
+	arpcLog "github.com/lesismal/arpc/log"
+	"gopkg.in/yaml.v3"
 	"gostc-sub/internal/common"
+	"gostc-sub/internal/common/system"
 	"log"
 
 	// Register connectors
@@ -118,6 +122,10 @@ import (
 )
 
 func init() {
+	system.EnableCompatibilityMode()
+	codec.SetCodec(&YAMLCodec{})
+	arpcLog.SetLevel(arpcLog.LevelError)
+
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
 	level := logger.InfoLevel
 	logger.SetDefault(xlogger.NewLogger(xlogger.LevelOption(level)))
@@ -125,4 +133,15 @@ func init() {
 	parsing.SetDefaultTLSConfig(tlsConfig)
 	frpLog.Logger = frpLog.Logger.WithOptions(log2.WithOutput(common.Logger))
 	fmt.Println("VERSION：", common.VERSION)
+}
+
+type YAMLCodec struct {
+}
+
+func (y *YAMLCodec) Marshal(v interface{}) ([]byte, error) {
+	return yaml.Marshal(v)
+}
+
+func (y *YAMLCodec) Unmarshal(data []byte, v interface{}) error {
+	return yaml.Unmarshal(data, v)
 }
