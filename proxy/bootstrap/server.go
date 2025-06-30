@@ -11,6 +11,7 @@ import (
 var server *proxy.Server
 
 func InitServer() {
+	_ = os.MkdirAll(global.Config.Certs, 0644)
 	var domains = make(map[string]proxy.DomainConfig)
 	for domain, item := range global.Config.Domains {
 		domains[domain] = proxy.DomainConfig{
