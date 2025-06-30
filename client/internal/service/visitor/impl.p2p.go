@@ -19,6 +19,7 @@ type P2P struct {
 	bindPort int
 	bindAddr string
 	core     service.Service
+	stopFunc func()
 }
 
 func NewP2P(httpUrl string, key, bindAddr string, bindPort int) *P2P {
@@ -54,9 +55,10 @@ func (svc *P2P) Start() (err error) {
 
 func (svc *P2P) Stop() {
 	service2.State.Set(svc.key, false)
-	if svc.core != nil {
-		svc.core.Stop()
+	if svc.stopFunc != nil {
+		svc.stopFunc()
 	}
+	svc.stopFunc = nil
 }
 
 func (svc *P2P) IsRunning() bool {
@@ -88,6 +90,9 @@ func (svc *P2P) run() (err error) {
 	}
 	if err := svc.core.Start(); err != nil {
 		return err
+	}
+	svc.stopFunc = func() {
+		svc.core.Stop()
 	}
 	svc.core.Wait()
 	return nil

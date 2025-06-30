@@ -19,6 +19,7 @@ type Tunnel struct {
 	bindPort int
 	bindAddr string
 	core     service.Service
+	stopFunc func()
 }
 
 func NewTunnel(httpUrl string, key, bindAddr string, bindPort int) *Tunnel {
@@ -55,9 +56,10 @@ func (svc *Tunnel) Start() (err error) {
 
 func (svc *Tunnel) Stop() {
 	service2.State.Set(svc.key, false)
-	if svc.core != nil {
-		svc.core.Stop()
+	if svc.stopFunc != nil {
+		svc.stopFunc()
 	}
+	svc.stopFunc = nil
 }
 
 func (svc *Tunnel) IsRunning() bool {
@@ -91,6 +93,9 @@ func (svc *Tunnel) run() (err error) {
 	}
 	if err := svc.core.Start(); err != nil {
 		return err
+	}
+	svc.stopFunc = func() {
+		svc.core.Stop()
 	}
 	svc.core.Wait()
 	return nil
