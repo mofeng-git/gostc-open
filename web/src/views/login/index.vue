@@ -123,6 +123,7 @@ const registerFunc = () => {
         state.value.tabsValue = 'login'
         state.value.register.data.account = ''
         state.value.register.data.password = ''
+        await refreshCaptchaFunc()
       } finally {
         state.value.register.loading = false
       }
@@ -239,7 +240,7 @@ onBeforeMount(() => {
                   show-password-on="click"
               />
             </n-form-item>
-            <n-form-item path="captchaValue" label="验证码" v-if="!state.captcha.security">
+            <n-form-item path="captchaValue" label="验证码">
               <n-input
                   v-model:value="state.register.data.captchaValue"
                   placeholder="验证码"

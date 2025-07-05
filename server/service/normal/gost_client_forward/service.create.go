@@ -59,14 +59,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 			return errors.New("该节点未启用端口转发功能")
 		}
 
-		for _, ruleCode := range node.GetRules() {
-			rule := node_rule.Registry.GetRule(ruleCode)
-			if rule.Code() == "" {
-				continue
-			}
-			if !rule.Allow(tx, user.Code) {
-				return errors.New("规则不符合，" + rule.Description())
-			}
+		if err := node_rule.VerifyAll(tx, user.Code, node.GetRules()); err != nil {
+			return err
 		}
 
 		cfg, _ := tx.GostNodeConfig.Where(

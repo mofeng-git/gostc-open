@@ -20,6 +20,10 @@ func (u DefaultRule) Code() string {
 	return ""
 }
 
+func (u DefaultRule) Group() string {
+	return ""
+}
+
 func (u DefaultRule) Description() string {
 	return "无使用条件约束"
 }

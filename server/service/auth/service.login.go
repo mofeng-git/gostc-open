@@ -28,6 +28,8 @@ func (service *service) Login(ip string, req LoginReq) (result LoginResp, err er
 	defer func() {
 		if err != nil {
 			cache2.SetIpSecurity(ip, false)
+		} else {
+			cache2.SetIpSecurity(ip, true)
 		}
 	}()
 	db, _, _ := repository.Get("")
@@ -60,7 +62,6 @@ func (service *service) Login(ip string, req LoginReq) (result LoginResp, err er
 	} else {
 		key := utils.RandStr(32, utils.AllDict)
 		cache2.SetLoginOtp(key, user.Code, time.Minute*5)
-		cache2.SetIpSecurity(ip, true)
 		result = LoginResp{
 			Otp:   1,
 			Token: key,

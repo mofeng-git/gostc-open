@@ -1,23 +1,24 @@
 package node_rule
 
 import (
+	"errors"
 	"server/repository/query"
+	"strings"
 	"sync"
 )
 
 type RuleInterface interface {
 	Code() string
 	Allow(db *query.Query, userCode string) bool
+	Group() string
 	Name() string
 	Description() string
 }
 
 var Registry = registry{
-	sort: []string{defaultRule.Code()},
-	data: map[string]RuleInterface{
-		defaultRule.Code(): defaultRule,
-	},
-	mu: &sync.RWMutex{},
+	sort: []string{},
+	data: map[string]RuleInterface{},
+	mu:   &sync.RWMutex{},
 }
 
 type registry struct {
@@ -66,4 +67,41 @@ func (r *registry) SetRule(rule RuleInterface) {
 		r.sort = append(r.sort, rule.Code())
 		r.data[rule.Code()] = rule
 	}
+}
+
+func VerifyAll(tx *query.Query, userCode string, codes []string) error {
+	var groupMap = make(map[string][]RuleInterface)
+	for _, code := range codes {
+		if code == "" {
+			continue
+		}
+		rule := Registry.GetRule(code)
+		if rule.Code() == "" {
+			continue
+		}
+		group := rule.Group()
+		groupMap[group] = append(groupMap[group], rule)
+	}
+	for _, rules := range groupMap {
+		if err := verifyGroup(tx, userCode, rules); err != nil {
+			return errors.New("规则不符合，" + err.Error())
+		}
+	}
+	return nil
+}
+
+func verifyGroup(tx *query.Query, userCode string, rules []RuleInterface) error {
+	var errMsg []string
+	for _, rule := range rules {
+		if rule.Allow(tx, userCode) {
+			errMsg = []string{}
+			break
+		} else {
+			errMsg = append(errMsg, rule.Description())
+		}
+	}
+	if len(errMsg) != 0 {
+		return errors.New(strings.Join(errMsg, ";"))
+	}
+	return nil
 }

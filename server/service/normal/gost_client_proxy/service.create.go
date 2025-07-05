@@ -53,14 +53,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			return errors.New("该节点未启代理隧道功能")
 		}
 
-		for _, ruleCode := range node.GetRules() {
-			rule := node_rule.Registry.GetRule(ruleCode)
-			if rule.Code() == "" {
-				continue
-			}
-			if !rule.Allow(tx, user.Code) {
-				return errors.New("规则不符合，" + rule.Description())
-			}
+		if err := node_rule.VerifyAll(tx, user.Code, node.GetRules()); err != nil {
+			return err
 		}
 
 		cfg, _ := tx.GostNodeConfig.Where(

@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	service2 "github.com/SianHH/frp-package/package"
+	"github.com/SianHH/frp-package/package/frpc"
+	"github.com/SianHH/frp-package/package/frps"
+	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	system_service "github.com/kardianos/service"
 	"gostc-sub/cli/service_option"
 	"gostc-sub/gui/global"
@@ -31,7 +34,7 @@ type program struct {
 	stopFunc func()
 }
 
-func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string, tunCfg string) string {
+func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string, tunCfg, originType string) string {
 	if cfgFile != "" {
 		return "cfg"
 	}
@@ -49,6 +52,12 @@ func selectMode(cfgFile string, isServer, isVisit, isP2P bool, webAddress string
 	}
 	if tunCfg != "" {
 		return "tunCfg"
+	}
+	if originType == "frps" {
+		return "frps"
+	}
+	if originType == "frpc" {
+		return "frpc"
 	}
 	return "client"
 }
@@ -96,6 +105,10 @@ func (p *program) run() {
 	var console bool
 	flag.BoolVar(&console, "console", false, "log to stdout")
 
+	// 载入原版配置内容
+	var originCfg string
+	flag.StringVar(&originCfg, "c", "", "load frp cfg file, /root/frps.toml or /root/frpc.toml")
+
 	flag.Parse()
 
 	address = env.GetEnv("GOSTC_CLIENT_ADDR", address)
@@ -116,7 +129,7 @@ func (p *program) run() {
 	var wsurl = common.GenerateWsUrl(tlsEnable, address)
 	var apiurl = common.GenerateHttpUrl(tlsEnable, address)
 
-	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tunCfg)
+	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tunCfg, os.Getenv("GOSTC_FRP_TYPE"))
 
 	switch mode {
 	case "cfg":
@@ -178,6 +191,34 @@ func (p *program) run() {
 			}
 			time.Sleep(time.Second)
 		}
+	case "frps":
+		file, err := os.ReadFile(originCfg)
+		if err != nil {
+			fmt.Println("read frps cfg fail", originCfg, err)
+			return
+		}
+		svc, err := frps.NewService(v1.ServerConfig{}, frps.FromBytes(file))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		if err := svc.Start(); err != nil {
+			fmt.Println(err)
+			return
+		}
+		svc.Wait()
+	case "frpc":
+		file, err := os.ReadFile(originCfg)
+		if err != nil {
+			fmt.Println("read frpc cfg fail", originCfg, err)
+			return
+		}
+		svc, err := frpc.NewService(v1.ClientCommonConfig{}, nil, nil, frpc.FromBytes(file))
+		if err := svc.Start(); err != nil {
+			fmt.Println(err)
+			return
+		}
+		svc.Wait()
 	}
 }
 

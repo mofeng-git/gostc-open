@@ -13,8 +13,8 @@ import (
 type RegisterReq struct {
 	Account      string `binding:"required" json:"account" label:"账号"`
 	Password     string `binding:"required" json:"password" label:"秘密"`
-	CaptchaKey   string `json:"captchaKey" label:"验证码Key"`
-	CaptchaValue string `json:"captchaValue" label:"验证码Value"`
+	CaptchaKey   string `binding:"required" json:"captchaKey" label:"验证码Key"`
+	CaptchaValue string `binding:"required" json:"captchaValue" label:"验证码Value"`
 }
 
 func (service *service) Register(ip string, req RegisterReq) (err error) {
@@ -25,7 +25,7 @@ func (service *service) Register(ip string, req RegisterReq) (err error) {
 	}
 
 	db, _, log := repository.Get("")
-	if !cache2.GetIpSecurity(ip) && !cache2.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
+	if !cache2.ValidCaptcha(req.CaptchaKey, req.CaptchaValue, true) {
 		return errors.New("验证码错误")
 	}
 
