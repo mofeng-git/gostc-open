@@ -37,6 +37,7 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.Name = field.NewString(tableName, "name")
 	_gostClientHost.TargetIp = field.NewString(tableName, "target_ip")
 	_gostClientHost.TargetPort = field.NewString(tableName, "target_port")
+	_gostClientHost.TargetHttps = field.NewInt(tableName, "target_https")
 	_gostClientHost.DomainPrefix = field.NewString(tableName, "domain_prefix")
 	_gostClientHost.CustomDomain = field.NewString(tableName, "custom_domain")
 	_gostClientHost.CustomCert = field.NewString(tableName, "custom_cert")
@@ -119,6 +120,7 @@ type gostClientHost struct {
 	Name             field.String
 	TargetIp         field.String
 	TargetPort       field.String
+	TargetHttps      field.Int
 	DomainPrefix     field.String
 	CustomDomain     field.String
 	CustomCert       field.String
@@ -169,6 +171,7 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.Name = field.NewString(table, "name")
 	g.TargetIp = field.NewString(table, "target_ip")
 	g.TargetPort = field.NewString(table, "target_port")
+	g.TargetHttps = field.NewInt(table, "target_https")
 	g.DomainPrefix = field.NewString(table, "domain_prefix")
 	g.CustomDomain = field.NewString(table, "custom_domain")
 	g.CustomCert = field.NewString(table, "custom_cert")
@@ -204,7 +207,7 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 32)
+	g.fieldMap = make(map[string]field.Expr, 33)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -215,6 +218,7 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["name"] = g.Name
 	g.fieldMap["target_ip"] = g.TargetIp
 	g.fieldMap["target_port"] = g.TargetPort
+	g.fieldMap["target_https"] = g.TargetHttps
 	g.fieldMap["domain_prefix"] = g.DomainPrefix
 	g.fieldMap["custom_domain"] = g.CustomDomain
 	g.fieldMap["custom_cert"] = g.CustomCert

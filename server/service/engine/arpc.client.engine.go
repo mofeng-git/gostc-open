@@ -5,6 +5,8 @@ import (
 	"fmt"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	"github.com/lesismal/arpc"
+	"go.uber.org/zap"
+	"server/global"
 	"server/model"
 	"server/pkg/utils"
 	"server/repository/cache"
@@ -18,12 +20,18 @@ type ARpcClientEngine struct {
 	client *arpc.Client
 }
 
+func (e *ARpcClientEngine) IsRunning() bool {
+	return e.client.CheckState() == nil
+}
+
 func NewARpcClientEngine(code string, client *arpc.Client) *ARpcClientEngine {
 	return &ARpcClientEngine{code: code, client: client}
 }
 
 func (e *ARpcClientEngine) Stop(msg string) {
-	_ = e.client.Notify("stop", msg, time.Second*30)
+	_ = e.client.CallAsync("stop", msg, func(c *arpc.Context, err error) {
+
+	}, time.Second*30)
 }
 
 func (e *ARpcClientEngine) PortCheck(tx *query.Query, ip, port string) error {
@@ -54,6 +62,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 	var data = HostConfig{
 		Key:     host.Code,
 		BaseCfg: e.generateServerCommonCfg(host.Node, *auth),
+		IsHttps: host.TargetHttps == 1,
 		Http: HTTPProxyConfig{
 			HTTPProxyConfig: v1.HTTPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -84,24 +93,33 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 			},
 		},
 	}
-	var relay string
-	if err := e.client.Call("host_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("host_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveHost(tx *query.Query, host model.GostClientHost, node model.GostNode) error {
-	var relay string
-	if err := e.client.Call("remove_config", host.Code, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", host.Code, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -174,24 +192,32 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 		},
 	}
 
-	var relay string
-	if err := e.client.Call("forward_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("forward_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveForward(tx *query.Query, forward model.GostClientForward) error {
-	var relay string
-	if err := e.client.Call("remove_config", forward.Code, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", forward.Code, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -262,24 +288,32 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 		},
 	}
 
-	var relay string
-	if err := e.client.Call("tunnel_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("tunnel_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveTunnel(tx *query.Query, tunnel model.GostClientTunnel, node model.GostNode) error {
-	var relay string
-	if err := e.client.Call("remove_config", tunnel.Code, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", tunnel.Code, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -354,24 +388,33 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 	if p2p.Forward != 1 || p2p.Node.P2PDisableForward == 1 {
 		data.STCP = STCPProxyConfig{}
 	}
-	var relay string
-	if err := e.client.Call("p2p_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("p2p_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveP2P(tx *query.Query, p2p model.GostClientP2P) error {
-	var relay string
-	if err := e.client.Call("remove_config", p2p.Code, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", p2p.Code, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -404,24 +447,33 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 		},
 		Limiter: fmt.Sprintf("%dKB", proxy.Limiter*128),
 	}
-	var relay string
-	if err := e.client.Call("proxy_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("proxy_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveProxy(tx *query.Query, proxy model.GostClientProxy) error {
-	var relay string
-	if err := e.client.Call("remove_config", proxy.Code, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", proxy.Code, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -455,27 +507,37 @@ func (e *ARpcClientEngine) CustomCfgConfig(tx *query.Query, cfgCode string) erro
 		_ = e.RemoveCustomCfg(tx, cfgCode)
 		return errors.New(warnMsg)
 	}
-	var relay string
-	if err := e.client.Call("custom_cfg_config", CustomCfgConfig{
+
+	var data = CustomCfgConfig{
 		Key:     cfg.Code,
 		Type:    cfg.ContentType,
 		Content: cfg.Content,
-	}, &relay, time.Second*30); err != nil {
-		return err
 	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("custom_cfg_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcClientEngine) RemoveCustomCfg(tx *query.Query, cfgCode string) error {
-	var relay string
-	if err := e.client.Call("remove_config", cfgCode, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("remove_config", cfgCode, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }

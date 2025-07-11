@@ -23,6 +23,7 @@ type Item struct {
 	Name             string     `json:"name"`
 	TargetIp         string     `json:"targetIp"`
 	TargetPort       string     `json:"targetPort"`
+	TargetHttps      int        `json:"targetHttps"`
 	DomainPrefix     string     `json:"domainPrefix"`
 	DomainFull       string     `json:"domainFull"`
 	CustomDomain     string     `json:"customDomain"`
@@ -93,6 +94,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			Name:             host.Name,
 			TargetIp:         host.TargetIp,
 			TargetPort:       host.TargetPort,
+			TargetHttps:      host.TargetHttps,
 			DomainPrefix:     host.DomainPrefix,
 			DomainFull:       host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache2.GetNodeCustomDomain(host.NodeCode)),
 			CustomDomain:     host.CustomDomain,

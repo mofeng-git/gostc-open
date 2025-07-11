@@ -15,12 +15,13 @@ import (
 )
 
 type CreateReq struct {
-	Name       string `binding:"required" json:"name" label:"名称"`
-	TargetIp   string `binding:"required" json:"targetIp" label:"内网IP"`
-	TargetPort string `binding:"required" json:"targetPort" label:"内网端口"`
-	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
-	ConfigCode string `binding:"required" json:"configCode" label:"套餐配置"`
+	Name        string `binding:"required" json:"name" label:"名称"`
+	TargetIp    string `binding:"required" json:"targetIp" label:"内网IP"`
+	TargetPort  string `binding:"required" json:"targetPort" label:"内网端口"`
+	TargetHttps int    `json:"targetHttps"`
+	NodeCode    string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ClientCode  string `binding:"required" json:"clientCode" label:"客户端编号"`
+	ConfigCode  string `binding:"required" json:"configCode" label:"套餐配置"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -119,6 +120,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			Name:         req.Name,
 			TargetIp:     req.TargetIp,
 			TargetPort:   req.TargetPort,
+			TargetHttps:  req.TargetHttps,
 			DomainPrefix: domainPrefix,
 			NodeCode:     req.NodeCode,
 			ClientCode:   req.ClientCode,

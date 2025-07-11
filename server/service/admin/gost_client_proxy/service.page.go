@@ -13,11 +13,13 @@ import (
 
 type PageReq struct {
 	bean.PageParam
-	Name       string `json:"name"`
-	Account    string `json:"account"`
-	ClientName string `json:"clientName"`
-	NodeName   string `json:"nodeName"`
-	Enable     int    `json:"enable"`
+	Name         string `json:"name"`
+	Account      string `json:"account"`
+	ClientName   string `json:"clientName"`
+	NodeName     string `json:"nodeName"`
+	Enable       int    `json:"enable"`
+	ClientOnline int    `json:"clientOnline"`
+	NodeOnline   int    `json:"nodeOnline"`
 }
 
 type Item struct {
@@ -83,6 +85,44 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 		_ = db.GostClient.Where(db.GostClient.Name.Like("%"+req.ClientName+"%")).Pluck(db.GostClient.Code, &clientCodes)
 		where = append(where, db.GostClientProxy.ClientCode.In(clientCodes...))
 	}
+	if req.ClientOnline > 0 {
+		var clientCodes []string
+		_ = db.GostClient.Pluck(db.GostClient.Code, &clientCodes)
+		var onlineCodes []string
+		var offlineCodes []string
+		for _, code := range clientCodes {
+			if cache2.GetClientOnline(code) {
+				onlineCodes = append(onlineCodes, code)
+			} else {
+				offlineCodes = append(offlineCodes, code)
+			}
+		}
+		if req.ClientOnline == 1 {
+			where = append(where, db.GostClientProxy.ClientCode.In(onlineCodes...))
+		} else {
+			where = append(where, db.GostClientProxy.ClientCode.In(offlineCodes...))
+		}
+	}
+
+	if req.NodeOnline > 0 {
+		var nodeCodes []string
+		_ = db.GostNode.Pluck(db.GostNode.Code, &nodeCodes)
+		var onlineCodes []string
+		var offlineCodes []string
+		for _, code := range nodeCodes {
+			if cache2.GetNodeOnline(code) {
+				onlineCodes = append(onlineCodes, code)
+			} else {
+				offlineCodes = append(offlineCodes, code)
+			}
+		}
+		if req.NodeOnline == 1 {
+			where = append(where, db.GostClientProxy.NodeCode.In(onlineCodes...))
+		} else {
+			where = append(where, db.GostClientProxy.NodeCode.In(offlineCodes...))
+		}
+	}
+
 	proxys, total, _ := db.GostClientProxy.Preload(
 		db.GostClientProxy.User,
 		db.GostClientProxy.Client,

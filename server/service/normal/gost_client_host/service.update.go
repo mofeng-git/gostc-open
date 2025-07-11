@@ -16,6 +16,7 @@ type UpdateReq struct {
 	Name         string `binding:"required" json:"name"`
 	TargetIp     string `binding:"required" json:"targetIp"`
 	TargetPort   string `binding:"required" json:"targetPort"`
+	TargetHttps  int    `json:"targetHttps"`
 	DomainPrefix string `binding:"required" json:"domainPrefix"`
 }
 
@@ -57,6 +58,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		host.Name = req.Name
 		host.TargetIp = req.TargetIp
 		host.TargetPort = req.TargetPort
+		host.TargetHttps = req.TargetHttps
 		host.DomainPrefix = req.DomainPrefix
 
 		if err := tx.GostClientHost.Save(host); err != nil {

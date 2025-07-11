@@ -24,6 +24,7 @@ func (y *YAMLCodec) Unmarshal(data []byte, v interface{}) error {
 }
 
 type IClient interface {
+	IsRunning() bool                                                                        // 运行状态
 	Stop(msg string)                                                                        // 停止运行
 	PortCheck(tx *query.Query, ip, port string) error                                       // 检测端口可用性
 	HostConfig(tx *query.Query, hostCode string) error                                      // 域名解析配置
@@ -41,6 +42,7 @@ type IClient interface {
 }
 
 type INode interface {
+	IsRunning() bool                                                              // 运行状态
 	Stop(msg string)                                                              // 停止运行
 	PortCheck(tx *query.Query, ip, port string) error                             // 检测端口可用性
 	Config(tx *query.Query) error                                                 // 服务端配置
@@ -110,6 +112,10 @@ func (reg EngineRegister) Get(code string) (*Engine, bool) {
 type DefaultClientImpl struct {
 }
 
+func (d DefaultClientImpl) IsRunning() bool {
+	return false
+}
+
 func (d DefaultClientImpl) CustomCfgConfig(tx *query.Query, cfgCode string) error {
 	return nil
 }
@@ -166,6 +172,10 @@ func (d DefaultClientImpl) RemoveProxy(tx *query.Query, proxy model.GostClientPr
 }
 
 type DefaultNodeImpl struct {
+}
+
+func (d DefaultNodeImpl) IsRunning() bool {
+	return false
 }
 
 func (d DefaultNodeImpl) Stop(msg string) {

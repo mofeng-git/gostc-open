@@ -179,35 +179,35 @@ const operatorRenderLabel = (option)=>{
     <SearchCard :show-border="false" space>
       <SearchItem
           type="input"
-          :label-width="70"
+          :label-width="100"
           clearable
           label="账号"
           @onChange="value => state.table.search.account=value"
       ></SearchItem>
       <SearchItem
           type="input"
-          :label-width="70"
+          :label-width="100"
           clearable
           label="名称"
           @onChange="value => state.table.search.name=value"
       ></SearchItem>
       <SearchItem
           type="input"
-          :label-width="70"
+          :label-width="100"
           clearable
           label="客户端"
           @onChange="value => state.table.search.clientName=value"
       ></SearchItem>
       <SearchItem
           type="input"
-          :label-width="70"
+          :label-width="100"
           clearable
           label="节点"
           @onChange="value => state.table.search.nodeName=value"
       ></SearchItem>
       <SearchItem
           type="select"
-          :label-width="70"
+          :label-width="100"
           label="状态"
           :default="0"
           :options="[
@@ -216,6 +216,30 @@ const operatorRenderLabel = (option)=>{
               {value:'停用',key:2}
           ]"
           @onChange="value => state.table.search.enable=value"
+      ></SearchItem>
+      <SearchItem
+          type="select"
+          :label-width="100"
+          label="客户端状态"
+          :default="0"
+          :options="[
+              {value:'全部',key:0},
+              {value:'在线',key:1},
+              {value:'离线',key:2}
+          ]"
+          @onChange="value => state.table.search.clientOnline=value"
+      ></SearchItem>
+      <SearchItem
+          type="select"
+          :label-width="100"
+          label="节点状态"
+          :default="0"
+          :options="[
+              {value:'全部',key:0},
+              {value:'在线',key:1},
+              {value:'离线',key:2}
+          ]"
+          @onChange="value => state.table.search.nodeOnline=value"
       ></SearchItem>
       <SearchItem type="custom">
         <n-space>

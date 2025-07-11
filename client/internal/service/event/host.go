@@ -5,6 +5,7 @@ import (
 	"github.com/SianHH/frp-package/package/frpc"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	"github.com/lesismal/arpc"
+	"strconv"
 )
 
 func HostHandle(client *arpc.Client, callback func(key string)) {
@@ -13,6 +14,15 @@ func HostHandle(client *arpc.Client, callback func(key string)) {
 		if err := c.Bind(&req); err != nil {
 			_ = c.Write(err.Error())
 			return
+		}
+		if req.IsHttps {
+			req.Http.Plugin = v1.TypedClientPluginOptions{
+				Type: v1.PluginHTTP2HTTPS,
+				ClientPluginOptions: &v1.HTTP2HTTPSPluginOptions{
+					Type:      v1.PluginHTTP2HTTPS,
+					LocalAddr: req.Http.LocalIP + ":" + strconv.Itoa(req.Http.LocalPort),
+				},
+			}
 		}
 		var proxyCfgs []v1.ProxyConfigurer
 		if req.Http.Name != "" {

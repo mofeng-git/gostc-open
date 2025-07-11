@@ -5,6 +5,8 @@ import (
 	"fmt"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	"github.com/lesismal/arpc"
+	"go.uber.org/zap"
+	"server/global"
 	"server/pkg/utils"
 	"server/repository/query"
 	"time"
@@ -22,6 +24,10 @@ type ARpcNodeEngine struct {
 	code   string
 	ip     string
 	client *arpc.Client
+}
+
+func (e *ARpcNodeEngine) IsRunning() bool {
+	return e.client.CheckState() == nil
 }
 
 func (e *ARpcNodeEngine) PortCheck(tx *query.Query, ip, port string) error {
@@ -59,7 +65,6 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 			TCPMuxHTTPConnectPort: 0,
 			TCPMuxPassthrough:     false,
 			SubDomainHost:         "",
-			Custom404Page:         "",
 			SSHTunnelGateway:      v1.SSHTunnelGateway{},
 			WebServer:             v1.WebServerConfig{},
 			EnablePrometheus:      false,
@@ -67,12 +72,6 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 			Transport: v1.ServerTransportConfig{
 				MaxPoolCount: 30,
 			},
-			DetailedErrorsToClient:          nil,
-			MaxPortsPerClient:               0,
-			UserConnTimeout:                 0,
-			UDPPacketSize:                   0,
-			NatHoleAnalysisDataReserveHours: 0,
-			AllowPorts:                      nil,
 			HTTPPlugins: []v1.HTTPPluginOptions{
 				{
 					Name:      "login-plugins",
@@ -130,13 +129,17 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 		data.ServerConfig.QUICBindPort = 0
 	}
 
-	var relay string
-	if err := e.client.Call("server_config", data, &relay, time.Second*30); err != nil {
-		return err
-	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("server_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
@@ -149,22 +152,30 @@ func (e *ARpcNodeEngine) CustomDomain(tx *query.Query, domain, cert, key string,
 	if err != nil {
 		return err
 	}
-	var relay string
-	if err := e.client.Call("server_domain_config", ServerDomain{
+
+	var data = ServerDomain{
 		Domain:     domain,
 		Target:     fmt.Sprintf("http://127.0.0.1:%s", node.HttpPort),
 		Cert:       cert,
 		Key:        key,
 		ForceHttps: forceHttps,
-	}, &relay, time.Second*30); err != nil {
-		return err
 	}
-	if relay != "success" {
-		return errors.New(relay)
-	}
+	go utils.Retry(func() error {
+		var relay string
+		if err := e.client.Call("server_domain_config", data, &relay, time.Second*30); err != nil {
+			global.Logger.Error("send message fail", zap.Error(err))
+			return err
+		}
+		if relay != "success" {
+			global.Logger.Error("send message fail", zap.String("relay", relay))
+		}
+		return nil
+	}, 5, time.Second*5)
 	return nil
 }
 
 func (e *ARpcNodeEngine) Stop(msg string) {
-	_ = e.client.Notify("stop", msg, time.Second*30)
+	_ = e.client.CallAsync("stop", msg, func(c *arpc.Context, err error) {
+
+	}, time.Second*30)
 }

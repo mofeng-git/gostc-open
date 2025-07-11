@@ -46,6 +46,7 @@ const state = ref({
       name: '',
       targetIp: '',
       targetPort: '',
+      targetHttps: 0,
       domainPrefix: '',
     },
     dataRules: {
@@ -527,6 +528,12 @@ const operatorRenderLabel = (option) => {
       >
         <n-form-item path="name" label="名称">
           <n-input v-model:value="state.update.data.name" placeholder="我的服务"></n-input>
+        </n-form-item>
+        <n-form-item path="targetHttps" label="内网协议">
+          <n-radio-group v-model:value="state.update.data.targetHttps">
+            <n-radio-button :value="0">HTTP</n-radio-button>
+            <n-radio-button :value="1">HTTPS</n-radio-button>
+          </n-radio-group>
         </n-form-item>
         <n-form-item path="targetIp" label="内网IP">
           <n-input v-model:value="state.update.data.targetIp" placeholder="127.0.0.1"></n-input>

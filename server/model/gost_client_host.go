@@ -5,6 +5,7 @@ type GostClientHost struct {
 	Name             string     `gorm:"column:name;index;comment:名称"`
 	TargetIp         string     `gorm:"column:target_ip;index;comment:内网IP"`
 	TargetPort       string     `gorm:"column:target_port;index;comment:内网端口"`
+	TargetHttps      int        `gorm:"column:target_https;comment:是否为Https服务"`
 	DomainPrefix     string     `gorm:"column:domain_prefix;index;comment:域名前缀"`
 	CustomDomain     string     `gorm:"column:custom_domain;index;comment:自定义域名"`
 	CustomCert       string     `gorm:"column:custom_cert;comment:自定义证书"`

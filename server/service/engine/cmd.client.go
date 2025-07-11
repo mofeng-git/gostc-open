@@ -10,6 +10,9 @@ func ClientStop(code string, msg string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().Stop(msg)
 }
 
@@ -22,12 +25,18 @@ func ClientHostConfig(tx *query.Query, hostCode string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().HostConfig(tx, hostCode)
 }
 
 func ClientRemoveHostConfig(tx *query.Query, host model.GostClientHost, node model.GostNode) {
 	engine, ok := EngineRegistry.Get(host.ClientCode)
 	if !ok {
+		return
+	}
+	if !engine.GetClient().IsRunning() {
 		return
 	}
 	engine.GetClient().RemoveHost(tx, host, node)
@@ -42,12 +51,18 @@ func ClientForwardConfig(tx *query.Query, forwardCode string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().ForwardConfig(tx, forwardCode)
 }
 
 func ClientRemoveForwardConfig(forward model.GostClientForward) {
 	engine, ok := EngineRegistry.Get(forward.ClientCode)
 	if !ok {
+		return
+	}
+	if !engine.GetClient().IsRunning() {
 		return
 	}
 	engine.GetClient().RemoveForward(nil, forward)
@@ -62,12 +77,18 @@ func ClientTunnelConfig(tx *query.Query, tunnelCode string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().TunnelConfig(tx, tunnelCode)
 }
 
 func ClientRemoveTunnelConfig(tx *query.Query, tunnel model.GostClientTunnel, node model.GostNode) {
 	engine, ok := EngineRegistry.Get(tunnel.ClientCode)
 	if !ok {
+		return
+	}
+	if !engine.GetClient().IsRunning() {
 		return
 	}
 	engine.GetClient().RemoveTunnel(tx, tunnel, node)
@@ -82,12 +103,18 @@ func ClientProxyConfig(tx *query.Query, proxyCode string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().ProxyConfig(tx, proxyCode)
 }
 
 func ClientRemoveProxyConfig(proxy model.GostClientProxy) {
 	engine, ok := EngineRegistry.Get(proxy.ClientCode)
 	if !ok {
+		return
+	}
+	if !engine.GetClient().IsRunning() {
 		return
 	}
 	engine.GetClient().RemoveProxy(nil, proxy)
@@ -102,6 +129,9 @@ func ClientP2PConfig(tx *query.Query, p2pCode string) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().P2PConfig(tx, p2pCode)
 }
 
@@ -110,12 +140,18 @@ func ClientRemoveP2PConfig(p2p model.GostClientP2P) {
 	if !ok {
 		return
 	}
+	if !engine.GetClient().IsRunning() {
+		return
+	}
 	engine.GetClient().RemoveP2P(nil, p2p)
 }
 
 func ClientPortCheck(tx *query.Query, code string, port string) error {
 	engine, ok := EngineRegistry.Get(code)
 	if !ok {
+		return nil
+	}
+	if !engine.GetClient().IsRunning() {
 		return nil
 	}
 	return engine.GetClient().PortCheck(tx, "", port)
@@ -130,12 +166,18 @@ func ClientCfgConfig(tx *query.Query, code string) error {
 	if !ok {
 		return nil
 	}
+	if !engine.GetClient().IsRunning() {
+		return nil
+	}
 	return engine.GetClient().CustomCfgConfig(tx, code)
 }
 
 func ClientCfgRemove(clientCode, code string) {
 	engine, ok := EngineRegistry.Get(clientCode)
 	if !ok {
+		return
+	}
+	if !engine.GetClient().IsRunning() {
 		return
 	}
 	_ = engine.GetClient().RemoveCustomCfg(nil, code)

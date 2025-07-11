@@ -174,6 +174,7 @@ type HostConfig struct {
 	Key     string // 唯一标识
 	BaseCfg v1.ClientCommonConfig
 	Http    HTTPProxyConfig
+	IsHttps bool
 }
 
 type ForwardConfig struct {
