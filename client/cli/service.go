@@ -126,8 +126,9 @@ func (p *program) run() {
 		os.Exit(0)
 	}
 
-	var wsurl = common.GenerateWsUrl(tlsEnable, address)
-	var apiurl = common.GenerateHttpUrl(tlsEnable, address)
+	//var wsurl = common.GenerateWsUrl(tlsEnable, address)
+	//var apiurl = common.GenerateHttpUrl(tlsEnable, address)
+	generate := common.NewGenerateUrl(tlsEnable, address)
 
 	var mode = selectMode(cfgFile, server, visit, p2p, wAddress, tunCfg, os.Getenv("GOSTC_FRP_TYPE"))
 
@@ -156,7 +157,7 @@ func (p *program) run() {
 		}
 		<-signal.Free()
 	case "visit", "p2p":
-		runTunnels(mode, vTunnels, apiurl)
+		runTunnels(mode, vTunnels, generate)
 	case "client", "server":
 		if key == "" {
 			if mode == "client" {
@@ -170,14 +171,14 @@ func (p *program) run() {
 			fmt.Println("please enter key")
 			os.Exit(1)
 		}
-		fmt.Println("WS_URL：", wsurl)
-		fmt.Println("API_URL：", apiurl)
+		fmt.Println("WS_URL：", generate.WsUrl())
+		fmt.Println("API_URL：", generate.HttpUrl())
 		var svc service.Service
 		switch mode {
 		case "server":
-			svc = service.NewNode(wsurl, apiurl, key, proxyBaseUrl)
+			svc = service.NewNode(generate, key, proxyBaseUrl)
 		case "client":
-			svc = service.NewClient(wsurl, apiurl, key)
+			svc = service.NewClient(generate, key)
 		}
 		if err := svc.Start(); err != nil {
 			log.Fatalln("启动失败", err)

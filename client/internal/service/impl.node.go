@@ -16,19 +16,17 @@ import (
 type Node struct {
 	key          string
 	proxyBaseUrl string
-	wsUrl        string
-	apiUrl       string
+	generate     common.GenerateUrl
 	svcMap       *sync.Map
 	stopFunc     func()
 }
 
-func NewNode(wsUrl, apiUrl, key, proxyBaseUrl string) *Node {
+func NewNode(url common.GenerateUrl, key, proxyBaseUrl string) *Node {
 	return &Node{
 		key:          key,
 		proxyBaseUrl: proxyBaseUrl,
 		svcMap:       &sync.Map{},
-		wsUrl:        wsUrl,
-		apiUrl:       apiUrl,
+		generate:     url,
 	}
 }
 
@@ -70,7 +68,7 @@ func (svc *Node) run() (err error) {
 		return errors.New("please entry key")
 	}
 	client, err := arpc.NewClient(func() (net.Conn, error) {
-		return websocket.Dial(svc.wsUrl+"/rpc/ws", http.Header{
+		return websocket.Dial(svc.generate.WsUrl()+"/rpc/ws", http.Header{
 			"key": []string{svc.key},
 		})
 	})
@@ -114,7 +112,7 @@ func (svc *Node) run() (err error) {
 	var callback = func(key string) {
 		svc.svcMap.Store(key, true)
 	}
-	event.ServerHandle(client, svc.apiUrl, callback)
+	event.ServerHandle(client, svc.generate.HttpUrl(), callback)
 	event.PortCheckHandle(client)
 	event.ServerDomainHandle(client, svc.proxyBaseUrl)
 	go svc.ping(client)

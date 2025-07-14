@@ -21,7 +21,8 @@ func init() {
 			var client model.Client
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &client)
-			svc := service2.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), common.GenerateHttpUrl(client.Tls == 1, client.Address), client.Key)
+			generate := common.NewGenerateUrl(client.Tls == 1, client.Address)
+			svc := service2.NewClient(generate, client.Key)
 			global.ClientMap.Store(client.Key, svc)
 			if client.AutoStart == 1 {
 				_ = svc.Start()
@@ -37,7 +38,8 @@ func init() {
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &p2p)
 			port, _ := strconv.Atoi(p2p.Port)
-			svc := service.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, port)
+			generate := common.NewGenerateUrl(p2p.Tls == 1, p2p.Address)
+			svc := service.NewP2P(generate, p2p.Key, p2p.Bind, port)
 			global.P2PMap.Store(p2p.Key, svc)
 			if p2p.AutoStart == 1 {
 				_ = svc.Start()
@@ -53,7 +55,8 @@ func init() {
 			marshal, _ := json.Marshal(value)
 			_ = json.Unmarshal(marshal, &tunnel)
 			port, _ := strconv.Atoi(tunnel.Port)
-			svc := service.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, port)
+			generate := common.NewGenerateUrl(tunnel.Tls == 1, tunnel.Address)
+			svc := service.NewTunnel(generate, tunnel.Key, tunnel.Bind, port)
 			global.TunnelMap.Store(tunnel.Key, svc)
 			if tunnel.AutoStart == 1 {
 				_ = svc.Start()

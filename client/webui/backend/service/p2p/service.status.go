@@ -28,7 +28,8 @@ func (*service) Status(req StatusReq) error {
 	svc, ok := global.P2PMap.Load(req.Key)
 	if !ok {
 		port, _ := strconv.Atoi(p2p.Port)
-		svc = service3.NewP2P(common.GenerateHttpUrl(p2p.Tls == 1, p2p.Address), p2p.Key, p2p.Bind, port)
+		generate := common.NewGenerateUrl(p2p.Tls == 1, p2p.Address)
+		svc = service3.NewP2P(generate, p2p.Key, p2p.Bind, port)
 		global.P2PMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {

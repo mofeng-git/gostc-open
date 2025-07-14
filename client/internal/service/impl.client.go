@@ -15,19 +15,17 @@ import (
 
 type Client struct {
 	key      string
-	wsUrl    string
-	apiUrl   string
+	generate common.GenerateUrl
 	core     service.Service
 	svcMap   *sync.Map
 	stopFunc func()
 }
 
-func NewClient(wsUrl, apiUrl, key string) *Client {
+func NewClient(url common.GenerateUrl, key string) *Client {
 	return &Client{
-		key:    key,
-		wsUrl:  wsUrl,
-		apiUrl: apiUrl,
-		svcMap: &sync.Map{},
+		key:      key,
+		generate: url,
+		svcMap:   &sync.Map{},
 	}
 }
 
@@ -69,7 +67,7 @@ func (svc *Client) run() (err error) {
 		return errors.New("please entry key")
 	}
 	client, err := arpc.NewClient(func() (net.Conn, error) {
-		return websocket.Dial(svc.wsUrl+"/rpc/ws", http.Header{
+		return websocket.Dial(svc.generate.WsUrl()+"/rpc/ws", http.Header{
 			"key": []string{svc.key},
 		})
 	})

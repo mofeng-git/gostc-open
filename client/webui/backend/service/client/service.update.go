@@ -29,7 +29,8 @@ func (*service) Update(req UpdateReq) error {
 	}); err != nil {
 		return err
 	}
-	client := rpcService.NewClient(common.GenerateWsUrl(req.Tls == 1, req.Address), common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key)
+	generate := common.NewGenerateUrl(req.Tls == 1, req.Address)
+	client := rpcService.NewClient(generate, req.Key)
 	global.ClientMap.Store(req.Key, client)
 	return nil
 }

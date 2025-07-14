@@ -5,6 +5,7 @@ import (
 	"github.com/SianHH/frp-package/package/frpc"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	"github.com/lesismal/arpc"
+	"os"
 )
 
 func ForwardHandle(client *arpc.Client, callback func(key string)) {
@@ -22,6 +23,7 @@ func ForwardHandle(client *arpc.Client, callback func(key string)) {
 			proxyCfgs = append(proxyCfgs, req.UDP.To())
 		}
 		service.Del(req.Key)
+		req.BaseCfg.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 		svc, err := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
 		if err != nil {
 			_ = c.Write(err.Error())

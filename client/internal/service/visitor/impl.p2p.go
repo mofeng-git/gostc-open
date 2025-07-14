@@ -10,22 +10,23 @@ import (
 	service2 "gostc-sub/internal/service"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
 
 type P2P struct {
 	key      string
-	httpUrl  string
+	generate common.GenerateUrl
 	bindPort int
 	bindAddr string
 	core     service.Service
 	stopFunc func()
 }
 
-func NewP2P(httpUrl string, key, bindAddr string, bindPort int) *P2P {
+func NewP2P(url common.GenerateUrl, key, bindAddr string, bindPort int) *P2P {
 	return &P2P{
 		key:      key,
-		httpUrl:  httpUrl + "/api/v1/public/frp/visitorP2P?key=" + key,
+		generate: url,
 		bindPort: bindPort,
 		bindAddr: bindAddr,
 	}
@@ -69,7 +70,7 @@ func (svc *P2P) run() (err error) {
 	if svc.key == "" {
 		return errors.New("please entry key")
 	}
-	config, err := svc.loadConfig(svc.httpUrl)
+	config, err := svc.loadConfig(svc.generate.HttpUrl() + "/api/v1/public/frp/visitorP2P?key=" + svc.key)
 	if err != nil {
 		return err
 	}
@@ -84,6 +85,7 @@ func (svc *P2P) run() (err error) {
 		config.XTCP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.XTCP)
 	}
+	config.Common.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 	svc.core, err = frpc.NewService(config.Common, nil, visitorCfgs)
 	if err != nil {
 		return err

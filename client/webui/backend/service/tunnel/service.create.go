@@ -42,7 +42,8 @@ func (*service) Create(req CreateReq) error {
 	}); err != nil {
 		return err
 	}
-	tunnel := service3.NewTunnel(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, port)
+	generate := common.NewGenerateUrl(req.Tls == 1, req.Address)
+	tunnel := service3.NewTunnel(generate, req.Key, req.Bind, port)
 	global.TunnelMap.Store(req.Key, tunnel)
 	return nil
 }

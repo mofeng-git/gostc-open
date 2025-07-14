@@ -10,22 +10,23 @@ import (
 	service2 "gostc-sub/internal/service"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
 
 type Tunnel struct {
 	key      string
-	httpUrl  string
+	generate common.GenerateUrl
 	bindPort int
 	bindAddr string
 	core     service.Service
 	stopFunc func()
 }
 
-func NewTunnel(httpUrl string, key, bindAddr string, bindPort int) *Tunnel {
+func NewTunnel(url common.GenerateUrl, key, bindAddr string, bindPort int) *Tunnel {
 	return &Tunnel{
 		key:      key,
-		httpUrl:  httpUrl + "/api/v1/public/frp/visitorTunnel?key=" + key,
+		generate: url,
 		bindPort: bindPort,
 		bindAddr: bindAddr,
 		core:     nil,
@@ -70,7 +71,7 @@ func (svc *Tunnel) run() (err error) {
 	if svc.key == "" {
 		return errors.New("please entry key")
 	}
-	config, err := svc.loadConfig(svc.httpUrl)
+	config, err := svc.loadConfig(svc.generate.HttpUrl() + "/api/v1/public/frp/visitorTunnel?key=" + svc.key)
 	if err != nil {
 		return err
 	}
@@ -87,6 +88,7 @@ func (svc *Tunnel) run() (err error) {
 		config.SUDP.Plugin = v1.TypedVisitorPluginOptions{}
 		visitorCfgs = append(visitorCfgs, &config.SUDP)
 	}
+	config.Common.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 	svc.core, err = frpc.NewService(config.Common, nil, visitorCfgs)
 	if err != nil {
 		return err

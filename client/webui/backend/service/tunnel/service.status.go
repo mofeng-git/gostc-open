@@ -28,7 +28,8 @@ func (*service) Status(req StatusReq) error {
 	svc, ok := global.TunnelMap.Load(req.Key)
 	if !ok {
 		port, _ := strconv.Atoi(tunnel.Port)
-		svc = service3.NewTunnel(common.GenerateHttpUrl(tunnel.Tls == 1, tunnel.Address), tunnel.Key, tunnel.Bind, port)
+		generate := common.NewGenerateUrl(tunnel.Tls == 1, tunnel.Address)
+		svc = service3.NewTunnel(generate, tunnel.Key, tunnel.Bind, port)
 		global.TunnelMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {

@@ -8,6 +8,7 @@ require (
 	gioui.org v0.8.0
 	github.com/SianHH/frp-package v0.0.0-20250619151611-d380a531ffce
 	github.com/energye/systray v1.0.2
+	github.com/fatedier/golib v0.5.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-gost/core v0.3.1
 	github.com/go-gost/x v0.5.3
@@ -30,6 +31,7 @@ require (
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/alessio/shellescape v1.4.1 // indirect
+	github.com/apernet/quic-go v0.52.1-0.20250607183305-9320c9d14431 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -42,7 +44,6 @@ require (
 	github.com/coreos/go-oidc/v3 v3.14.1 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/fatedier/golib v0.5.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/cors v1.7.2 // indirect

@@ -43,7 +43,8 @@ func (*service) Create(req CreateReq) error {
 	}); err != nil {
 		return err
 	}
-	p2p := service3.NewP2P(common.GenerateHttpUrl(req.Tls == 1, req.Address), req.Key, req.Bind, port)
+	generate := common.NewGenerateUrl(req.Tls == 1, req.Address)
+	p2p := service3.NewP2P(generate, req.Key, req.Bind, port)
 	global.P2PMap.Store(req.Key, p2p)
 	return nil
 }

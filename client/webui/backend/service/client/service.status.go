@@ -25,7 +25,8 @@ func (*service) Status(req StatusReq) error {
 
 	svc, ok := global.ClientMap.Load(req.Key)
 	if !ok {
-		svc = service2.NewClient(common.GenerateWsUrl(client.Tls == 1, client.Address), common.GenerateHttpUrl(client.Tls == 1, client.Address), req.Key)
+		generate := common.NewGenerateUrl(client.Tls == 1, client.Address)
+		svc = service2.NewClient(generate, req.Key)
 		global.ClientMap.Store(req.Key, svc)
 	}
 	if req.Status == 1 {

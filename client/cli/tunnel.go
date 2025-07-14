@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gostc-sub/internal/common"
 	service "gostc-sub/internal/service/visitor"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ type Tunnel struct {
 	Port string
 }
 
-func runTunnels(mode string, vTunnels string, apiurl string) {
+func runTunnels(mode string, vTunnels string, url common.GenerateUrl) {
 	var wg = &sync.WaitGroup{}
 	var tunnelList []Tunnel
 	tunnels := strings.Split(vTunnels, ",")
@@ -46,7 +47,7 @@ func runTunnels(mode string, vTunnels string, apiurl string) {
 				fmt.Println("私有隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
-			svc := service.NewTunnel(apiurl, tunnel.VKey, tunnel.Bind, port)
+			svc := service.NewTunnel(url, tunnel.VKey, tunnel.Bind, port)
 			if err := svc.Start(); err != nil {
 				fmt.Println("私有隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
@@ -59,7 +60,7 @@ func runTunnels(mode string, vTunnels string, apiurl string) {
 				fmt.Println("P2P隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue
 			}
-			svc := service.NewP2P(apiurl, tunnel.VKey, tunnel.Bind, port)
+			svc := service.NewP2P(url, tunnel.VKey, tunnel.Bind, port)
 			if err := svc.Start(); err != nil {
 				fmt.Println("P2P隧道启动失败", tunnel.VKey, tunnel.Bind+":"+tunnel.Port, err)
 				continue

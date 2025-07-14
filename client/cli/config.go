@@ -76,7 +76,8 @@ func configExample() {
 func startForConfig() {
 	wg := &sync.WaitGroup{}
 	for _, client := range Cfg.Clients {
-		svc := service2.NewClient(common.GenerateWsUrl(client.Tls, client.Address), common.GenerateHttpUrl(client.Tls, client.Address), client.Key)
+		generate := common.NewGenerateUrl(client.Tls, client.Address)
+		svc := service2.NewClient(generate, client.Key)
 		if err := svc.Start(); err != nil {
 			fmt.Println(client.Key, client.Remark, "启动失败", err)
 		}
@@ -85,7 +86,8 @@ func startForConfig() {
 		go loop(wg, svc)
 	}
 	for _, tunnel := range Cfg.Tunnels {
-		svc := service.NewTunnel(common.GenerateHttpUrl(tunnel.Tls, tunnel.Address), tunnel.Key, tunnel.Bind, tunnel.Port)
+		generate := common.NewGenerateUrl(tunnel.Tls, tunnel.Address)
+		svc := service.NewTunnel(generate, tunnel.Key, tunnel.Bind, tunnel.Port)
 		if err := svc.Start(); err != nil {
 			fmt.Println(tunnel.Key, tunnel.Remark, "启动失败", err)
 		}
@@ -94,7 +96,8 @@ func startForConfig() {
 		go loop(wg, svc)
 	}
 	for _, p2p := range Cfg.P2Ps {
-		svc := service.NewP2P(common.GenerateHttpUrl(p2p.Tls, p2p.Address), p2p.Key, p2p.Bind, p2p.Port)
+		generate := common.NewGenerateUrl(p2p.Tls, p2p.Address)
+		svc := service.NewP2P(generate, p2p.Key, p2p.Bind, p2p.Port)
 		if err := svc.Start(); err != nil {
 			fmt.Println(p2p.Key, p2p.Remark, "启动失败", err)
 		}
