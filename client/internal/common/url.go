@@ -1,31 +1,12 @@
 package common
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
 )
-
-func GenerateWsUrl(tls bool, address string) string {
-	var scheme string
-	if tls {
-		scheme = "wss"
-	} else {
-		scheme = "ws"
-	}
-	return scheme + "://" + address
-}
-
-func GenerateHttpUrl(tls bool, address string) string {
-	var scheme string
-	if tls {
-		scheme = "https"
-	} else {
-		scheme = "http"
-	}
-	return scheme + "://" + address
-}
 
 type GenerateUrl interface {
 	WsUrl() string
@@ -102,6 +83,10 @@ func (g *generate) refresh() {
 	g.expAt = time.Now().Add(time.Second * 30).UnixNano()
 }
 
+var tr = &http.Transport{
+	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+}
+
 func parseUrl(reqUrl string) string {
 	// 最多跟随10次重定向
 	maxRedirects := 10
@@ -110,6 +95,7 @@ func parseUrl(reqUrl string) string {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
+		Transport: tr,
 	}
 
 	for i := 0; i < maxRedirects; i++ {
