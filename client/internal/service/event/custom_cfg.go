@@ -6,6 +6,7 @@ import (
 	"github.com/SianHH/frp-package/package/frps"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
 	"github.com/lesismal/arpc"
+	"time"
 )
 
 func CustomCfgHandle(client *arpc.Client, callback func(key string)) {
@@ -16,6 +17,7 @@ func CustomCfgHandle(client *arpc.Client, callback func(key string)) {
 			return
 		}
 		service.Del(req.Key)
+		time.Sleep(time.Second)
 
 		var svc service.Service
 		var err error

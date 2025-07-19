@@ -4,6 +4,7 @@ import (
 	service "github.com/SianHH/frp-package/package"
 	"github.com/SianHH/frp-package/package/frps"
 	"github.com/lesismal/arpc"
+	"time"
 )
 
 func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)) {
@@ -14,6 +15,7 @@ func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)
 			return
 		}
 		service.Del(req.Key)
+		time.Sleep(time.Second)
 		for i := 0; i < len(req.ServerConfig.HTTPPlugins); i++ {
 			req.ServerConfig.HTTPPlugins[i].Addr = httpUrl
 		}

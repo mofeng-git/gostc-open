@@ -7,6 +7,7 @@ import (
 	"github.com/lesismal/arpc"
 	"os"
 	"strconv"
+	"time"
 )
 
 func HostHandle(client *arpc.Client, callback func(key string)) {
@@ -30,6 +31,7 @@ func HostHandle(client *arpc.Client, callback func(key string)) {
 			proxyCfgs = append(proxyCfgs, req.Http.To())
 		}
 		service.Del(req.Key)
+		time.Sleep(time.Second)
 		req.BaseCfg.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 		svc, err := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
 		if err != nil {
