@@ -162,7 +162,7 @@ func (p *program) run() {
 		if key == "" {
 			if mode == "client" {
 				fmt.Println("load configuration file", global.BasePath+"/config.yaml")
-				if err := loadConfig(cfgFile); err != nil {
+				if err := loadConfig(global.BasePath + "/config.yaml"); err != nil {
 					log.Fatalln(err)
 				}
 				startForConfig()
