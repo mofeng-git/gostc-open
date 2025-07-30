@@ -2,6 +2,7 @@ package engine
 
 import (
 	"server/model"
+	"server/repository/cache"
 	"server/repository/query"
 )
 
@@ -185,6 +186,10 @@ func ClientCfgRemove(clientCode, code string) {
 
 // 将客户端的所有隧道下发到客户端上
 func ClientAllConfigUpdateByClientCode(tx *query.Query, clientCode string) {
+	if !cache.GetClientOnline(clientCode) {
+		return
+	}
+
 	var hostCodes []string
 	_ = tx.GostClientHost.Where(
 		tx.GostClientHost.ClientCode.Eq(clientCode),
@@ -231,6 +236,20 @@ func ClientAllConfigUpdateByClientCode(tx *query.Query, clientCode string) {
 
 // 将节点的所有隧道下发到客户端上
 func ClientAllConfigUpdateByNodeCode(tx *query.Query, nodeCode string) {
+	if !cache.GetNodeOnline(nodeCode) {
+		return
+	}
+
+	// 查询客户端，只过滤出在线的客户端，减少多余数据处理
+	var clientCodes []string
+	_ = tx.GostClient.Pluck(tx.GostClient.Code, &clientCodes)
+	var onlineClientCodes []string
+	for _, code := range clientCodes {
+		if cache.GetClientOnline(code) {
+			onlineClientCodes = append(onlineClientCodes, code)
+		}
+	}
+
 	var hostCodes []string
 	_ = tx.GostClientHost.Where(
 		tx.GostClientHost.NodeCode.Eq(nodeCode),

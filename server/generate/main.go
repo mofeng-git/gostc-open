@@ -2,23 +2,14 @@ package main
 
 import (
 	"gorm.io/gen"
-	"server/bootstrap"
-	"server/global"
 	"server/model"
 )
 
 func main() {
-	bootstrap.InitLogger()
-	bootstrap.InitConfig()
-	bootstrap.InitPersistence()
-	defer bootstrap.Release()
-
 	g := gen.NewGenerator(gen.Config{
 		OutPath: "./repository/query",
 		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface, // generate mode
 	})
-
-	g.UseDB(global.DB.GetDB())
 
 	g.ApplyBasic(
 		model.GostAuth{},

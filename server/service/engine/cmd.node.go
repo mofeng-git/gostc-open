@@ -58,7 +58,3 @@ func NodeAddDomain(tx *query.Query, code, domain, cert, key string, forceHttps i
 	}
 	engine.GetNode().CustomDomain(tx, domain, cert, key, forceHttps)
 }
-
-func NodeAllConfigUpdate(tx *query.Query, code string) {
-	NodeConfig(tx, code)
-}

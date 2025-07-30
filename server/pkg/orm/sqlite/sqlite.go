@@ -88,6 +88,11 @@ func NewDB(dbFile, logLevel string, toFile string, console bool) (*Sqlite, error
 	if err != nil {
 		return nil, err
 	}
+	d.Exec("PRAGMA journal_mode=WAL")
+	d.Exec("PRAGMA synchronous=NORMAL")
+	d.Exec("PRAGMA busy_timeout=10000")
+	d.Exec("PRAGMA cache_size=-10000") // 10MB缓存
+
 	db, err := d.DB()
 	if err != nil {
 		return nil, err
@@ -103,6 +108,7 @@ func NewMemoryDB(logLevel string, toFile string, console bool) (*Sqlite, error) 
 	var impl Sqlite
 	gormConfig := gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true, // 关闭自动建表的外键约束
+		SkipDefaultTransaction:                   true,
 	}
 	gormConfig.NamingStrategy = schema.NamingStrategy{
 		SingularTable: true,
