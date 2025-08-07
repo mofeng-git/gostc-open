@@ -159,11 +159,20 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
-				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
-				BandwidthLimitMode:   "client",
-				ProxyProtocolVersion: "",
+				UseEncryption:      true,
+				UseCompression:     true,
+				BandwidthLimit:     fmt.Sprintf("%dKB", forward.Limiter*128),
+				BandwidthLimitMode: "client",
+				ProxyProtocolVersion: func() string {
+					switch forward.ProxyProtocol {
+					case 1:
+						return "v1"
+					case 2:
+						return "v2"
+					default:
+						return ""
+					}
+				}(),
 			},
 		},
 		UDP: UDPProxyConfig{

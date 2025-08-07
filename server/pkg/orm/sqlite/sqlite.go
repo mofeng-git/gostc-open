@@ -91,7 +91,7 @@ func NewDB(dbFile, logLevel string, toFile string, console bool) (*Sqlite, error
 	d.Exec("PRAGMA journal_mode=WAL")
 	d.Exec("PRAGMA synchronous=NORMAL")
 	d.Exec("PRAGMA busy_timeout=10000")
-	d.Exec("PRAGMA cache_size=-10000") // 10MB缓存
+	//d.Exec("PRAGMA cache_size=-10000") // 10MB缓存
 
 	db, err := d.DB()
 	if err != nil {

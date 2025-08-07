@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var Logger = NewCircularLogger(10000)
+var Logger = NewCircularLogger(1000)
 
 type LogEntry struct {
 	Timestamp time.Time

@@ -551,12 +551,12 @@ const operatorRenderLabel = (option) => {
         <n-form-item path="port" label="远程端口">
           <n-input v-model:value="state.update.data.port" placeholder="10001"></n-input>
         </n-form-item>
-        <!--        <n-form-item path="proxyProtocol" label="PROXY Protocol">-->
-        <!--          <n-select-->
-        <!--              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"-->
-        <!--              v-model:value="state.update.data.proxyProtocol"-->
-        <!--          ></n-select>-->
-        <!--        </n-form-item>-->
+        <n-form-item path="proxyProtocol" label="PROXY Protocol">
+          <n-select
+              :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"
+              v-model:value="state.update.data.proxyProtocol"
+          ></n-select>
+        </n-form-item>
       </n-form>
     </Modal>
 

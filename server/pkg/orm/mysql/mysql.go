@@ -102,8 +102,9 @@ func NewDB(config Config, logLevel string, toFile string, console bool) (*Mysql,
 	if err != nil {
 		return nil, err
 	}
-	db.SetConnMaxLifetime(time.Hour * 4)
-	db.SetMaxOpenConns(50)
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetConnMaxLifetime(time.Minute * 2)
+	db.SetMaxOpenConns(100)
 	db.SetMaxIdleConns(10)
 	impl.db = d
 	return &impl, nil
