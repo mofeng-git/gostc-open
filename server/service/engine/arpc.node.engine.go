@@ -32,7 +32,7 @@ func (e *ARpcNodeEngine) IsRunning() bool {
 
 func (e *ARpcNodeEngine) PortCheck(tx *query.Query, ip, port string) error {
 	var relay string
-	if err := e.client.Call("port_check", port, &relay, time.Second*30); err != nil {
+	if err := e.client.Call("port_check", port, &relay, time.Second*5); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -49,7 +49,8 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 
 	_, serverPort := node.GetOriginAddress()
 	var data = ServerConfig{
-		Key: node.Code,
+		UpdateTag: node.UpdatedAt.Format(time.DateTime),
+		Key:       node.Code,
 		ServerConfig: v1.ServerConfig{
 			Auth: v1.AuthServerConfig{
 				Token: node.Code,

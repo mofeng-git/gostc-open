@@ -9,13 +9,19 @@ import (
 	"time"
 )
 
-func P2PHandle(client *arpc.Client, callback func(key string)) {
+func P2PHandle(client *arpc.Client, callback func(key, updateTag string), checkUpdate func(key, updateTag string) bool) {
 	client.Handler.Handle("p2p_config", func(c *arpc.Context) {
 		var req P2PConfig
 		if err := c.Bind(&req); err != nil {
 			_ = c.Write(err.Error())
 			return
 		}
+
+		if !checkUpdate(req.Key, req.UpdateTag) {
+			_ = c.Write("success")
+			return
+		}
+
 		var proxyCfgs []v1.ProxyConfigurer
 		if req.XTCP.Name != "" {
 			proxyCfgs = append(proxyCfgs, req.XTCP.To())
@@ -28,7 +34,7 @@ func P2PHandle(client *arpc.Client, callback func(key string)) {
 		req.BaseCfg.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 		svc, err := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
 		if err != nil {
-			_ = c.Write(err.Error())
+			_ = c.Write(err)
 			return
 		}
 		if err := svc.Start(); err != nil {
@@ -40,7 +46,7 @@ func P2PHandle(client *arpc.Client, callback func(key string)) {
 			_ = c.Write(err.Error())
 			return
 		}
-		callback(req.Key)
+		callback(req.Key, req.UpdateTag)
 		_ = c.Write("success")
 	})
 }

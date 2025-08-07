@@ -36,7 +36,7 @@ func (e *ARpcClientEngine) Stop(msg string) {
 
 func (e *ARpcClientEngine) PortCheck(tx *query.Query, ip, port string) error {
 	var relay string
-	if err := e.client.Call("port_check", port, &relay, time.Second*30); err != nil {
+	if err := e.client.Call("port_check", port, &relay, time.Second*5); err != nil {
 		return err
 	}
 	if relay != "success" {
@@ -60,9 +60,10 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 		return err
 	}
 	var data = HostConfig{
-		Key:     host.Code,
-		BaseCfg: e.generateServerCommonCfg(host.Node, *auth),
-		IsHttps: host.TargetHttps == 1,
+		Key:       host.Code,
+		UpdateTag: host.UpdatedAt.Format(time.DateTime) + "#" + host.Node.UpdatedAt.Format(time.DateTime),
+		BaseCfg:   e.generateServerCommonCfg(host.Node, *auth),
+		IsHttps:   host.TargetHttps == 1,
 		Http: HTTPProxyConfig{
 			HTTPProxyConfig: v1.HTTPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -140,8 +141,9 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 	}
 
 	var data = ForwardConfig{
-		Key:     forward.Code,
-		BaseCfg: e.generateServerCommonCfg(forward.Node, *auth),
+		Key:       forward.Code,
+		UpdateTag: forward.UpdatedAt.Format(time.DateTime) + "#" + forward.Node.UpdatedAt.Format(time.DateTime),
+		BaseCfg:   e.generateServerCommonCfg(forward.Node, *auth),
 		TCP: TCPProxyConfig{
 			TCPProxyConfig: v1.TCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -159,20 +161,11 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:      true,
-				UseCompression:     true,
-				BandwidthLimit:     fmt.Sprintf("%dKB", forward.Limiter*128),
-				BandwidthLimitMode: "client",
-				ProxyProtocolVersion: func() string {
-					switch forward.ProxyProtocol {
-					case 1:
-						return "v1"
-					case 2:
-						return "v2"
-					default:
-						return ""
-					}
-				}(),
+				UseEncryption:        true,
+				UseCompression:       true,
+				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
+				BandwidthLimitMode:   "client",
+				ProxyProtocolVersion: "",
 			},
 		},
 		UDP: UDPProxyConfig{
@@ -192,11 +185,20 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
-				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
-				BandwidthLimitMode:   "client",
-				ProxyProtocolVersion: "",
+				UseEncryption:      true,
+				UseCompression:     true,
+				BandwidthLimit:     fmt.Sprintf("%dKB", forward.Limiter*128),
+				BandwidthLimitMode: "client",
+				ProxyProtocolVersion: func() string {
+					switch forward.ProxyProtocol {
+					case 1:
+						return "v2"
+					case 2:
+						return "v2"
+					default:
+						return ""
+					}
+				}(),
 			},
 		},
 	}
@@ -245,8 +247,9 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 		return err
 	}
 	var data = TunnelConfig{
-		Key:     tunnel.Code,
-		BaseCfg: e.generateServerCommonCfg(tunnel.Node, *auth),
+		Key:       tunnel.Code,
+		UpdateTag: tunnel.UpdatedAt.Format(time.DateTime) + "#" + tunnel.Node.UpdatedAt.Format(time.DateTime),
+		BaseCfg:   e.generateServerCommonCfg(tunnel.Node, *auth),
 		STCP: STCPProxyConfig{
 			STCPProxyConfig: v1.STCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -343,8 +346,9 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 	}
 
 	var data = P2PConfig{
-		Key:     p2p.Code,
-		BaseCfg: e.generateServerCommonCfg(p2p.Node, *auth),
+		Key:       p2p.Code,
+		UpdateTag: p2p.UpdatedAt.Format(time.DateTime) + "#" + p2p.Node.UpdatedAt.Format(time.DateTime),
+		BaseCfg:   e.generateServerCommonCfg(p2p.Node, *auth),
 		XTCP: XTCPProxyConfig{
 			XTCPProxyConfig: v1.XTCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -444,12 +448,13 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 	}
 
 	var data = ProxyConfig{
-		Key:      proxy.Code,
-		BaseCfg:  e.generateServerCommonCfg(proxy.Node, *auth),
-		Name:     proxy.Code + "_proxy",
-		Port:     utils.StrMustInt(proxy.Port),
-		AuthUser: proxy.AuthUser,
-		AuthPwd:  proxy.AuthPwd,
+		Key:       proxy.Code,
+		UpdateTag: proxy.UpdatedAt.Format(time.DateTime) + "#" + proxy.Node.UpdatedAt.Format(time.DateTime),
+		BaseCfg:   e.generateServerCommonCfg(proxy.Node, *auth),
+		Name:      proxy.Code + "_proxy",
+		Port:      utils.StrMustInt(proxy.Port),
+		AuthUser:  proxy.AuthUser,
+		AuthPwd:   proxy.AuthPwd,
 		Metadata: map[string]string{
 			"user":     auth.User,
 			"password": auth.Password,
@@ -518,9 +523,10 @@ func (e *ARpcClientEngine) CustomCfgConfig(tx *query.Query, cfgCode string) erro
 	}
 
 	var data = CustomCfgConfig{
-		Key:     cfg.Code,
-		Type:    cfg.ContentType,
-		Content: cfg.Content,
+		Key:       cfg.Code,
+		UpdateTag: cfg.UpdatedAt.Format(time.DateTime),
+		Type:      cfg.ContentType,
+		Content:   cfg.Content,
 	}
 	go utils.Retry(func() error {
 		var relay string

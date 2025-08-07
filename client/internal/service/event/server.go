@@ -7,13 +7,19 @@ import (
 	"time"
 )
 
-func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)) {
+func ServerHandle(client *arpc.Client, httpUrl string, callback func(key, updateTag string), checkUpdate func(key, updateTag string) bool) {
 	client.Handler.Handle("server_config", func(c *arpc.Context) {
 		var req ServerConfig
 		if err := c.Bind(&req); err != nil {
 			_ = c.Write(err.Error())
 			return
 		}
+
+		if !checkUpdate(req.Key, req.UpdateTag) {
+			_ = c.Write("success")
+			return
+		}
+
 		service.Del(req.Key)
 		time.Sleep(time.Second)
 		for i := 0; i < len(req.ServerConfig.HTTPPlugins); i++ {
@@ -21,7 +27,7 @@ func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)
 		}
 		svc, err := frps.NewService(req.ServerConfig)
 		if err != nil {
-			_ = c.Write(err.Error())
+			_ = c.Write(err)
 			return
 		}
 		if err := svc.Start(); err != nil {
@@ -33,7 +39,7 @@ func ServerHandle(client *arpc.Client, httpUrl string, callback func(key string)
 			_ = c.Write(err.Error())
 			return
 		}
-		callback(req.Key)
+		callback(req.Key, req.UpdateTag)
 		_ = c.Write("success")
 	})
 }

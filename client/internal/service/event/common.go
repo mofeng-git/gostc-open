@@ -171,47 +171,53 @@ func (m XTCPProxyConfig) To() *v1.XTCPProxyConfig {
 }
 
 type HostConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	Http    HTTPProxyConfig
-	IsHttps bool
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	Http      HTTPProxyConfig
+	IsHttps   bool
+	UpdateTag string
 }
 
 type ForwardConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	TCP     TCPProxyConfig
-	UDP     UDPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	TCP       TCPProxyConfig
+	UDP       UDPProxyConfig
+	UpdateTag string
 }
 
 type TunnelConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	STCP    STCPProxyConfig
-	SUDP    SUDPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	STCP      STCPProxyConfig
+	SUDP      SUDPProxyConfig
+	UpdateTag string
 }
 
 type ProxyConfig struct {
-	Key      string // 唯一标识
-	BaseCfg  v1.ClientCommonConfig
-	Name     string
-	Port     int
-	AuthUser string
-	AuthPwd  string
-	Metadata map[string]string
-	Limiter  string
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	Name      string
+	Port      int
+	AuthUser  string
+	AuthPwd   string
+	Metadata  map[string]string
+	Limiter   string
+	UpdateTag string
 }
 
 type P2PConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	XTCP    XTCPProxyConfig
-	STCP    STCPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	XTCP      XTCPProxyConfig
+	STCP      STCPProxyConfig
+	UpdateTag string
 }
 
 type ServerConfig struct {
 	Key string // 唯一标识
 	v1.ServerConfig
+	UpdateTag string
 }
 
 type ServerDomain struct {
@@ -249,7 +255,8 @@ type TunNodeConfig struct {
 }
 
 type CustomCfgConfig struct {
-	Key     string
-	Type    string
-	Content string
+	Key       string
+	Type      string
+	Content   string
+	UpdateTag string
 }

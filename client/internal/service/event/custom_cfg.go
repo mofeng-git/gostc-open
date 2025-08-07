@@ -9,16 +9,21 @@ import (
 	"time"
 )
 
-func CustomCfgHandle(client *arpc.Client, callback func(key string)) {
+func CustomCfgHandle(client *arpc.Client, callback func(key, updateTag string), checkUpdate func(key, updateTag string) bool) {
 	client.Handler.Handle("custom_cfg_config", func(c *arpc.Context) {
 		var req CustomCfgConfig
 		if err := c.Bind(&req); err != nil {
 			_ = c.Write(err.Error())
 			return
 		}
+
+		if !checkUpdate(req.Key, req.UpdateTag) {
+			_ = c.Write("success")
+			return
+		}
+
 		service.Del(req.Key)
 		time.Sleep(time.Second)
-
 		var svc service.Service
 		var err error
 		switch req.Type {
@@ -48,7 +53,7 @@ func CustomCfgHandle(client *arpc.Client, callback func(key string)) {
 			_ = c.Write(err.Error())
 			return
 		}
-		callback(req.Key)
+		callback(req.Key, req.UpdateTag)
 		_ = c.Write("success")
 	})
 }

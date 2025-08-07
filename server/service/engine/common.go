@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/SianHH/frp-package/pkg/config/types"
 	v1 "github.com/SianHH/frp-package/pkg/config/v1"
-	"github.com/go-gost/x/config"
 )
 
 type ProxyTransport struct {
@@ -171,47 +170,53 @@ func (m XTCPProxyConfig) To() *v1.XTCPProxyConfig {
 }
 
 type HostConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	Http    HTTPProxyConfig
-	IsHttps bool
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	Http      HTTPProxyConfig
+	IsHttps   bool
+	UpdateTag string
 }
 
 type ForwardConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	TCP     TCPProxyConfig
-	UDP     UDPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	TCP       TCPProxyConfig
+	UDP       UDPProxyConfig
+	UpdateTag string
 }
 
 type TunnelConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	STCP    STCPProxyConfig
-	SUDP    SUDPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	STCP      STCPProxyConfig
+	SUDP      SUDPProxyConfig
+	UpdateTag string
 }
 
 type ProxyConfig struct {
-	Key      string // 唯一标识
-	BaseCfg  v1.ClientCommonConfig
-	Name     string
-	Port     int
-	AuthUser string
-	AuthPwd  string
-	Metadata map[string]string
-	Limiter  string
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	Name      string
+	Port      int
+	AuthUser  string
+	AuthPwd   string
+	Metadata  map[string]string
+	Limiter   string
+	UpdateTag string
 }
 
 type P2PConfig struct {
-	Key     string // 唯一标识
-	BaseCfg v1.ClientCommonConfig
-	XTCP    XTCPProxyConfig
-	STCP    STCPProxyConfig
+	Key       string // 唯一标识
+	BaseCfg   v1.ClientCommonConfig
+	XTCP      XTCPProxyConfig
+	STCP      STCPProxyConfig
+	UpdateTag string
 }
 
 type ServerConfig struct {
 	Key string // 唯一标识
 	v1.ServerConfig
+	UpdateTag string
 }
 
 type ServerDomain struct {
@@ -222,34 +227,9 @@ type ServerDomain struct {
 	ForceHttps int
 }
 
-type ServerDomainCacheData struct {
-	Domain            string
-	Active            bool
-	CacheRules        []ServerDomainCacheRuleConfig
-	CacheExcludeRules []ServerDomainCacheRuleConfig
-}
-
-type ServerDomainCacheRuleConfig struct {
-	Method string
-	Type   string // 规则类型 prefix:前缀匹配 suffix:后缀匹配 include:包含 full:全部匹配
-	Rule   string
-}
-
-type TunMasterConfig struct {
-	Key            string
-	Service        config.ServiceConfig
-	ForwardService config.ServiceConfig
-	Auther         config.AutherConfig
-}
-
-type TunNodeConfig struct {
-	Key     string
-	Service config.ServiceConfig
-	Chain   config.ChainConfig
-}
-
 type CustomCfgConfig struct {
-	Key     string
-	Type    string
-	Content string
+	Key       string
+	Type      string
+	Content   string
+	UpdateTag string
 }

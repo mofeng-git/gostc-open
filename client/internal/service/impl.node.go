@@ -16,16 +16,20 @@ import (
 type Node struct {
 	key          string
 	proxyBaseUrl string
+	cacheBaseUrl string
 	generate     common.GenerateUrl
 	svcMap       *sync.Map
+	svcUpdateMap *sync.Map
 	stopFunc     func()
 }
 
-func NewNode(url common.GenerateUrl, key, proxyBaseUrl string) *Node {
+func NewNode(url common.GenerateUrl, key, proxyBaseUrl, cacheBaseUrl string) *Node {
 	return &Node{
 		key:          key,
 		proxyBaseUrl: proxyBaseUrl,
+		cacheBaseUrl: cacheBaseUrl,
 		svcMap:       &sync.Map{},
+		svcUpdateMap: &sync.Map{},
 		generate:     url,
 	}
 }
@@ -109,16 +113,34 @@ func (svc *Node) run() (err error) {
 		return err
 	}
 
-	var callback = func(key string) {
+	// 注册事件
+	var callback = func(key, updateTag string) {
 		svc.svcMap.Store(key, true)
+		svc.svcUpdateMap.Store(key, updateTag)
 	}
-	event.ServerHandle(client, svc.generate.HttpUrl(), callback)
+	// true:allowUpdate false:denyUpdate
+	var checkUpdate = func(key, updateTag string) bool {
+		if updateTag == "" {
+			return true
+		}
+		value, ok := svc.svcUpdateMap.Load(key)
+		if !ok {
+			return true
+		}
+		u, ok := value.(string)
+		if !ok {
+			return true
+		}
+		return u != updateTag
+	}
+
+	event.ServerHandle(client, svc.generate.HttpUrl(), callback, checkUpdate)
 	event.PortCheckHandle(client)
 	event.ServerDomainHandle(client, svc.proxyBaseUrl)
-	go svc.ping(client)
 	event.StopHandle(client, func() {
 		svc.Stop()
 	})
+	go svc.ping(client)
 	<-stopChan
 	return err
 }

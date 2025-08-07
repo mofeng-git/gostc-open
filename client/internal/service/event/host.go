@@ -10,13 +10,19 @@ import (
 	"time"
 )
 
-func HostHandle(client *arpc.Client, callback func(key string)) {
+func HostHandle(client *arpc.Client, callback func(key, updateTag string), checkUpdate func(key, updateTag string) bool) {
 	client.Handler.Handle("host_config", func(c *arpc.Context) {
 		var req HostConfig
 		if err := c.Bind(&req); err != nil {
 			_ = c.Write(err.Error())
 			return
 		}
+
+		if !checkUpdate(req.Key, req.UpdateTag) {
+			_ = c.Write("success")
+			return
+		}
+
 		if req.IsHttps {
 			req.Http.Plugin = v1.TypedClientPluginOptions{
 				Type: v1.PluginHTTP2HTTPS,
@@ -35,7 +41,7 @@ func HostHandle(client *arpc.Client, callback func(key string)) {
 		req.BaseCfg.Transport.ProxyURL = os.Getenv("GOSTC_TRANSPORT_PROXY_URL")
 		svc, err := frpc.NewService(req.BaseCfg, proxyCfgs, nil)
 		if err != nil {
-			_ = c.Write(err.Error())
+			_ = c.Write(err)
 			return
 		}
 		if err := svc.Start(); err != nil {
@@ -47,7 +53,7 @@ func HostHandle(client *arpc.Client, callback func(key string)) {
 			_ = c.Write(err.Error())
 			return
 		}
-		callback(req.Key)
+		callback(req.Key, req.UpdateTag)
 		_ = c.Write("success")
 	})
 }

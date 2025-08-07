@@ -203,7 +203,7 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		}
 	}()
 	time.Sleep(time.Second)
-	global.Logger.Info("rcp server on address: " + global.Config.Address)
+	global.Logger.Info("rpc server on address: " + global.Config.Address)
 }
 
 type TrafficOutput struct {

@@ -14,18 +14,20 @@ import (
 )
 
 type Client struct {
-	key      string
-	generate common.GenerateUrl
-	core     service.Service
-	svcMap   *sync.Map
-	stopFunc func()
+	key          string
+	generate     common.GenerateUrl
+	core         service.Service
+	svcMap       *sync.Map
+	svcUpdateMap *sync.Map
+	stopFunc     func()
 }
 
 func NewClient(url common.GenerateUrl, key string) *Client {
 	return &Client{
-		key:      key,
-		generate: url,
-		svcMap:   &sync.Map{},
+		key:          key,
+		generate:     url,
+		svcMap:       &sync.Map{},
+		svcUpdateMap: &sync.Map{},
 	}
 }
 
@@ -100,21 +102,38 @@ func (svc *Client) run() (err error) {
 	})
 
 	// 注册事件
-	var callback = func(key string) {
+	var callback = func(key, updateTag string) {
 		svc.svcMap.Store(key, true)
+		svc.svcUpdateMap.Store(key, updateTag)
+	}
+	// true:allowUpdate false:denyUpdate
+	var checkUpdate = func(key, updateTag string) bool {
+		if updateTag == "" {
+			return true
+		}
+		value, ok := svc.svcUpdateMap.Load(key)
+		if !ok {
+			return true
+		}
+		u, ok := value.(string)
+		if !ok {
+			return true
+		}
+		return u != updateTag
 	}
 	event.PortCheckHandle(client)
-	event.HostHandle(client, callback)
-	event.ForwardHandle(client, callback)
-	event.TunnelHandle(client, callback)
-	event.ProxyHandle(client, callback)
-	event.P2PHandle(client, callback)
-	event.CustomCfgHandle(client, callback)
+	event.HostHandle(client, callback, checkUpdate)
+	event.ForwardHandle(client, callback, checkUpdate)
+	event.TunnelHandle(client, callback, checkUpdate)
+	event.ProxyHandle(client, callback, checkUpdate)
+	event.P2PHandle(client, callback, checkUpdate)
+	event.CustomCfgHandle(client, callback, checkUpdate)
 	event.StopHandle(client, func() {
 		svc.Stop()
 	})
 	event.RemoveHandle(client, func(key string) {
 		svc.svcMap.Delete(key)
+		svc.svcUpdateMap.Delete(key)
 	})
 	go svc.ping(client)
 	svc.stopFunc = func() {
