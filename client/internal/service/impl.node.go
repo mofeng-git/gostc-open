@@ -16,18 +16,16 @@ import (
 type Node struct {
 	key          string
 	proxyBaseUrl string
-	cacheBaseUrl string
 	generate     common.GenerateUrl
 	svcMap       *sync.Map
 	svcUpdateMap *sync.Map
 	stopFunc     func()
 }
 
-func NewNode(url common.GenerateUrl, key, proxyBaseUrl, cacheBaseUrl string) *Node {
+func NewNode(url common.GenerateUrl, key, proxyBaseUrl string) *Node {
 	return &Node{
 		key:          key,
 		proxyBaseUrl: proxyBaseUrl,
-		cacheBaseUrl: cacheBaseUrl,
 		svcMap:       &sync.Map{},
 		svcUpdateMap: &sync.Map{},
 		generate:     url,
