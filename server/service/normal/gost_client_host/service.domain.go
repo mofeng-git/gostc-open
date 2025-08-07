@@ -102,6 +102,7 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 		}
 		engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey, host.CustomForceHttps)
 		engine.NodeIngress(tx, host.NodeCode)
+		engine.ClientHostConfig(tx, host.Code)
 		return nil
 	})
 }
