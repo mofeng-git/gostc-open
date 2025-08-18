@@ -2,16 +2,6 @@
 
 基于Frp开发的内网穿透管理平台，支持多用户、多节点，支持速率，中心化配置，通过网页修改配置，实时生效。
 
-(组网功能，采用GOST的TUN，组网暂未开源)
-
-**(此版本为开源版)**
-
-开源版对比不开源版本功能差异：
-(当前仅节点和后台管理服务存在功能上的差异，客户端通用)
-1. 无客户端IP地区限制功能
-2. 无用户绑定QQ功能
-3. 无资源缓存缓存功能
-
 [GOST开源地址](https://github.com/go-gost/gost)
 
 [FRP开源地址](https://github.com/fatedier/frp)
@@ -19,6 +9,25 @@
 如果想快速体验，可直接使用我提供的服务
 
 [地址](https://gost.sian.one)
+
+## 版本说明
+Github为开源版，功能上只适合个人使用或者朋友之间共享使用
+
+如果想要商业运营内网穿透，可以选择商业版，商业版包含更多商业化运营功能
+
+例如：
+- CDK功能：可以对接外部发卡网，销售内网穿透服务
+- 对接易支付：可以直接对接易支付平台，平台内充值余额购买服务
+- 用户组：按用户组限制隧道数量和可用流量
+
+更详细内容，可以查看文档
+[功能对比](https://docs.sian.one/gostc/pro/diff.html)
+[Pro定价](https://docs.sian.one/gostc/pro/price.html)
+[许可证说明](https://docs.sian.one/gostc/pro/licence.html)
+
+商业版可以自己部署体验，但是有2个节点数量的限制，超过2个节点将无法正常使用，将节点删除到2个以下，即可继续使用。
+
+如果您再使用过程中，发现2个节点数量无法满足您的需求，可以考虑购买许可证获取更多的节点数量
 
 ## License
 This project is licensed under the [Apache-2.0 License](https://github.com/SianHH/gostc-open?tab=Apache-2.0-1-ov-file).
@@ -150,7 +159,6 @@ services:
 参数`--tls`根据服务端是否使用SSL设置
 
 参数`-addr`是服务端的访问地址
-
 
 节点：
 ```yaml
