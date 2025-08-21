@@ -10,10 +10,12 @@ import (
 )
 
 type UpdateReq struct {
-	Code    string `binding:"required" json:"code"`
-	Name    string `binding:"required" json:"name"`
-	Type    string `binding:"required" json:"type"`
-	Content string `binding:"required" json:"content"`
+	Code     string `binding:"required" json:"code"`
+	Name     string `binding:"required" json:"name"`
+	Type     string `binding:"required" json:"type"`
+	Content  string `binding:"required" json:"content"`
+	Address  string `json:"address"`
+	Platform string `json:"platform"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -35,6 +37,8 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		cfg.Name = req.Name
 		cfg.ContentType = req.Type
 		cfg.Content = req.Content
+		cfg.Platform = req.Platform
+		cfg.Address = req.Address
 
 		if err := tx.FrpClientCfg.Save(cfg); err != nil {
 			log.Error("修改配置隧道失败", zap.Error(err))

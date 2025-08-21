@@ -18,6 +18,8 @@ import Empty from "../../../components/Empty.vue";
 import Alert from "../../../icon/alert.vue";
 import Online from "../../../icon/online.vue";
 import {apiNormalGostClientList} from "../../../api/normal/gost_client.js";
+import {appStore} from "../../../store/app.js";
+import {goToUrl} from "../../../utils/browser.js";
 
 const state = ref({
   table: {
@@ -36,6 +38,8 @@ const state = ref({
       clientCode: '',
       name: '',
       type: 'frpc',
+      address: '',
+      platform: '',
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -231,6 +235,13 @@ const operatorRenderLabel = (option) => {
           <n-button type="info" :focusable="false" @click="searchTable">搜索</n-button>
           <n-button type="info" :focusable="false" @click="refreshTable">刷新</n-button>
           <n-button type="info" :focusable="false" @click="openCreate">新增</n-button>
+          <n-button
+              v-if="appStore().siteConfig.guideConfig.cfgURL"
+              :focusable="false"
+              type="warning"
+              @click="goToUrl(appStore().siteConfig.guideConfig.cfgURL)">
+            使用教程
+          </n-button>
         </n-space>
       </SearchItem>
     </SearchCard>
@@ -270,6 +281,8 @@ const operatorRenderLabel = (option) => {
               <span>客户端：<Online :size="10" :online="row.client.online===1"></Online>&nbsp&nbsp{{
                   row.client.name
                 }}</span><br>
+              <span>FRP平台：{{ row.platform }}</span><br>
+              <span>访问地址：{{ row.address }}</span><br>
               <span>配置类型：{{ row.type }}</span><br>
             </div>
             <n-space justify="end" style="width: 100%">
@@ -329,6 +342,12 @@ const operatorRenderLabel = (option) => {
       >
         <n-form-item path="name" label="名称">
           <n-input v-model:value="state.update.data.name" placeholder="我的服务"></n-input>
+        </n-form-item>
+        <n-form-item path="platform" label="FRP平台(仅展示)">
+          <n-input v-model:value="state.update.data.platform" placeholder="FRP平台(仅展示)"></n-input>
+        </n-form-item>
+        <n-form-item path="address" label="访问地址(仅展示)">
+          <n-input v-model:value="state.update.data.address" placeholder="访问地址(仅展示)"></n-input>
         </n-form-item>
         <n-form-item path="type" label="配置文件类型">
           <n-select

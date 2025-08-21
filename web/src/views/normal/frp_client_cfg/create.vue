@@ -14,6 +14,8 @@ const state = ref({
     clientCode: '',
     name: '',
     type: 'frpc',
+    address: '',
+    platform: '',
   },
   dataRules: {
     name: requiredRule('请输入名称'),
@@ -108,6 +110,12 @@ onBeforeMount(() => {
       <n-form ref="createRef" :rules="state.dataRules" :model="state.data">
         <n-form-item path="name" label="名称">
           <n-input v-model:value="state.data.name" placeholder="我的服务"></n-input>
+        </n-form-item>
+        <n-form-item path="platform" label="FRP平台(仅展示)">
+          <n-input v-model:value="state.data.platform" placeholder="FRP平台(仅展示)"></n-input>
+        </n-form-item>
+        <n-form-item path="address" label="访问地址(仅展示)">
+          <n-input v-model:value="state.data.address" placeholder="访问地址(仅展示)"></n-input>
         </n-form-item>
         <n-form-item path="type" label="配置文件类型">
           <n-select

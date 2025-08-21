@@ -16,6 +16,8 @@ type CreateReq struct {
 	ClientCode string `binding:"required" json:"clientCode"`
 	Type       string `binding:"required" json:"type"`
 	Content    string `binding:"required" json:"content"`
+	Address    string `json:"address"`
+	Platform   string `json:"platform"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -40,6 +42,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			ContentType: req.Type,
 			ClientCode:  req.ClientCode,
 			UserCode:    claims.Code,
+			Address:     req.Address,
+			Platform:    req.Platform,
 		}
 		if err := tx.FrpClientCfg.Create(&cfg); err != nil {
 			log.Error("新增用户配置隧道失败", zap.Error(err))

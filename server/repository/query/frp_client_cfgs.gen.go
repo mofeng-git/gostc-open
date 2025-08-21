@@ -36,6 +36,8 @@ func newFrpClientCfg(db *gorm.DB, opts ...gen.DOOption) frpClientCfg {
 	_frpClientCfg.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_frpClientCfg.Name = field.NewString(tableName, "name")
 	_frpClientCfg.Enable = field.NewInt(tableName, "enable")
+	_frpClientCfg.Address = field.NewString(tableName, "address")
+	_frpClientCfg.Platform = field.NewString(tableName, "platform")
 	_frpClientCfg.Content = field.NewString(tableName, "content")
 	_frpClientCfg.ContentType = field.NewString(tableName, "content_type")
 	_frpClientCfg.ClientCode = field.NewString(tableName, "client_code")
@@ -83,6 +85,8 @@ type frpClientCfg struct {
 	UpdatedAt   field.Time
 	Name        field.String
 	Enable      field.Int
+	Address     field.String
+	Platform    field.String
 	Content     field.String
 	ContentType field.String
 	ClientCode  field.String
@@ -115,6 +119,8 @@ func (f *frpClientCfg) updateTableName(table string) *frpClientCfg {
 	f.UpdatedAt = field.NewTime(table, "updated_at")
 	f.Name = field.NewString(table, "name")
 	f.Enable = field.NewInt(table, "enable")
+	f.Address = field.NewString(table, "address")
+	f.Platform = field.NewString(table, "platform")
 	f.Content = field.NewString(table, "content")
 	f.ContentType = field.NewString(table, "content_type")
 	f.ClientCode = field.NewString(table, "client_code")
@@ -135,7 +141,7 @@ func (f *frpClientCfg) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (f *frpClientCfg) fillFieldMap() {
-	f.fieldMap = make(map[string]field.Expr, 15)
+	f.fieldMap = make(map[string]field.Expr, 17)
 	f.fieldMap["id"] = f.Id
 	f.fieldMap["code"] = f.Code
 	f.fieldMap["allow_edit"] = f.AllowEdit
@@ -145,6 +151,8 @@ func (f *frpClientCfg) fillFieldMap() {
 	f.fieldMap["updated_at"] = f.UpdatedAt
 	f.fieldMap["name"] = f.Name
 	f.fieldMap["enable"] = f.Enable
+	f.fieldMap["address"] = f.Address
+	f.fieldMap["platform"] = f.Platform
 	f.fieldMap["content"] = f.Content
 	f.fieldMap["content_type"] = f.ContentType
 	f.fieldMap["client_code"] = f.ClientCode
