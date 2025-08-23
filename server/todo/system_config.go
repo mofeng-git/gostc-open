@@ -29,6 +29,7 @@ func systemConfig() {
 		"1",
 		"1",
 		"1",
+		"1",
 	) {
 		_ = db.SystemConfig.Create(item)
 	}

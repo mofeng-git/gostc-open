@@ -17,6 +17,7 @@ type GostReq struct {
 	FuncP2P     string `binding:"required" json:"funcP2P"`
 	FuncProxy   string `binding:"required" json:"funcProxy"`
 	FuncNode    string `binding:"required" json:"funcNode"`
+	FuncCfg     string `binding:"required" json:"funcCfg"`
 }
 
 func (service *service) Gost(req GostReq) error {
@@ -32,6 +33,7 @@ func (service *service) Gost(req GostReq) error {
 			req.FuncP2P,
 			req.FuncProxy,
 			req.FuncNode,
+			req.FuncCfg,
 		)...); err != nil {
 			log.Error("修改系统GOST配置失败", zap.Error(err))
 			return errors.New("操作失败")
@@ -45,6 +47,7 @@ func (service *service) Gost(req GostReq) error {
 			FuncP2P:     req.FuncP2P,
 			FuncProxy:   req.FuncProxy,
 			FuncNode:    req.FuncNode,
+			FuncCfg:     req.FuncCfg,
 		})
 		return nil
 	})

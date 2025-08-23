@@ -13,6 +13,7 @@ const state = ref({
     funcProxy:"2",
     funcTun:"2",
     funcNode:"2",
+    funcCfg:"2",
   },
   submitLoading: false,
 })
@@ -61,6 +62,7 @@ onBeforeMount(() => {
             <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcTunnel">私有隧道</n-checkbox>
             <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcP2P">P2P隧道</n-checkbox>
             <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcProxy">代理隧道</n-checkbox>
+            <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcCfg">配置隧道</n-checkbox>
 <!--            <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcTun">虚拟组网</n-checkbox>-->
             <n-checkbox checked-value="1" unchecked-value="2" v-model:checked="state.data.funcNode">自建节点</n-checkbox>
           </n-space>

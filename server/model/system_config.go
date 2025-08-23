@@ -31,6 +31,9 @@ type SystemConfigBase struct {
 
 func GetSystemConfigBase(list []*SystemConfig) (result SystemConfigBase) {
 	for _, item := range list {
+		if item.Kind != SYSTEM_CONFIG_KIND_BASE {
+			continue
+		}
 		switch item.Key {
 		case "title":
 			result.Title = item.Value
@@ -77,9 +80,10 @@ type SystemConfigGost struct {
 	FuncP2P     string `json:"funcP2P"`
 	FuncProxy   string `json:"funcProxy"`
 	FuncNode    string `json:"funcNode"`
+	FuncCfg     string `json:"funcCfg"`
 }
 
-func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForward, funcTunnel, funcP2P, funcProxy, funcNode string) []*SystemConfig {
+func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForward, funcTunnel, funcP2P, funcProxy, funcNode, funcCfg string) []*SystemConfig {
 	return []*SystemConfig{
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "version", Value: version},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "logger", Value: logger},
@@ -89,11 +93,15 @@ func GenerateSystemConfigGost(version string, logger string, funcWeb, funcForwar
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcP2P", Value: funcP2P},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcProxy", Value: funcProxy},
 		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcNode", Value: funcNode},
+		{Kind: SYSTEM_CONFIG_KIND_GOST, Key: "funcCfg", Value: funcCfg},
 	}
 }
 
 func GetSystemConfigGost(list []*SystemConfig) (result SystemConfigGost) {
 	for _, item := range list {
+		if item.Kind != SYSTEM_CONFIG_KIND_GOST {
+			continue
+		}
 		switch item.Key {
 		case "version":
 			result.Version = item.Value
@@ -111,6 +119,8 @@ func GetSystemConfigGost(list []*SystemConfig) (result SystemConfigGost) {
 			result.FuncProxy = item.Value
 		case "funcNode":
 			result.FuncNode = item.Value
+		case "funcCfg":
+			result.FuncCfg = item.Value
 		}
 	}
 	return result
@@ -162,6 +172,9 @@ func GenerateSystemConfigEmail(enable, nickName, host, port, user, pwd, resetPwd
 
 func GetSystemConfigEmail(list []*SystemConfig) (result SystemConfigEmail) {
 	for _, item := range list {
+		if item.Kind != SYSTEM_CONFIG_KIND_EMAIL {
+			continue
+		}
 		switch item.Key {
 		case "enable":
 			result.Enable = item.Value

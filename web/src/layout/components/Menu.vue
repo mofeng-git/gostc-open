@@ -16,6 +16,7 @@ const menuTreeDataComputed = computed(() => {
   funcMap.set("funcProxy",appStore().siteConfig.funcProxy)
   funcMap.set("funcTun",appStore().siteConfig.funcTun)
   funcMap.set("funcNode",appStore().siteConfig.funcNode)
+  funcMap.set("funcCfg",appStore().siteConfig.funcCfg)
   if (appStore().userInfo.admin === 1) {
     return routerToMenu(allRouters,funcMap)
   }

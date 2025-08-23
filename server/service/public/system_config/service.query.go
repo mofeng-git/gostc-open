@@ -23,6 +23,7 @@ type QueryResp struct {
 	FuncP2P     string `json:"funcP2P"`
 	FuncProxy   string `json:"funcProxy"`
 	FuncNode    string `json:"funcNode"`
+	FuncCfg     string `json:"funcCfg"`
 
 	System QuerySystemInfo `json:"system"`
 }
@@ -52,6 +53,7 @@ func (service *service) Query() QueryResp {
 		FuncP2P:     gostConfig.FuncP2P,
 		FuncProxy:   gostConfig.FuncProxy,
 		FuncNode:    gostConfig.FuncNode,
+		FuncCfg:     gostConfig.FuncCfg,
 
 		System: QuerySystemInfo{
 			Version: global.VERSION,
