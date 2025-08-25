@@ -14,7 +14,6 @@ import (
 )
 
 func certWatcher(client *arpc.Client) (done func()) {
-	global.BasePath = "."
 	certpath, _ := filepath.Abs(global.BasePath + "/data/certs")
 	_ = os.MkdirAll(certpath, 0755)
 	w := watcher.New()
