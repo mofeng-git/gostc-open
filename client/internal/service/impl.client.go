@@ -136,7 +136,10 @@ func (svc *Client) run() (err error) {
 		svc.svcUpdateMap.Delete(key)
 	})
 	go svc.ping(client)
+	// 开启证书目录变动监听
+	certWatcherDone := certWatcher(client)
 	svc.stopFunc = func() {
+		certWatcherDone()
 		client.Stop()
 	}
 	<-stopChan

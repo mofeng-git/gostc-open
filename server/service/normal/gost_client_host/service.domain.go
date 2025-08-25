@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"server/model"
-	"server/pkg/jwt"
 	"server/pkg/utils"
 	"server/repository"
 	"server/repository/cache"
@@ -23,7 +22,7 @@ type DomainReq struct {
 	CustomForceHttps int    `json:"customForceHttps"`
 }
 
-func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
+func (service *service) Domain(userCode string, req DomainReq) error {
 	db, _, log := repository.Get("")
 	if req.CustomDomain != "" {
 		if !utils.ValidateDomain(req.CustomDomain) {
@@ -38,7 +37,7 @@ func (service *service) Domain(claims jwt.Claims, req DomainReq) error {
 	}
 
 	return db.Transaction(func(tx *query.Query) error {
-		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(userCode)).First()
 		if user == nil {
 			return errors.New("用户错误")
 		}

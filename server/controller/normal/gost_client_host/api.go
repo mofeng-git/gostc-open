@@ -28,7 +28,7 @@ func Domain(c *gin.Context) {
 		bean.Response.Param(c, err)
 		return
 	}
-	if err := svr.Domain(middleware.GetClaims(c), req); err != nil {
+	if err := svr.Domain(middleware.GetClaims(c).Code, req); err != nil {
 		bean.Response.Fail(c, err.Error())
 		return
 	}

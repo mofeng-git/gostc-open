@@ -14,6 +14,7 @@ import (
 	"server/repository"
 	cache3 "server/repository/cache"
 	"server/service/engine"
+	service "server/service/normal/gost_client_host"
 	"strings"
 	"time"
 )
@@ -109,6 +110,7 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		cache3.SetClientOnline(gostClient.Code, true, cache2.NoExpiration)
 		cache3.SetClientVersion(gostClient.Code, version)
 		client.Set("code", gostClient.Code)
+		client.Set("userCode", gostClient.UserCode)
 		engine.ClientAllConfigUpdateByClientCode(db, gostClient.Code)
 	})
 	rpcServer.Handler.Handle("rpc/node/reg", func(c *arpc.Context) {
@@ -191,6 +193,40 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		_ = c.Write("success")
 	})
 
+	rpcServer.Handler.Handle("rpc/client/host_set_domain_certs", func(c *arpc.Context) {
+		var req HostSetDomainCerts
+		if err := c.Bind(&req); err != nil {
+			_ = c.Write(err.Error())
+			return
+		}
+		userCodeTemp, ok := c.Client.Get("userCode")
+		if !ok {
+			_ = c.Write("unknown error")
+			return
+		}
+		userCode := userCodeTemp.(string)
+		db, _, _ := repository.Get("")
+		host, err := db.GostClientHost.Where(
+			db.GostClientHost.CustomDomain.Eq(req.Domain),
+			db.GostClientHost.UserCode.Eq(userCode),
+		).First()
+		if err != nil {
+			_ = c.Write("no tunnel matching the domain name was queried.")
+			return
+		}
+		if err := service.Service.Domain(userCode, service.DomainReq{
+			Code:             host.Code,
+			CustomDomain:     req.Domain,
+			CustomCert:       req.Cert,
+			CustomKey:        req.Key,
+			CustomForceHttps: host.CustomForceHttps,
+		}); err != nil {
+			_ = c.Write(err.Error())
+			return
+		}
+		_ = c.Write("success")
+	})
+
 	// 入口
 	ginEngine.GET("rpc/ws", func(c *gin.Context) {
 		ln.(*websocket.Listener).Handler(c.Writer, c.Request)
@@ -210,4 +246,10 @@ type TrafficOutput struct {
 	Name      string
 	ProxyType string
 	Total     int64
+}
+
+type HostSetDomainCerts struct {
+	Domain string `json:"domain"`
+	Cert   string `json:"cert"`
+	Key    string `json:"key"`
 }
