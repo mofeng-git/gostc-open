@@ -215,6 +215,10 @@ func (p *program) run() {
 			return
 		}
 		svc, err := frpc.NewService(v1.ClientCommonConfig{}, nil, nil, frpc.FromBytes(file))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		if err := svc.Start(); err != nil {
 			fmt.Println(err)
 			return
