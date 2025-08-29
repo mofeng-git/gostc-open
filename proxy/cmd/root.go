@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	_ "github.com/caddyserver/caddy/v2/modules/standard"
 	"github.com/spf13/cobra"
 	"proxy/bootstrap"
 	"proxy/global"

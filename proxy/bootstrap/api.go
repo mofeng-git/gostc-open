@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/caddyserver/caddy/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -11,7 +12,6 @@ import (
 	"proxy/configs"
 	"proxy/global"
 	"proxy/pkg/middleware"
-	"proxy/pkg/proxy"
 	"time"
 )
 
@@ -81,12 +81,17 @@ func InitApi() {
 		if err := os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644); err != nil {
 			global.Logger.Error("save config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
 		}
-		server.UpdateDomain(req.Domain, proxy.DomainConfig{
-			Target:     req.Target,
-			Cert:       certFile,
-			Key:        keyFile,
-			ForceHttps: req.ForceHttps == 1,
-		})
+
+		cfgBytes, _, err := global.Config.ParseCaddyFileConfig()
+		if err != nil {
+			global.Logger.Error("parse caddyfile fail", zap.Error(err))
+			return
+		}
+
+		if err := caddy.Load(cfgBytes, true); err != nil {
+			global.Logger.Error("reload caddyfile fail", zap.Error(err))
+			return
+		}
 	})
 
 	svc := &http.Server{
