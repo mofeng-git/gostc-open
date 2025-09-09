@@ -18,12 +18,13 @@ type ListItem struct {
 	Name   string `json:"name"`
 	Remark string `json:"remark"`
 
-	Web          int    `json:"web"`
-	Tunnel       int    `json:"tunnel"`
-	Forward      int    `json:"forward"`
-	Proxy        int    `json:"proxy"`
-	P2P          int    `json:"p2p"`
-	ForwardPorts string `json:"forwardPorts"`
+	Web                int    `json:"web"`
+	Tunnel             int    `json:"tunnel"`
+	Forward            int    `json:"forward"`
+	Proxy              int    `json:"proxy"`
+	P2P                int    `json:"p2p"`
+	ForwardPorts       string `json:"forwardPorts"`
+	AllowDomainMatcher int    `json:"allowDomainMatcher"`
 
 	Rules        []string         `json:"rules"`
 	RuleNames    []string         `json:"ruleNames"`
@@ -86,21 +87,22 @@ func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 			ruleNames = append(ruleNames, getRule.Name())
 		}
 		list = append(list, ListItem{
-			Code:         node.Code,
-			Name:         node.Name,
-			Remark:       node.Remark,
-			Web:          node.Web,
-			Tunnel:       node.Tunnel,
-			Forward:      node.Forward,
-			Proxy:        node.Proxy,
-			P2P:          node.P2P,
-			ForwardPorts: node.ForwardPorts,
-			Rules:        node.GetRules(),
-			RuleNames:    ruleNames,
-			Tags:         node.GetTags(),
-			Configs:      configs,
-			Online:       utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
-			CustomDomain: utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
+			Code:               node.Code,
+			Name:               node.Name,
+			Remark:             node.Remark,
+			Web:                node.Web,
+			Tunnel:             node.Tunnel,
+			Forward:            node.Forward,
+			Proxy:              node.Proxy,
+			P2P:                node.P2P,
+			AllowDomainMatcher: node.AllowDomainMatcher,
+			ForwardPorts:       node.ForwardPorts,
+			Rules:              node.GetRules(),
+			RuleNames:          ruleNames,
+			Tags:               node.GetTags(),
+			Configs:            configs,
+			Online:             utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
+			CustomDomain:       utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
 		})
 	}
 	return list

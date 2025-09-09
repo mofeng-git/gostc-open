@@ -193,7 +193,7 @@ onBeforeMount(() => {
 
 const operatorOptions = [
   {
-    label: '流量',
+    label: '流量统计',
     key: 'obs',
     disabled: false,
     func:openObsModal,

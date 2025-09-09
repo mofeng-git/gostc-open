@@ -28,13 +28,14 @@ type Item struct {
 	Proxy   int `json:"proxy"`
 	P2P     int `json:"p2p"`
 
-	Domain           string `json:"domain"`
-	CustomDomain     int    `json:"customDomain"`
-	DenyDomainPrefix string `json:"denyDomainPrefix"`
-	UrlTpl           string `json:"urlTpl"`
-	Address          string `json:"address"`
-	ReplaceAddress   string `json:"replaceAddress"`
-	Protocol         string `json:"protocol"`
+	Domain             string `json:"domain"`
+	CustomDomain       int    `json:"customDomain"`
+	DenyDomainPrefix   string `json:"denyDomainPrefix"`
+	UrlTpl             string `json:"urlTpl"`
+	Address            string `json:"address"`
+	ReplaceAddress     string `json:"replaceAddress"`
+	Protocol           string `json:"protocol"`
+	AllowDomainMatcher int    `json:"allowDomainMatcher"`
 
 	HttpPort          string   `json:"httpPort"`
 	ForwardPorts      string   `json:"forwardPorts"`
@@ -93,37 +94,38 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			}
 		}
 		list = append(list, Item{
-			Code:              node.Code,
-			Key:               node.Key,
-			Name:              node.Name,
-			Remark:            utils.TrinaryOperation(node.Remark == "", "暂无介绍", node.Remark),
-			Web:               node.Web,
-			Tunnel:            node.Tunnel,
-			Forward:           node.Forward,
-			Proxy:             node.Proxy,
-			P2P:               node.P2P,
-			Domain:            node.Domain,
-			CustomDomain:      utils.TrinaryOperation(cache2.GetNodeCustomDomain(node.Code), 1, 2),
-			DenyDomainPrefix:  node.DenyDomainPrefix,
-			UrlTpl:            node.UrlTpl,
-			Address:           node.Address,
-			ReplaceAddress:    node.ReplaceAddress,
-			HttpPort:          node.HttpPort,
-			Protocol:          node.Protocol,
-			ForwardPorts:      node.ForwardPorts,
-			Rules:             node.GetRules(),
-			RuleNames:         ruleNames,
-			Tags:              node.GetTags(),
-			IndexValue:        node.IndexValue,
-			P2PDisableForward: node.P2PDisableForward,
-			Online:            utils.TrinaryOperation(cache2.GetNodeOnline(node.Code), 1, 2),
-			Version:           cache2.GetNodeVersion(node.Code),
-			InputBytes:        monthObsInfo.InputBytes,
-			OutputBytes:       monthObsInfo.OutputBytes,
-			LimitResetIndex:   node.LimitResetIndex,
-			LimitTotal:        node.LimitTotal,
-			LimitKind:         node.LimitKind,
-			LimitUseTotal:     obsUseTotal,
+			Code:               node.Code,
+			Key:                node.Key,
+			Name:               node.Name,
+			Remark:             utils.TrinaryOperation(node.Remark == "", "暂无介绍", node.Remark),
+			Web:                node.Web,
+			Tunnel:             node.Tunnel,
+			Forward:            node.Forward,
+			Proxy:              node.Proxy,
+			P2P:                node.P2P,
+			Domain:             node.Domain,
+			CustomDomain:       utils.TrinaryOperation(cache2.GetNodeCustomDomain(node.Code), 1, 2),
+			DenyDomainPrefix:   node.DenyDomainPrefix,
+			AllowDomainMatcher: node.AllowDomainMatcher,
+			UrlTpl:             node.UrlTpl,
+			Address:            node.Address,
+			ReplaceAddress:     node.ReplaceAddress,
+			HttpPort:           node.HttpPort,
+			Protocol:           node.Protocol,
+			ForwardPorts:       node.ForwardPorts,
+			Rules:              node.GetRules(),
+			RuleNames:          ruleNames,
+			Tags:               node.GetTags(),
+			IndexValue:         node.IndexValue,
+			P2PDisableForward:  node.P2PDisableForward,
+			Online:             utils.TrinaryOperation(cache2.GetNodeOnline(node.Code), 1, 2),
+			Version:            cache2.GetNodeVersion(node.Code),
+			InputBytes:         monthObsInfo.InputBytes,
+			OutputBytes:        monthObsInfo.OutputBytes,
+			LimitResetIndex:    node.LimitResetIndex,
+			LimitTotal:         node.LimitTotal,
+			LimitKind:          node.LimitKind,
+			LimitUseTotal:      obsUseTotal,
 		})
 	}
 	return list, total

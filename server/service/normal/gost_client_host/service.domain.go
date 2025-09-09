@@ -20,14 +20,13 @@ type DomainReq struct {
 	CustomCert       string `json:"customCert"`
 	CustomKey        string `json:"customKey"`
 	CustomForceHttps int    `json:"customForceHttps"`
+	DomainMatcher    int    `json:"domainMatcher"`
 }
 
 func (service *service) Domain(userCode string, req DomainReq) error {
 	db, _, log := repository.Get("")
-	if req.CustomDomain != "" {
-		if !utils.ValidateDomain(req.CustomDomain) {
-			return errors.New("域名格式错误")
-		}
+	if req.CustomDomain != "" && !utils.ValidateDomain(req.CustomDomain) {
+		return errors.New("域名格式错误")
 	}
 
 	if req.CustomCert != "" && req.CustomKey != "" {
@@ -42,7 +41,9 @@ func (service *service) Domain(userCode string, req DomainReq) error {
 			return errors.New("用户错误")
 		}
 
-		host, _ := tx.GostClientHost.Where(
+		host, _ := tx.GostClientHost.Preload(
+			tx.GostClientHost.Node,
+		).Where(
 			tx.GostClientHost.UserCode.Eq(user.Code),
 			tx.GostClientHost.Code.Eq(req.Code),
 		).First()
@@ -78,6 +79,10 @@ func (service *service) Domain(userCode string, req DomainReq) error {
 			return errors.New("节点错误")
 		}
 
+		if node.AllowDomainMatcher != 1 && req.DomainMatcher == 1 {
+			return errors.New("该隧道使用的节点不支持绑定泛域名")
+		}
+
 		if req.CustomDomain != "" {
 			if strings.Contains(req.CustomDomain, node.Domain) {
 				return errors.New("请使用你自己的域名")
@@ -95,11 +100,12 @@ func (service *service) Domain(userCode string, req DomainReq) error {
 		host.CustomCert = req.CustomCert
 		host.CustomKey = req.CustomKey
 		host.CustomForceHttps = req.CustomForceHttps
+		host.CustomDomainMatcher = req.DomainMatcher
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("保存用户域名解析失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.NodeAddDomain(tx, host.NodeCode, host.CustomDomain, host.CustomCert, host.CustomKey, host.CustomForceHttps)
+		engine.NodeAddDomain(tx, host.NodeCode, host.GetCustomDomain(), host.CustomCert, host.CustomKey, host.CustomForceHttps)
 		engine.NodeIngress(tx, host.NodeCode)
 		engine.ClientHostConfig(tx, host.Code)
 		return nil

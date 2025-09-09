@@ -6,6 +6,11 @@ import (
 	"server/repository"
 	"server/repository/cache"
 	"server/repository/query"
+	forwardService "server/service/admin/gost_client_forward"
+	hostService "server/service/admin/gost_client_host"
+	p2pService "server/service/admin/gost_client_p2p"
+	proxyService "server/service/admin/gost_client_proxy"
+	tunnelService "server/service/admin/gost_client_tunnel"
 	"server/service/engine"
 )
 
@@ -15,26 +20,26 @@ type DeleteReq struct {
 
 func (service *service) Delete(req DeleteReq) error {
 	db, _, log := repository.Get("")
-	return db.Transaction(func(tx *query.Query) error {
+	if err := db.Transaction(func(tx *query.Query) error {
 		node, _ := tx.GostNode.Where(tx.GostNode.Code.Eq(req.Code)).First()
 		if node == nil {
 			return nil
 		}
 
-		hostTotal, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Count()
-		if hostTotal > 0 {
-			return errors.New("请先删除该节点的所有隧道")
-		}
-
-		forwardTotal, _ := tx.GostClientForward.Where(tx.GostClientForward.NodeCode.Eq(node.Code)).Count()
-		if forwardTotal > 0 {
-			return errors.New("请先删除该节点的所有隧道")
-		}
-
-		tunnelTotal, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Count()
-		if tunnelTotal > 0 {
-			return errors.New("请先删除该节点的所有隧道")
-		}
+		//hostTotal, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Count()
+		//if hostTotal > 0 {
+		//	return errors.New("请先删除该节点的所有隧道")
+		//}
+		//
+		//forwardTotal, _ := tx.GostClientForward.Where(tx.GostClientForward.NodeCode.Eq(node.Code)).Count()
+		//if forwardTotal > 0 {
+		//	return errors.New("请先删除该节点的所有隧道")
+		//}
+		//
+		//tunnelTotal, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Count()
+		//if tunnelTotal > 0 {
+		//	return errors.New("请先删除该节点的所有隧道")
+		//}
 
 		if _, err := tx.GostNode.Where(tx.GostNode.Code.Eq(node.Code)).Delete(); err != nil {
 			log.Error("删除节点失败", zap.Error(err))
@@ -46,5 +51,34 @@ func (service *service) Delete(req DeleteReq) error {
 		engine.NodeStop(node.Code, "节点已被删除")
 		cache.DelNodeInfo(node.Code)
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
+
+	var hostCodes []string
+	_ = db.GostClientHost.Where(db.GostClientHost.NodeCode.Eq(req.Code)).Pluck(db.GostClientHost.Code, &hostCodes)
+	for _, code := range hostCodes {
+		_ = hostService.Service.Delete(hostService.DeleteReq{Code: code})
+	}
+	var forwardCodes []string
+	_ = db.GostClientForward.Where(db.GostClientForward.NodeCode.Eq(req.Code)).Pluck(db.GostClientForward.Code, &forwardCodes)
+	for _, code := range forwardCodes {
+		_ = forwardService.Service.Delete(forwardService.DeleteReq{Code: code})
+	}
+	var tunnelCodes []string
+	_ = db.GostClientTunnel.Where(db.GostClientTunnel.NodeCode.Eq(req.Code)).Pluck(db.GostClientTunnel.Code, &tunnelCodes)
+	for _, code := range tunnelCodes {
+		_ = tunnelService.Service.Delete(tunnelService.DeleteReq{Code: code})
+	}
+	var p2pCodes []string
+	_ = db.GostClientP2P.Where(db.GostClientP2P.NodeCode.Eq(req.Code)).Pluck(db.GostClientP2P.Code, &p2pCodes)
+	for _, code := range p2pCodes {
+		_ = p2pService.Service.Delete(p2pService.DeleteReq{Code: code})
+	}
+	var proxyCodes []string
+	_ = db.GostClientProxy.Where(db.GostClientProxy.NodeCode.Eq(req.Code)).Pluck(db.GostClientProxy.Code, &proxyCodes)
+	for _, code := range proxyCodes {
+		_ = proxyService.Service.Delete(proxyService.DeleteReq{Code: code})
+	}
+	return nil
 }

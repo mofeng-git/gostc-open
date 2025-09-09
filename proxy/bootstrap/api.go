@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/caddyserver/caddy/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -14,14 +13,6 @@ import (
 	"proxy/pkg/middleware"
 	"time"
 )
-
-type DomainReq struct {
-	Domain     string `json:"domain"`
-	Target     string `json:"target"`
-	Cert       string `json:"cert"`
-	Key        string `json:"key"`
-	ForceHttps int    `json:"forceHttps"`
-}
 
 func verifyCertificateAndKey(cert, key string) error {
 	_, err := tls.X509KeyPair([]byte(cert), []byte(key))
@@ -47,52 +38,7 @@ func InitApi() {
 		return true
 	}))
 
-	engine.POST("/domain", func(c *gin.Context) {
-		var req DomainReq
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.String(500, err.Error())
-			return
-		}
-		if req.Domain == "" {
-			return
-		}
-
-		var certFile = fmt.Sprintf("%s/data/certs/%s.pem", global.BASE_PATH, req.Domain)
-		var keyFile = fmt.Sprintf("%s/data/certs/%s.key", global.BASE_PATH, req.Domain)
-		if req.Cert != "" && req.Key != "" {
-			if err := verifyCertificateAndKey(req.Cert, req.Key); err != nil {
-				global.Logger.Warn("cert valid fail", zap.Error(err))
-				return
-			}
-			_ = os.WriteFile(certFile, []byte(req.Cert), 0644)
-			_ = os.WriteFile(keyFile, []byte(req.Key), 0644)
-		} else {
-			certFile = ""
-			keyFile = ""
-		}
-
-		global.Config.Domains[req.Domain] = configs.DomainConfig{
-			Target:     req.Target,
-			Cert:       certFile,
-			Key:        keyFile,
-			ForceHttps: req.ForceHttps == 1,
-		}
-		marshal, _ := yaml.Marshal(global.Config)
-		if err := os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644); err != nil {
-			global.Logger.Error("save config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
-		}
-
-		cfgBytes, _, err := global.Config.ParseCaddyFileConfig()
-		if err != nil {
-			global.Logger.Error("parse caddyfile fail", zap.Error(err))
-			return
-		}
-
-		if err := caddy.Load(cfgBytes, true); err != nil {
-			global.Logger.Error("reload caddyfile fail", zap.Error(err))
-			return
-		}
-	})
+	engine.POST("/domain", Domain)
 
 	svc := &http.Server{
 		Addr:    global.Config.ApiAddr,
@@ -110,4 +56,55 @@ func InitApi() {
 		os.Exit(1)
 	}
 	global.Logger.Info("api server listen on address: " + global.Config.ApiAddr)
+}
+
+type DomainReq struct {
+	Domain     string `json:"domain"`
+	Target     string `json:"target"`
+	Cert       string `json:"cert"`
+	Key        string `json:"key"`
+	ForceHttps int    `json:"forceHttps"`
+}
+
+func Domain(c *gin.Context) {
+	var req DomainReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	if req.Domain == "" {
+		return
+	}
+
+	var certFile = fmt.Sprintf("%s/data/certs/%s.pem", global.BASE_PATH, req.Domain)
+	var keyFile = fmt.Sprintf("%s/data/certs/%s.key", global.BASE_PATH, req.Domain)
+	if req.Cert != "" && req.Key != "" {
+		if err := verifyCertificateAndKey(req.Cert, req.Key); err != nil {
+			global.Logger.Warn("cert valid fail", zap.Error(err))
+			return
+		}
+		_ = os.WriteFile(certFile, []byte(req.Cert), 0644)
+		_ = os.WriteFile(keyFile, []byte(req.Key), 0644)
+	} else {
+		certFile = ""
+		keyFile = ""
+	}
+
+	if global.Config.Domains == nil {
+		global.Config.Domains = make(map[string]configs.DomainConfig)
+	}
+	global.Config.Domains[req.Domain] = configs.DomainConfig{
+		Target:     req.Target,
+		Cert:       certFile,
+		Key:        keyFile,
+		ForceHttps: req.ForceHttps == 1,
+	}
+	marshal, err := yaml.Marshal(global.Config)
+	if err != nil {
+		global.Logger.Error("yaml.Marshal config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
+		return
+	}
+	if err := os.WriteFile(global.BASE_PATH+"/data/config.yaml", marshal, 0644); err != nil {
+		global.Logger.Error("save config fail", zap.String("config path", global.BASE_PATH+"/data/config.yaml"), zap.Error(err))
+	}
 }

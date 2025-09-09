@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"github.com/caddyserver/caddy/v2"
+	"github.com/caddyserver/certmagic"
 	"go.uber.org/zap"
 	"os"
 	"proxy/configs"
@@ -27,6 +28,8 @@ func InitServer() {
 		Release()
 		os.Exit(1)
 	}
+
+	caddy.DefaultStorage = &certmagic.FileStorage{Path: global.BASE_PATH + "/data/caddy"}
 
 	if err := caddy.Run(config); err != nil {
 		global.Logger.Error("generate caddy.Config fail", zap.Error(err))

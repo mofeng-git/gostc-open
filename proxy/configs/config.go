@@ -11,45 +11,48 @@ import (
 )
 
 type Config struct {
-	HTTPAddr  string `yaml:"http-addr"`
-	HTTPSAddr string `yaml:"https-addr"`
-	Certs     string `yaml:"certs"`
-	ApiAddr   string `yaml:"api-addr"`
+	HTTPAddr    string `yaml:"http-addr"`
+	HTTPSAddr   string `yaml:"https-addr"`
+	Certs       string `yaml:"certs"`
+	ApiAddr     string `yaml:"api-addr"`
+	AutoSetCert bool   `yaml:"auto-set-cert"` // 自动申请证书
 
 	Default DomainConfig            `yaml:"default"`
 	Domains map[string]DomainConfig `yaml:"domains"`
 }
 
 type DomainConfig struct {
-	Target     string `yaml:"target"`
-	Cert       string `yaml:"cert"`
-	Key        string `yaml:"key"`
-	ForceHttps bool   `yaml:"force-https"`
+	Target       string `yaml:"target"`
+	Cert         string `yaml:"cert"`
+	Key          string `yaml:"key"`
+	ForceHttps   bool   `yaml:"force-https"`
+	DisableHttps bool   `yaml:"disable-https"`
 }
 
 var adapter = caddyconfig.GetAdapter("caddyfile")
 
-func (c *Config) ParseCaddyFileConfig() ([]byte, []caddyconfig.Warning, error) {
+func (c *Config) GenerateCaddyfile() string {
 	_, httpPort, _ := net.SplitHostPort(c.HTTPAddr)
 	_, httpsPort, _ := net.SplitHostPort(c.HTTPSAddr)
 	var cfgs []string
 
 	cfgs = append(cfgs, `
 { 
-	auto_https off
+    admin off
 }
 `)
 
 	// 处理默认页面
 	if httpPort != "" {
-		if c.Default.ForceHttps && httpsPort != "" {
+		if c.Default.ForceHttps && httpsPort != "" && !c.Default.DisableHttps {
 			cfgs = append(cfgs, generateHttpToHttpsCfg("", httpPort, fmt.Sprintf("https://:%s", httpsPort)))
 		} else {
 			cfgs = append(cfgs, generateHttpCfg("", httpPort, c.Default.Target))
 		}
 	}
-	if httpsPort != "" {
-		cfgs = append(cfgs, generateHttpsCfg("", httpsPort, c.Default.Target, c.Default.Cert, c.Default.Key))
+	// 默认反代目标，不自动申请SSL
+	if httpsPort != "" && !c.Default.DisableHttps {
+		cfgs = append(cfgs, generateHttpsCfg("", httpsPort, c.Default.Target, c.Default.Cert, c.Default.Key, false))
 	}
 
 	// 处理其他站点
@@ -59,17 +62,22 @@ func (c *Config) ParseCaddyFileConfig() ([]byte, []caddyconfig.Warning, error) {
 		}
 
 		if httpPort != "" {
-			if target.ForceHttps && httpsPort != "" {
+			if target.ForceHttps && httpsPort != "" && !target.DisableHttps {
 				cfgs = append(cfgs, generateHttpToHttpsCfg(domain, httpPort, fmt.Sprintf("https://%s:%s", domain, httpsPort)))
 			} else {
 				cfgs = append(cfgs, generateHttpCfg(domain, httpPort, target.Target))
 			}
 		}
-		if httpsPort != "" {
-			cfgs = append(cfgs, generateHttpsCfg(domain, httpsPort, target.Target, target.Cert, target.Key))
+		if httpsPort != "" && !target.DisableHttps {
+			cfgs = append(cfgs, generateHttpsCfg(domain, httpsPort, target.Target, target.Cert, target.Key, c.AutoSetCert))
 		}
 	}
-	result, warnMsg, err := adapter.Adapt([]byte(strings.Join(cfgs, "\n")), nil)
+	return strings.Join(cfgs, "\n")
+}
+
+func (c *Config) ParseCaddyFileConfig() ([]byte, []caddyconfig.Warning, error) {
+	caddyfile := c.GenerateCaddyfile()
+	result, warnMsg, err := adapter.Adapt([]byte(caddyfile), nil)
 	return result, warnMsg, err
 }
 
@@ -108,9 +116,20 @@ https://%s:%s {
 }
 `
 
-func generateHttpsCfg(domain, port, target, certPath, keyPath string) string {
+var caddyFileHttpsCertTemplate = `
+https://%s:%s {
+	encode gzip
+	reverse_proxy %s {
+        flush_interval 0s
+		header_up X-Real-IP {remote}
+    }
+}
+`
+
+func generateHttpsCfg(domain, port, target, certPath, keyPath string, autoSetCert bool) string {
 	if certPath == "" || keyPath == "" {
 		certPath = "internal"
+		keyPath = ""
 	} else {
 		if stat, err := os.Stat(certPath); err != nil || stat.IsDir() {
 			certPath = "internal"
@@ -121,7 +140,13 @@ func generateHttpsCfg(domain, port, target, certPath, keyPath string) string {
 			keyPath = ""
 		}
 	}
-	return fmt.Sprintf(caddyFileHttpsTemplate, domain, port, certPath, keyPath, target)
+	// 启用了自动申请证书，并且未手动设置证书，则启用自动申请证书
+	// 泛域名，不自动申请SSL
+	if autoSetCert && certPath == "internal" && !strings.HasPrefix(domain, "*") {
+		return fmt.Sprintf(caddyFileHttpsCertTemplate, domain, port, target)
+	} else {
+		return fmt.Sprintf(caddyFileHttpsTemplate, domain, port, certPath, keyPath, target)
+	}
 }
 
 func GenerateCaddyConfig(cfg []byte) (*caddy.Config, error) {

@@ -122,8 +122,12 @@ onBeforeMount(() => {
             <n-tag type="info" size="small" bordered v-for="rule in state.node.ruleNames">{{ rule }}</n-tag>
           </n-space>
           <n-space>
-            <span>自定义域名：</span>
+            <span>绑定域名：</span>
             <span>{{ state.node.customDomain === 1 ? '支持' : '不支持' }}</span>
+          </n-space>
+          <n-space>
+            <span>绑定泛域名：</span>
+            <span>{{ state.node.allowDomainMatcher === 1 ? '允许' : '禁止' }}</span>
           </n-space>
           <n-space>
             <span>介绍：</span>

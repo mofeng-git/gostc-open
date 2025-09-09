@@ -53,6 +53,7 @@ const state = ref({
       address: '',
       replaceAddress: '',
       protocol: protocols[0].value,
+      allowDomainMatcher: 0,
       urlTpl: '',
       httpPort: '',
       forwardPorts: '',
@@ -86,6 +87,7 @@ const state = ref({
       address: '',
       replaceAddress: '',
       protocol: protocols[0].value,
+      allowDomainMatcher: 0,
       urlTpl: '',
       httpPort: '',
       forwardPorts: '',
@@ -156,6 +158,7 @@ const openCreate = () => {
     address: '',
     replaceAddress: '',
     protocol: protocols[0].value,
+    allowDomainMatcher: 0,
     urlTpl: '',
     httpPort: '',
     forwardPorts: '',
@@ -408,13 +411,14 @@ onBeforeMount(() => {
               <span>30天流量( IN | OUT )：{{
                   flowFormat(row.inputBytes) + ' | ' + flowFormat(row.outputBytes)
                 }}</span><br>
-              <span>自定义域名：{{ row.customDomain === 1 ? '支持' : '不支持' }}</span><br>
               <span>代理隧道：{{ row.proxy === 1 ? '启用' : '禁用' }}</span><br>
               <n-tabs animated size="small">
                 <n-tab-pane name="web" tab="域名解析">
                   <span>访问端口：{{ row.httpPort }}</span><br>
                   <span>基础域名：{{ row.domain }}</span><br>
                   <span>不允许的域名前缀：{{ row.denyDomainPrefix || '暂无' }}</span><br>
+                  <span>绑定域名：{{ row.customDomain === 1 ? '支持' : '不支持' }}</span><br>
+                  <span>绑定域名：{{ row.allowDomainMatcher === 1 ? '允许' : '禁止' }}</span><br>
                 </n-tab-pane>
                 <n-tab-pane name="forward" tab="端口转发">
                   <span>开放端口：{{ row.forwardPorts }}</span><br>
@@ -450,7 +454,7 @@ onBeforeMount(() => {
                   >删除
                   </n-button>
                 </template>
-                确认删除吗？
+                此操作会删除使用该节点的所有隧道，确认删除吗？
               </n-popconfirm>
             </n-space>
           </n-el>
@@ -591,6 +595,14 @@ onBeforeMount(() => {
                   v-model:value.trim="state.create.data.denyDomainPrefix"
                   placeholder="一行一个"
               ></n-input>
+            </n-form-item>
+            <n-alert type="warning" show-icon>用户如果绑定泛域名，不利于隧道审查</n-alert>
+            <p/>
+            <n-form-item path="allowDomainMatcher" label="绑定泛域名">
+              <n-switch v-model:value="state.create.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1" :round="false">
+                <template #checked>允许</template>
+                <template #unchecked>禁止</template>
+              </n-switch>
             </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">
@@ -771,6 +783,14 @@ onBeforeMount(() => {
                   v-model:value.trim="state.update.data.denyDomainPrefix"
                   placeholder="一行一个"
               ></n-input>
+            </n-form-item>
+            <n-alert type="warning" show-icon>用户如果绑定泛域名，不利于隧道审查</n-alert>
+            <p/>
+            <n-form-item path="allowDomainMatcher" label="绑定泛域名">
+              <n-switch v-model:value="state.update.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1" :round="false">
+                <template #checked>允许</template>
+                <template #unchecked>禁止</template>
+              </n-switch>
             </n-form-item>
           </n-tab-pane>
           <n-tab-pane name="forward" tab="端口转发">

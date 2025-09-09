@@ -214,6 +214,10 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 			_ = c.Write("no tunnel matching the domain name was queried.")
 			return
 		}
+		if host.CustomCert == req.Cert && host.CustomKey == req.Key {
+			_ = c.Write("success")
+			return
+		}
 		if err := service.Service.Domain(userCode, service.DomainReq{
 			Code:             host.Code,
 			CustomDomain:     req.Domain,

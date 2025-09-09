@@ -80,10 +80,10 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 				},
 				DomainConfig: v1.DomainConfig{
 					CustomDomains: []string{
-						host.Node.GetDomainHost(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+						host.Node.GetDomainHost(host.DomainPrefix, host.GetCustomDomain(), cache.GetNodeCustomDomain(host.NodeCode)),
 					},
 				},
-				HostHeaderRewrite: host.Node.GetDomainHost(host.DomainPrefix, host.CustomDomain, cache.GetNodeCustomDomain(host.NodeCode)),
+				//HostHeaderRewrite: host.Node.GetDomainHost(host.DomainPrefix, host.GetCustomDomain(), cache.GetNodeCustomDomain(host.NodeCode)),
 			},
 			Transport: ProxyTransport{
 				UseEncryption:        true,

@@ -19,28 +19,29 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code             string     `json:"code"`
-	Name             string     `json:"name"`
-	TargetIp         string     `json:"targetIp"`
-	TargetPort       string     `json:"targetPort"`
-	TargetHttps      int        `json:"targetHttps"`
-	DomainPrefix     string     `json:"domainPrefix"`
-	DomainFull       string     `json:"domainFull"`
-	CustomDomain     string     `json:"customDomain"`
-	CustomCert       string     `json:"customCert"`
-	CustomKey        string     `json:"customKey"`
-	CustomEnable     int        `json:"customEnable"`
-	CustomForceHttps int        `json:"customForceHttps"`
-	Node             ItemNode   `json:"node"`
-	Client           ItemClient `json:"client"`
-	Config           ItemConfig `json:"config"`
-	Enable           int        `json:"enable"`
-	WarnMsg          string     `json:"warnMsg"`
-	CreatedAt        string     `json:"createdAt"`
-	InputBytes       int64      `json:"inputBytes"`
-	OutputBytes      int64      `json:"outputBytes"`
-	WhiteEnable      int        `json:"whiteEnable"`
-	WhiteList        []string   `json:"whiteList"`
+	Code                string     `json:"code"`
+	Name                string     `json:"name"`
+	TargetIp            string     `json:"targetIp"`
+	TargetPort          string     `json:"targetPort"`
+	TargetHttps         int        `json:"targetHttps"`
+	DomainPrefix        string     `json:"domainPrefix"`
+	DomainFull          string     `json:"domainFull"`
+	CustomDomain        string     `json:"customDomain"`
+	CustomCert          string     `json:"customCert"`
+	CustomKey           string     `json:"customKey"`
+	CustomEnable        int        `json:"customEnable"`
+	CustomForceHttps    int        `json:"customForceHttps"`
+	CustomDomainMatcher int        `json:"customDomainMatcher"`
+	Node                ItemNode   `json:"node"`
+	Client              ItemClient `json:"client"`
+	Config              ItemConfig `json:"config"`
+	Enable              int        `json:"enable"`
+	WarnMsg             string     `json:"warnMsg"`
+	CreatedAt           string     `json:"createdAt"`
+	InputBytes          int64      `json:"inputBytes"`
+	OutputBytes         int64      `json:"outputBytes"`
+	WhiteEnable         int        `json:"whiteEnable"`
+	WhiteList           []string   `json:"whiteList"`
 }
 
 type ItemClient struct {
@@ -50,12 +51,13 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code         string `json:"code"`
-	Name         string `json:"name"`
-	Address      string `json:"address"`
-	Online       int    `json:"online"`
-	Domain       string `json:"domain"`
-	CustomDomain int    `json:"customDomain"`
+	Code               string `json:"code"`
+	Name               string `json:"name"`
+	Address            string `json:"address"`
+	Online             int    `json:"online"`
+	Domain             string `json:"domain"`
+	CustomDomain       int    `json:"customDomain"`
+	AllowDomainMatcher int    `json:"allowDomainMatcher"`
 }
 
 type ItemConfig struct {
@@ -90,18 +92,19 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 	for _, host := range hosts {
 		obsInfo := cache2.GetTunnelObsDateRange(cache2.MONTH_DATEONLY_LIST, host.Code)
 		list = append(list, Item{
-			Code:             host.Code,
-			Name:             host.Name,
-			TargetIp:         host.TargetIp,
-			TargetPort:       host.TargetPort,
-			TargetHttps:      host.TargetHttps,
-			DomainPrefix:     host.DomainPrefix,
-			DomainFull:       host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache2.GetNodeCustomDomain(host.NodeCode)),
-			CustomDomain:     host.CustomDomain,
-			CustomCert:       host.CustomCert,
-			CustomKey:        host.CustomKey,
-			CustomForceHttps: host.CustomForceHttps,
-			CustomEnable:     utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
+			Code:                host.Code,
+			Name:                host.Name,
+			TargetIp:            host.TargetIp,
+			TargetPort:          host.TargetPort,
+			TargetHttps:         host.TargetHttps,
+			DomainPrefix:        host.DomainPrefix,
+			DomainFull:          host.Node.GetDomainFull(host.DomainPrefix, host.GetCustomDomain(), cache2.GetNodeCustomDomain(host.NodeCode)),
+			CustomDomain:        host.CustomDomain,
+			CustomCert:          host.CustomCert,
+			CustomKey:           host.CustomKey,
+			CustomForceHttps:    host.CustomForceHttps,
+			CustomDomainMatcher: host.CustomDomainMatcher,
+			CustomEnable:        utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
 			Node: ItemNode{
 				Code: host.NodeCode,
 				Name: host.Node.Name,
@@ -109,9 +112,10 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := host.Node.GetAddress()
 					return address
 				}(),
-				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(host.NodeCode), 1, 2),
-				Domain:       host.Node.Domain,
-				CustomDomain: utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
+				Online:             utils.TrinaryOperation(cache2.GetNodeOnline(host.NodeCode), 1, 2),
+				Domain:             host.Node.Domain,
+				CustomDomain:       utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
+				AllowDomainMatcher: host.Node.AllowDomainMatcher,
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,

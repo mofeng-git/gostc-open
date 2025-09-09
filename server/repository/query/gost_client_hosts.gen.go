@@ -43,6 +43,7 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.CustomCert = field.NewString(tableName, "custom_cert")
 	_gostClientHost.CustomKey = field.NewString(tableName, "custom_key")
 	_gostClientHost.CustomForceHttps = field.NewInt(tableName, "custom_force_https")
+	_gostClientHost.CustomDomainMatcher = field.NewInt(tableName, "custom_domain_matcher")
 	_gostClientHost.NodeCode = field.NewString(tableName, "node_code")
 	_gostClientHost.ClientCode = field.NewString(tableName, "client_code")
 	_gostClientHost.UserCode = field.NewString(tableName, "user_code")
@@ -109,38 +110,39 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 type gostClientHost struct {
 	gostClientHostDo
 
-	ALL              field.Asterisk
-	Id               field.Int
-	Code             field.String
-	AllowEdit        field.Int
-	AllowDel         field.Int
-	Version          field.Int64
-	CreatedAt        field.Time
-	UpdatedAt        field.Time
-	Name             field.String
-	TargetIp         field.String
-	TargetPort       field.String
-	TargetHttps      field.Int
-	DomainPrefix     field.String
-	CustomDomain     field.String
-	CustomCert       field.String
-	CustomKey        field.String
-	CustomForceHttps field.Int
-	NodeCode         field.String
-	ClientCode       field.String
-	UserCode         field.String
-	Enable           field.Int
-	Status           field.Int
-	WhiteEnable      field.Int
-	WhiteList        field.String
-	ChargingType     field.Int
-	Cycle            field.Int
-	Amount           field.Field
-	Limiter          field.Int
-	RLimiter         field.Int
-	CLimiter         field.Int
-	ExpAt            field.Int64
-	Node             gostClientHostBelongsToNode
+	ALL                 field.Asterisk
+	Id                  field.Int
+	Code                field.String
+	AllowEdit           field.Int
+	AllowDel            field.Int
+	Version             field.Int64
+	CreatedAt           field.Time
+	UpdatedAt           field.Time
+	Name                field.String
+	TargetIp            field.String
+	TargetPort          field.String
+	TargetHttps         field.Int
+	DomainPrefix        field.String
+	CustomDomain        field.String
+	CustomCert          field.String
+	CustomKey           field.String
+	CustomForceHttps    field.Int
+	CustomDomainMatcher field.Int
+	NodeCode            field.String
+	ClientCode          field.String
+	UserCode            field.String
+	Enable              field.Int
+	Status              field.Int
+	WhiteEnable         field.Int
+	WhiteList           field.String
+	ChargingType        field.Int
+	Cycle               field.Int
+	Amount              field.Field
+	Limiter             field.Int
+	RLimiter            field.Int
+	CLimiter            field.Int
+	ExpAt               field.Int64
+	Node                gostClientHostBelongsToNode
 
 	Client gostClientHostBelongsToClient
 
@@ -177,6 +179,7 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.CustomCert = field.NewString(table, "custom_cert")
 	g.CustomKey = field.NewString(table, "custom_key")
 	g.CustomForceHttps = field.NewInt(table, "custom_force_https")
+	g.CustomDomainMatcher = field.NewInt(table, "custom_domain_matcher")
 	g.NodeCode = field.NewString(table, "node_code")
 	g.ClientCode = field.NewString(table, "client_code")
 	g.UserCode = field.NewString(table, "user_code")
@@ -207,7 +210,7 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 33)
+	g.fieldMap = make(map[string]field.Expr, 34)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -224,6 +227,7 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["custom_cert"] = g.CustomCert
 	g.fieldMap["custom_key"] = g.CustomKey
 	g.fieldMap["custom_force_https"] = g.CustomForceHttps
+	g.fieldMap["custom_domain_matcher"] = g.CustomDomainMatcher
 	g.fieldMap["node_code"] = g.NodeCode
 	g.fieldMap["client_code"] = g.ClientCode
 	g.fieldMap["user_code"] = g.UserCode

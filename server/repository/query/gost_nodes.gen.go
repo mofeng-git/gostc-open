@@ -45,6 +45,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.P2P = field.NewInt(tableName, "p2p")
 	_gostNode.Domain = field.NewString(tableName, "domain")
 	_gostNode.DenyDomainPrefix = field.NewString(tableName, "deny_domain_prefix")
+	_gostNode.AllowDomainMatcher = field.NewInt(tableName, "allow_domain_matcher")
 	_gostNode.UrlTpl = field.NewString(tableName, "url_tpl")
 	_gostNode.Protocol = field.NewString(tableName, "protocol")
 	_gostNode.Address = field.NewString(tableName, "address")
@@ -84,38 +85,39 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 type gostNode struct {
 	gostNodeDo
 
-	ALL               field.Asterisk
-	Id                field.Int
-	Code              field.String
-	AllowEdit         field.Int
-	AllowDel          field.Int
-	Version           field.Int64
-	CreatedAt         field.Time
-	UpdatedAt         field.Time
-	IndexValue        field.Int
-	Key               field.String
-	Name              field.String
-	Remark            field.String
-	Web               field.Int
-	Tunnel            field.Int
-	Forward           field.Int
-	Proxy             field.Int
-	P2P               field.Int
-	Domain            field.String
-	DenyDomainPrefix  field.String
-	UrlTpl            field.String
-	Protocol          field.String
-	Address           field.String
-	HttpPort          field.String
-	ReplaceAddress    field.String
-	ForwardPorts      field.String
-	P2PDisableForward field.Int
-	Rules             field.String
-	Tags              field.String
-	LimitResetIndex   field.Int
-	LimitTotal        field.Int
-	LimitKind         field.Int
-	Configs           gostNodeHasManyConfigs
+	ALL                field.Asterisk
+	Id                 field.Int
+	Code               field.String
+	AllowEdit          field.Int
+	AllowDel           field.Int
+	Version            field.Int64
+	CreatedAt          field.Time
+	UpdatedAt          field.Time
+	IndexValue         field.Int
+	Key                field.String
+	Name               field.String
+	Remark             field.String
+	Web                field.Int
+	Tunnel             field.Int
+	Forward            field.Int
+	Proxy              field.Int
+	P2P                field.Int
+	Domain             field.String
+	DenyDomainPrefix   field.String
+	AllowDomainMatcher field.Int
+	UrlTpl             field.String
+	Protocol           field.String
+	Address            field.String
+	HttpPort           field.String
+	ReplaceAddress     field.String
+	ForwardPorts       field.String
+	P2PDisableForward  field.Int
+	Rules              field.String
+	Tags               field.String
+	LimitResetIndex    field.Int
+	LimitTotal         field.Int
+	LimitKind          field.Int
+	Configs            gostNodeHasManyConfigs
 
 	fieldMap map[string]field.Expr
 }
@@ -150,6 +152,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.P2P = field.NewInt(table, "p2p")
 	g.Domain = field.NewString(table, "domain")
 	g.DenyDomainPrefix = field.NewString(table, "deny_domain_prefix")
+	g.AllowDomainMatcher = field.NewInt(table, "allow_domain_matcher")
 	g.UrlTpl = field.NewString(table, "url_tpl")
 	g.Protocol = field.NewString(table, "protocol")
 	g.Address = field.NewString(table, "address")
@@ -178,7 +181,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 31)
+	g.fieldMap = make(map[string]field.Expr, 32)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -197,6 +200,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["p2p"] = g.P2P
 	g.fieldMap["domain"] = g.Domain
 	g.fieldMap["deny_domain_prefix"] = g.DenyDomainPrefix
+	g.fieldMap["allow_domain_matcher"] = g.AllowDomainMatcher
 	g.fieldMap["url_tpl"] = g.UrlTpl
 	g.fieldMap["protocol"] = g.Protocol
 	g.fieldMap["address"] = g.Address

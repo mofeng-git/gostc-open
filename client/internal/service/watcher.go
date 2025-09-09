@@ -100,9 +100,16 @@ func certWatcher(client *arpc.Client) (done func()) {
 		log.Warn("watcher certificate directory failed", err)
 		return
 	}
-	if err := w.Start(time.Second); err != nil {
-		log.Warn("watcher certificate directory failed", err)
-		return
+
+	var err error
+	go func() {
+		if err = w.Start(time.Second); err != nil {
+			log.Warn("watcher certificate directory failed", err)
+		}
+	}()
+	time.Sleep(time.Second)
+	if err != nil {
+		return nil
 	}
 	log.Info("watcher certificate directory success")
 	done = func() {

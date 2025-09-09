@@ -1,7 +1,6 @@
 <script setup>
 import {h, onBeforeMount, ref, watch} from "vue";
 import {
-  apiNormalGostClientHostAdmission,
   apiNormalGostClientHostDelete,
   apiNormalGostClientHostDomain,
   apiNormalGostClientHostEnable,
@@ -86,9 +85,11 @@ const state = ref({
       customCert: '',
       customKey: '',
       customForceHttps: 0,
+      domainMatcher: 0,
     },
     nodeAddress: '',
     customEnable: 2,
+    allowDomainMatcher: 0
   },
   clients: [],
   migrate: {
@@ -178,51 +179,21 @@ const deleteFunc = async (row) => {
   }
 }
 
-const openAdmission = (row) => {
-  state.value.admission.data = {
-    code: row.code,
-    whiteEnable: row.whiteEnable,
-    blackEnable: row.blackEnable,
-    white: [],
-    black: []
-  }
-  if (row.whiteList) {
-    state.value.admission.white = row?.whiteList.join('\n')
-  }
-  if (row.blackList) {
-    state.value.admission.black = row?.blackList.join('\n')
-  }
-  state.value.admission.open = true
-}
-
-const closeAdmission = () => {
-  state.value.admission.open = false
-}
-
-const admissionFunc = async () => {
-  try {
-    state.value.admission.loading = true
-    state.value.admission.data.white = state.value.admission.white.split('\n')
-    state.value.admission.data.black = state.value.admission.black.split('\n')
-    await apiNormalGostClientHostAdmission(state.value.admission.data)
-    closeAdmission()
-    refreshTable()
-  } finally {
-    state.value.admission.loading = false
-  }
-}
-
-
 const openDomainModal = (row) => {
   state.value.domain.code = row.code
   state.value.domain.nodeAddress = row.node.address
   state.value.domain.customEnable = row.customEnable
+  state.value.domain.allowDomainMatcher = row.node.allowDomainMatcher
+  if (row.node.allowDomainMatcher !== 1) {
+    row.customDomainMatcher = 0
+  }
   state.value.domain.data = {
     code: row.code,
     customDomain: row.customDomain,
     customCert: row.customCert,
     customKey: row.customKey,
     customForceHttps: row.customForceHttps,
+    domainMatcher: row.customDomainMatcher,
   }
   state.value.domain.open = true
 }
@@ -316,19 +287,13 @@ onBeforeMount(() => {
 
 const operatorOptions = [
   {
-    label: '流量',
+    label: '流量统计',
     key: 'obs',
     disabled: false,
     func: openObsModal,
   },
-  // {
-  //   label: '白名单',
-  //   key: 'admission',
-  //   disabled: false,
-  //   func: openAdmission,
-  // },
   {
-    label: '自定义域名',
+    label: '绑定域名',
     key: 'domain',
     disabled: false,
     func: openDomainModal,
@@ -573,7 +538,7 @@ const operatorRenderLabel = (option) => {
     </Modal>
 
     <Modal
-        title="自定义域名"
+        title="绑定域名"
         :show="state.domain.open"
         @on-confirm="domainFunc"
         @on-cancel="closeDomainModal"
@@ -590,22 +555,40 @@ const operatorRenderLabel = (option) => {
           请将域名解析到{{ state.domain.nodeAddress }}
         </n-alert>
         <n-alert type="warning" v-else>
-          此隧道使用的节点不支持自定义域名
+          此隧道使用的节点不支持绑定域名
         </n-alert>
         <p></p>
-        <n-form-item path="customDomain" label="域名(空则移除自定义域名)">
-          <n-input v-model:value="state.domain.data.customDomain" placeholder="www.example.com"></n-input>
-        </n-form-item>
+        <div v-if="state.domain.allowDomainMatcher!==1">
+          <n-alert type="warning">此隧道使用的节点不支持绑定泛域名</n-alert>
+          <p/>
+        </div>
         <n-switch
             v-model:value="state.domain.data.customForceHttps"
             :unchecked-value="0"
             :checked-value="1"
             :default-value="state.domain.data.customForceHttps"
             :round="false">
-          <template #unchecked>关闭强制HTTPS</template>
-          <template #checked>开启强制HTTPS</template>
+          <template #unchecked>关闭自动HTTPS</template>
+          <template #checked>开启自动HTTPS</template>
         </n-switch>
         <p></p>
+        <n-form-item path="customDomain" label="域名(空则移除绑定域名)">
+          <n-input-group>
+            <n-select
+                :disabled="state.domain.allowDomainMatcher!==1"
+                style="width: 120px"
+                :options="[{label:'普通域名',value:0},{label:'泛域名',value:1}]"
+                v-model:value="state.domain.data.domainMatcher"
+            ></n-select>
+            <n-input v-model:value="state.domain.data.customDomain" placeholder="www.example.com"></n-input>
+          </n-input-group>
+        </n-form-item>
+        <n-alert type="info" show-icon>
+          绑定后，通过此域名访问隧道：<strong>{{
+            (state.domain.data.domainMatcher === 1 ? '*.' : '') + state.domain.data.customDomain
+          }}</strong>
+        </n-alert>
+        <p/>
         <n-form-item path="customCert" label="证书(PEM，不设置，则使用默认TLS)">
           <n-input type="textarea" :autosize="{minRows:3,maxRows:6}" v-model:value="state.domain.data.customCert"
                    placeholder="-----BEGIN CERTIFICATE-----"></n-input>

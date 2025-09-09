@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 	"strings"
@@ -14,31 +15,37 @@ const (
 
 type GostNode struct {
 	Base
-	IndexValue        int              `gorm:"column:index_value;index;default:1000;comment:排序，升序"`
-	Key               string           `gorm:"column:key;size:100;uniqueIndex"`
-	Name              string           `gorm:"column:name;index;comment:名称"`
-	Remark            string           `gorm:"column:remark;comment:节点介绍"`
-	Web               int              `gorm:"column:web;size:1;default:2;comment:WEB功能"`
-	Tunnel            int              `gorm:"column:tunnel;size:1;default:2;comment:私有隧道功能"`
-	Forward           int              `gorm:"column:forward;size:1;default:2;comment:端口转发功能"`
-	Proxy             int              `gorm:"column:proxy;size:1;default:2;comment:代理隧道功能"`
-	P2P               int              `gorm:"column:p2p;size:1;default:2;comment:P2P隧道功能"`
-	Domain            string           `gorm:"column:domain;comment:基础域名"`
-	DenyDomainPrefix  string           `gorm:"column:deny_domain_prefix;comment:不允许的域名前缀"`
-	UrlTpl            string           `gorm:"column:url_tpl;comment:URL模板"`
-	Protocol          string           `gorm:"column:protocol;comment:协议"`
-	Address           string           `gorm:"column:address;comment:服务地址"`
-	HttpPort          string           `gorm:"column:http_port;comment:HTTP流量端口"`
-	ReplaceAddress    string           `gorm:"column:replace_address;comment:替换地址"`
-	ForwardPorts      string           `gorm:"column:forward_ports;comment:转发端口组"`
-	P2PDisableForward int              `gorm:"column:p2p_disable_forward;size:1;default:0;comment:是否禁用中继"`
-	Rules             string           `gorm:"column:rules;comment:规则限制"`
-	Tags              string           `gorm:"column:tags;comment:标签"`
-	Configs           []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
+	IndexValue         int              `gorm:"column:index_value;index;default:1000;comment:排序，升序"`
+	Key                string           `gorm:"column:key;size:100;uniqueIndex"`
+	Name               string           `gorm:"column:name;index;comment:名称"`
+	Remark             string           `gorm:"column:remark;comment:节点介绍"`
+	Web                int              `gorm:"column:web;size:1;default:2;comment:WEB功能"`
+	Tunnel             int              `gorm:"column:tunnel;size:1;default:2;comment:私有隧道功能"`
+	Forward            int              `gorm:"column:forward;size:1;default:2;comment:端口转发功能"`
+	Proxy              int              `gorm:"column:proxy;size:1;default:2;comment:代理隧道功能"`
+	P2P                int              `gorm:"column:p2p;size:1;default:2;comment:P2P隧道功能"`
+	Domain             string           `gorm:"column:domain;comment:基础域名"`
+	DenyDomainPrefix   string           `gorm:"column:deny_domain_prefix;comment:不允许的域名前缀"`
+	AllowDomainMatcher int              `gorm:"column:allow_domain_matcher;comment:自定义域名是否允许泛域名"`
+	UrlTpl             string           `gorm:"column:url_tpl;comment:URL模板"`
+	Protocol           string           `gorm:"column:protocol;comment:协议"`
+	Address            string           `gorm:"column:address;comment:服务地址"`
+	HttpPort           string           `gorm:"column:http_port;comment:HTTP流量端口"`
+	ReplaceAddress     string           `gorm:"column:replace_address;comment:替换地址"`
+	ForwardPorts       string           `gorm:"column:forward_ports;comment:转发端口组"`
+	P2PDisableForward  int              `gorm:"column:p2p_disable_forward;size:1;default:0;comment:是否禁用中继"`
+	Rules              string           `gorm:"column:rules;comment:规则限制"`
+	Tags               string           `gorm:"column:tags;comment:标签"`
+	Configs            []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
 
 	LimitResetIndex int `gorm:"column:limit_reset_index;comment:重置日期索引"`
 	LimitTotal      int `gorm:"column:limit_total;comment:预警流量(GB)"`
 	LimitKind       int `gorm:"column:limit_kind;size:1;default:0;comment:限制方式"`
+}
+
+// 生成更新指纹，对比指纹判断是否需要标记更新
+func (n GostNode) GenerateFingerprint() string {
+	return fmt.Sprintf("%s|%s|%s|%s|%s|%d", n.Domain, n.Protocol, n.Address, n.HttpPort, n.ReplaceAddress, n.AllowDomainMatcher)
 }
 
 func (n GostNode) GetAddress() (host string, port int) {

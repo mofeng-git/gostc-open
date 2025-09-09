@@ -140,7 +140,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			TargetIp:     host.TargetIp,
 			TargetPort:   host.TargetPort,
 			DomainPrefix: host.DomainPrefix,
-			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.CustomDomain, cache2.GetNodeCustomDomain(host.NodeCode)),
+			DomainFull:   host.Node.GetDomainFull(host.DomainPrefix, host.GetCustomDomain(), cache2.GetNodeCustomDomain(host.NodeCode)),
 			Node: ItemNode{
 				Code: host.NodeCode,
 				Name: host.Node.Name,

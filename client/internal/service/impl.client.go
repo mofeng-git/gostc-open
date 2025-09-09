@@ -139,7 +139,9 @@ func (svc *Client) run() (err error) {
 	// 开启证书目录变动监听
 	certWatcherDone := certWatcher(client)
 	svc.stopFunc = func() {
-		certWatcherDone()
+		if certWatcherDone != nil {
+			certWatcherDone()
+		}
 		client.Stop()
 	}
 	<-stopChan
