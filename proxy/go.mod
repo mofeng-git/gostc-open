@@ -4,8 +4,10 @@ go 1.25
 
 require (
 	github.com/caddyserver/caddy/v2 v2.10.2
+	github.com/caddyserver/certmagic v0.24.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/kardianos/service v1.2.2
+	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/cobra v1.9.1
 	go.uber.org/zap v1.27.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -32,7 +34,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/caddyserver/certmagic v0.24.0 // indirect
 	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/ccoveille/go-safecast v1.6.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
@@ -109,7 +110,6 @@ require (
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
-	github.com/radovskyb/watcher v1.0.7 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
