@@ -206,7 +206,9 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		}
 		userCode := userCodeTemp.(string)
 		db, _, _ := repository.Get("")
-		host, err := db.GostClientHost.Where(
+		host, err := db.GostClientHost.Preload(
+			db.GostClientHost.Node,
+		).Where(
 			db.GostClientHost.CustomDomain.Eq(req.Domain),
 			db.GostClientHost.UserCode.Eq(userCode),
 		).First()
@@ -220,10 +222,11 @@ func InitFrp(ginEngine *gin.Engine, ln net.Listener) {
 		}
 		if err := service.Service.Domain(userCode, service.DomainReq{
 			Code:             host.Code,
-			CustomDomain:     req.Domain,
+			CustomDomain:     host.CustomDomain,
 			CustomCert:       req.Cert,
 			CustomKey:        req.Key,
 			CustomForceHttps: host.CustomForceHttps,
+			DomainMatcher:    host.CustomDomainMatcher,
 		}); err != nil {
 			_ = c.Write(err.Error())
 			return
