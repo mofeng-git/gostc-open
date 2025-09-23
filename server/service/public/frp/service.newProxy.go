@@ -72,7 +72,7 @@ func (s *service) NewProxy(req NewProxyReq) (any, error) {
 	}
 
 	req.Content.BandwidthLimit = fmt.Sprintf("%dKB", result.Limiter*128)
-	req.Content.UseCompression = true
-	req.Content.UseEncryption = true
+	//req.Content.UseCompression = true
+	//req.Content.UseEncryption = true
 	return req.Content, nil
 }
