@@ -143,7 +143,7 @@ func (p *program) run() {
 		basePath = filepath.Dir(basePath)
 		moveWebuiCfgDir(basePath, basePath+"/data") // 移动旧配置文件路径
 		bootstrap.InitLogger()
-		bootstrap.InitFS(basePath)
+		bootstrap.InitFS(basePath + "/data")
 		bootstrap.InitTodo()
 		bootstrap.InitTask()
 		bootstrap.InitRouter()
