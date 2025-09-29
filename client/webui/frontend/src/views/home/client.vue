@@ -11,7 +11,7 @@ const state = ref({
       key: '',
       name: '',
       tls: 1,
-      address: 'gost.sian.one',
+      address: 'gostc.mofeng.run',
       autoStart:0,
     },
     dataRules: {
@@ -26,7 +26,7 @@ const state = ref({
       key: '',
       name: '',
       tls: 1,
-      address: 'gost.sian.one',
+      address: 'gostc.mofeng.run',
       autoStart:0,
     },
     dataRules: {
