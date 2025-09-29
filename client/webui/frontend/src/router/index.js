@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 import {baseRouters} from "./routers/base.js";
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/extras/gostc/'),
     routes: baseRouters,
     scrollBehavior: () => ({left: 0, top: 0}),
 })

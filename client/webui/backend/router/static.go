@@ -82,11 +82,18 @@ func InitStatic(engine *gin.Engine) error {
 				continue
 			}
 
-			engine.GET(ginStaticFilePath,
+			// 注册带前缀的路由
+			prefixedPath := "/extras/gostc/" + ginStaticFilePath
+			engine.GET(prefixedPath,
 				cacheControlMiddleware(),
 				serveFileHandler(fileKey, fileBytes),
 			)
-		}
+			}
+
+			// 根路径重定向到带前缀的路径
+			engine.GET("/", func(c *gin.Context) {
+				c.Redirect(http.StatusMovedPermanently, "/extras/gostc/")
+			})
 
 		engine.NoRoute(func(c *gin.Context) {
 			c.Data(http.StatusOK, "text/html; charset=utf-8", indexHTML)

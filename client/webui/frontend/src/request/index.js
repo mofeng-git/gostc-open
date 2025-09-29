@@ -2,7 +2,7 @@ import axios from 'axios'
 import {localStore} from "../store/local.js";
 
 const request = axios.create({
-    baseURL: "/api",
+    baseURL: "/extras/gostc/api",
     timeout: 15000,
     headers: {}
 })
