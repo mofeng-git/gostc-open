@@ -2,6 +2,7 @@ package frp
 
 import (
 	"github.com/gin-gonic/gin"
+	"gopkg.in/yaml.v3"
 	"server/service/public/frp"
 )
 
@@ -133,7 +134,8 @@ func VisitorTunnel(c *gin.Context) {
 		_ = c.Error(err)
 		return
 	}
-	c.YAML(200, result)
+	marshal, _ := yaml.Marshal(result)
+	_, _ = c.Writer.Write(marshal)
 }
 
 func VisitorP2P(c *gin.Context) {
@@ -143,5 +145,6 @@ func VisitorP2P(c *gin.Context) {
 		_ = c.Error(err)
 		return
 	}
-	c.YAML(200, result)
+	marshal, _ := yaml.Marshal(result)
+	_, _ = c.Writer.Write(marshal)
 }
