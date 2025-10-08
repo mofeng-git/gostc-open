@@ -86,8 +86,8 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 				//HostHeaderRewrite: host.Node.GetDomainHost(host.DomainPrefix, host.GetCustomDomain(), cache.GetNodeCustomDomain(host.NodeCode)),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        utils.TrinaryOperation(host.UseEncryption == 1, true, false),
-				UseCompression:       utils.TrinaryOperation(host.UseCompression == 1, true, false),
+				UseEncryption:        host.UseEncryption == 1,
+				UseCompression:       host.UseCompression == 1,
 				BandwidthLimit:       fmt.Sprintf("%dKB", host.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -161,8 +161,8 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        utils.TrinaryOperation(forward.UseEncryption == 1, true, false),
-				UseCompression:       utils.TrinaryOperation(forward.UseCompression == 1, true, false),
+				UseEncryption:        forward.UseEncryption == 1,
+				UseCompression:       forward.UseCompression == 1,
 				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -185,8 +185,8 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:      utils.TrinaryOperation(forward.UseEncryption == 1, true, false),
-				UseCompression:     utils.TrinaryOperation(forward.UseCompression == 1, true, false),
+				UseEncryption:      forward.UseEncryption == 1,
+				UseCompression:     forward.UseCompression == 1,
 				BandwidthLimit:     fmt.Sprintf("%dKB", forward.Limiter*128),
 				BandwidthLimitMode: "client",
 				ProxyProtocolVersion: func() string {
@@ -267,8 +267,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 				Secretkey: tunnel.VKey + "_stcp",
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        utils.TrinaryOperation(tunnel.UseEncryption == 1, true, false),
-				UseCompression:       utils.TrinaryOperation(tunnel.UseCompression == 1, true, false),
+				UseEncryption:        tunnel.UseEncryption == 1,
+				UseCompression:       tunnel.UseCompression == 1,
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -291,8 +291,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 				Secretkey: tunnel.VKey + "_sudp",
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        utils.TrinaryOperation(tunnel.UseEncryption == 1, true, false),
-				UseCompression:       utils.TrinaryOperation(tunnel.UseCompression == 1, true, false),
+				UseEncryption:        tunnel.UseEncryption == 1,
+				UseCompression:       tunnel.UseCompression == 1,
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -366,8 +366,8 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 				Secretkey: p2p.VKey,
 			},
 			Transport: ProxyTransport{
-				UseEncryption:  utils.TrinaryOperation(p2p.UseEncryption == 1, true, false),
-				UseCompression: utils.TrinaryOperation(p2p.UseCompression == 1, true, false),
+				UseEncryption:  p2p.UseEncryption == 1,
+				UseCompression: p2p.UseCompression == 1,
 				//BandwidthLimit:       fmt.Sprintf("%dKB", p2p.Limiter*128),
 				ProxyProtocolVersion: "",
 			},
@@ -389,8 +389,8 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 				Secretkey: p2p.VKey,
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        utils.TrinaryOperation(p2p.UseEncryption == 1, true, false),
-				UseCompression:       utils.TrinaryOperation(p2p.UseCompression == 1, true, false),
+				UseEncryption:        p2p.UseEncryption == 1,
+				UseCompression:       p2p.UseCompression == 1,
 				BandwidthLimit:       fmt.Sprintf("%dKB", p2p.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -448,18 +448,20 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 	}
 
 	var data = ProxyConfig{
-		Key:       proxy.Code,
-		UpdateTag: proxy.UpdatedAt.Format(time.DateTime) + "#" + proxy.Node.UpdatedAt.Format(time.DateTime),
-		BaseCfg:   e.generateServerCommonCfg(proxy.Node, *auth),
-		Name:      proxy.Code + "_proxy",
-		Port:      utils.StrMustInt(proxy.Port),
-		AuthUser:  proxy.AuthUser,
-		AuthPwd:   proxy.AuthPwd,
+		Key:      proxy.Code,
+		BaseCfg:  e.generateServerCommonCfg(proxy.Node, *auth),
+		Name:     proxy.Code + "_proxy",
+		Port:     utils.StrMustInt(proxy.Port),
+		AuthUser: proxy.AuthUser,
+		AuthPwd:  proxy.AuthPwd,
 		Metadata: map[string]string{
 			"user":     auth.User,
 			"password": auth.Password,
 		},
-		Limiter: fmt.Sprintf("%dKB", proxy.Limiter*128),
+		Limiter:        fmt.Sprintf("%dKB", proxy.Limiter*128),
+		UseEncryption:  proxy.UseEncryption,
+		UseCompression: proxy.UseCompression,
+		UpdateTag:      proxy.UpdatedAt.Format(time.DateTime) + "#" + proxy.Node.UpdatedAt.Format(time.DateTime),
 	}
 
 	go utils.Retry(func() error {

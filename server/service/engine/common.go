@@ -194,15 +194,17 @@ type TunnelConfig struct {
 }
 
 type ProxyConfig struct {
-	Key       string // 唯一标识
-	BaseCfg   v1.ClientCommonConfig
-	Name      string
-	Port      int
-	AuthUser  string
-	AuthPwd   string
-	Metadata  map[string]string
-	Limiter   string
-	UpdateTag string
+	Key            string // 唯一标识
+	BaseCfg        v1.ClientCommonConfig
+	Name           string
+	Port           int
+	AuthUser       string
+	AuthPwd        string
+	Metadata       map[string]string
+	Limiter        string
+	UseEncryption  int
+	UseCompression int
+	UpdateTag      string
 }
 
 type P2PConfig struct {
