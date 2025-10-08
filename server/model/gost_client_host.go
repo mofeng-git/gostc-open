@@ -22,6 +22,8 @@ type GostClientHost struct {
 	User                SystemUser `gorm:"foreignKey:UserCode;references:Code"`
 	Enable              int        `gorm:"column:enable;size:1;default:1;comment:启用状态"`
 	Status              int        `gorm:"column:status;size:1;default:1;comment:状态"`
+	UseEncryption       int        `gorm:"column:use_encryption;size:1;default:1;comment:加密"`
+	UseCompression      int        `gorm:"column:use_compression;size:1;default:1;comment:压缩"`
 	GostClientAdmission
 	GostClientConfig
 }

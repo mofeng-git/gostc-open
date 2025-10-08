@@ -19,20 +19,22 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code        string     `json:"code"`
-	Name        string     `json:"name"`
-	Port        string     `json:"port"`
-	Protocol    string     `json:"protocol"`
-	AuthUser    string     `json:"authUser"`
-	AuthPwd     string     `json:"authPwd"`
-	Node        ItemNode   `json:"node"`
-	Client      ItemClient `json:"client"`
-	Config      ItemConfig `json:"config"`
-	Enable      int        `json:"enable"`
-	WarnMsg     string     `json:"warnMsg"`
-	CreatedAt   string     `json:"createdAt"`
-	InputBytes  int64      `json:"inputBytes"`
-	OutputBytes int64      `json:"outputBytes"`
+	Code           string     `json:"code"`
+	Name           string     `json:"name"`
+	Port           string     `json:"port"`
+	Protocol       string     `json:"protocol"`
+	AuthUser       string     `json:"authUser"`
+	AuthPwd        string     `json:"authPwd"`
+	Node           ItemNode   `json:"node"`
+	Client         ItemClient `json:"client"`
+	Config         ItemConfig `json:"config"`
+	Enable         int        `json:"enable"`
+	WarnMsg        string     `json:"warnMsg"`
+	CreatedAt      string     `json:"createdAt"`
+	InputBytes     int64      `json:"inputBytes"`
+	OutputBytes    int64      `json:"outputBytes"`
+	UseEncryption  int        `json:"useEncryption"`
+	UseCompression int        `json:"useCompression"`
 }
 
 type ItemClient struct {
@@ -111,11 +113,13 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     proxy.CLimiter,
 				ExpAt: time.Unix(proxy.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:      proxy.Enable,
-			WarnMsg:     warn_msg.GetProxyWarnMsg(*proxy),
-			CreatedAt:   proxy.CreatedAt.Format(time.DateTime),
-			InputBytes:  obsInfo.InputBytes,
-			OutputBytes: obsInfo.OutputBytes,
+			Enable:         proxy.Enable,
+			WarnMsg:        warn_msg.GetProxyWarnMsg(*proxy),
+			CreatedAt:      proxy.CreatedAt.Format(time.DateTime),
+			InputBytes:     obsInfo.InputBytes,
+			OutputBytes:    obsInfo.OutputBytes,
+			UseEncryption:  proxy.UseEncryption,
+			UseCompression: proxy.UseCompression,
 		})
 	}
 	return list, total

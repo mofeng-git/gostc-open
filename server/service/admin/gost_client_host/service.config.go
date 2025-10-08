@@ -62,7 +62,6 @@ func (service *service) Config(req ConfigReq) error {
 			log.Error("修改域名解析配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientHostConfig(tx, host.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        host.Code,
 			Type:        model.GOST_TUNNEL_TYPE_HOST,
@@ -73,6 +72,7 @@ func (service *service) Config(req ConfigReq) error {
 			ExpAt:       host.ExpAt,
 			Limiter:     host.Limiter,
 		})
+		engine.ClientHostConfig(tx, host.Code)
 		return nil
 	})
 }

@@ -19,26 +19,28 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code          string        `json:"code"`
-	Name          string        `json:"name"`
-	TargetIp      string        `json:"targetIp"`
-	TargetPort    string        `json:"targetPort"`
-	ProxyProtocol int           `json:"proxyProtocol"`
-	Port          string        `json:"port"`
-	Node          ItemNode      `json:"node"`
-	Client        ItemClient    `json:"client"`
-	Config        ItemConfig    `json:"config"`
-	Enable        int           `json:"enable"`
-	WarnMsg       string        `json:"warnMsg"`
-	CreatedAt     string        `json:"createdAt"`
-	InputBytes    int64         `json:"inputBytes"`
-	OutputBytes   int64         `json:"outputBytes"`
-	MatcherEnable int           `json:"matcherEnable"`
-	Matchers      []ItemMatcher `json:"matchers"`
-	TcpMatcher    ItemMatcher   `json:"tcpMatcher"`
-	SSHMatcher    ItemMatcher   `json:"sshMatcher"`
-	WhiteEnable   int           `json:"whiteEnable"`
-	WhiteList     []string      `json:"whiteList"`
+	Code           string        `json:"code"`
+	Name           string        `json:"name"`
+	TargetIp       string        `json:"targetIp"`
+	TargetPort     string        `json:"targetPort"`
+	ProxyProtocol  int           `json:"proxyProtocol"`
+	Port           string        `json:"port"`
+	Node           ItemNode      `json:"node"`
+	Client         ItemClient    `json:"client"`
+	Config         ItemConfig    `json:"config"`
+	Enable         int           `json:"enable"`
+	WarnMsg        string        `json:"warnMsg"`
+	CreatedAt      string        `json:"createdAt"`
+	InputBytes     int64         `json:"inputBytes"`
+	OutputBytes    int64         `json:"outputBytes"`
+	MatcherEnable  int           `json:"matcherEnable"`
+	Matchers       []ItemMatcher `json:"matchers"`
+	TcpMatcher     ItemMatcher   `json:"tcpMatcher"`
+	SSHMatcher     ItemMatcher   `json:"sshMatcher"`
+	WhiteEnable    int           `json:"whiteEnable"`
+	WhiteList      []string      `json:"whiteList"`
+	UseEncryption  int           `json:"useEncryption"`
+	UseCompression int           `json:"useCompression"`
 }
 
 type ItemMatcher struct {
@@ -148,8 +150,10 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			//	TargetIp:   sshIp,
 			//	TargetPort: sshPort,
 			//},
-			WhiteEnable: forward.WhiteEnable,
-			WhiteList:   forward.GetWhiteList(),
+			WhiteEnable:    forward.WhiteEnable,
+			WhiteList:      forward.GetWhiteList(),
+			UseEncryption:  forward.UseEncryption,
+			UseCompression: forward.UseCompression,
 		})
 	}
 	return list, total

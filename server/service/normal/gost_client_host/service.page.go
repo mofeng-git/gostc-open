@@ -42,6 +42,8 @@ type Item struct {
 	OutputBytes         int64      `json:"outputBytes"`
 	WhiteEnable         int        `json:"whiteEnable"`
 	WhiteList           []string   `json:"whiteList"`
+	UseEncryption       int        `json:"useEncryption"`
+	UseCompression      int        `json:"useCompression"`
 }
 
 type ItemClient struct {
@@ -131,13 +133,15 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     host.CLimiter,
 				ExpAt: time.Unix(host.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:      host.Enable,
-			WarnMsg:     warn_msg.GetHostWarnMsg(*host),
-			CreatedAt:   host.CreatedAt.Format(time.DateTime),
-			InputBytes:  obsInfo.InputBytes,
-			OutputBytes: obsInfo.OutputBytes,
-			WhiteEnable: host.WhiteEnable,
-			WhiteList:   host.GetWhiteList(),
+			Enable:         host.Enable,
+			WarnMsg:        warn_msg.GetHostWarnMsg(*host),
+			CreatedAt:      host.CreatedAt.Format(time.DateTime),
+			InputBytes:     obsInfo.InputBytes,
+			OutputBytes:    obsInfo.OutputBytes,
+			WhiteEnable:    host.WhiteEnable,
+			WhiteList:      host.GetWhiteList(),
+			UseEncryption:  host.UseEncryption,
+			UseCompression: host.UseCompression,
 		})
 	}
 	return list, total

@@ -86,8 +86,8 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 				//HostHeaderRewrite: host.Node.GetDomainHost(host.DomainPrefix, host.GetCustomDomain(), cache.GetNodeCustomDomain(host.NodeCode)),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
+				UseEncryption:        utils.TrinaryOperation(host.UseEncryption == 1, true, false),
+				UseCompression:       utils.TrinaryOperation(host.UseCompression == 1, true, false),
 				BandwidthLimit:       fmt.Sprintf("%dKB", host.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -161,8 +161,8 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
+				UseEncryption:        utils.TrinaryOperation(forward.UseEncryption == 1, true, false),
+				UseCompression:       utils.TrinaryOperation(forward.UseCompression == 1, true, false),
 				BandwidthLimit:       fmt.Sprintf("%dKB", forward.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -185,8 +185,8 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 				RemotePort: utils.StrMustInt(forward.Port),
 			},
 			Transport: ProxyTransport{
-				UseEncryption:      true,
-				UseCompression:     true,
+				UseEncryption:      utils.TrinaryOperation(forward.UseEncryption == 1, true, false),
+				UseCompression:     utils.TrinaryOperation(forward.UseCompression == 1, true, false),
 				BandwidthLimit:     fmt.Sprintf("%dKB", forward.Limiter*128),
 				BandwidthLimitMode: "client",
 				ProxyProtocolVersion: func() string {
@@ -267,8 +267,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 				Secretkey: tunnel.VKey + "_stcp",
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
+				UseEncryption:        utils.TrinaryOperation(tunnel.UseEncryption == 1, true, false),
+				UseCompression:       utils.TrinaryOperation(tunnel.UseCompression == 1, true, false),
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -291,8 +291,8 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 				Secretkey: tunnel.VKey + "_sudp",
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
+				UseEncryption:        utils.TrinaryOperation(tunnel.UseEncryption == 1, true, false),
+				UseCompression:       utils.TrinaryOperation(tunnel.UseCompression == 1, true, false),
 				BandwidthLimit:       fmt.Sprintf("%dKB", tunnel.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -366,8 +366,8 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 				Secretkey: p2p.VKey,
 			},
 			Transport: ProxyTransport{
-				UseEncryption:  true,
-				UseCompression: true,
+				UseEncryption:  utils.TrinaryOperation(p2p.UseEncryption == 1, true, false),
+				UseCompression: utils.TrinaryOperation(p2p.UseCompression == 1, true, false),
 				//BandwidthLimit:       fmt.Sprintf("%dKB", p2p.Limiter*128),
 				ProxyProtocolVersion: "",
 			},
@@ -389,8 +389,8 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 				Secretkey: p2p.VKey,
 			},
 			Transport: ProxyTransport{
-				UseEncryption:        true,
-				UseCompression:       true,
+				UseEncryption:        utils.TrinaryOperation(p2p.UseEncryption == 1, true, false),
+				UseCompression:       utils.TrinaryOperation(p2p.UseCompression == 1, true, false),
 				BandwidthLimit:       fmt.Sprintf("%dKB", p2p.Limiter*128),
 				BandwidthLimitMode:   "client",
 				ProxyProtocolVersion: "",
@@ -501,7 +501,7 @@ func (e *ARpcClientEngine) generateServerCommonCfg(node model.GostNode, auth mod
 		ServerPort: serverPort,
 		Transport: v1.ClientTransportConfig{
 			Protocol:  node.Protocol,
-			PoolCount: 10,
+			PoolCount: 5,
 		},
 		Metadatas: map[string]string{
 			"user":     auth.User,

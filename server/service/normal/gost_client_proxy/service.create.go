@@ -17,14 +17,16 @@ import (
 )
 
 type CreateReq struct {
-	Name       string `binding:"required" json:"name" label:"名称"`
-	Port       string `json:"port" label:"本地端口"`
-	AuthUser   string `json:"authUser"`
-	AuthPwd    string `json:"authPwd"`
-	Protocol   string `binding:"required" json:"protocol" label:"协议"`
-	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
-	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ConfigCode string `binding:"required" json:"configCode" label:"套餐配置"`
+	Name           string `binding:"required" json:"name" label:"名称"`
+	Port           string `json:"port" label:"本地端口"`
+	AuthUser       string `json:"authUser"`
+	AuthPwd        string `json:"authPwd"`
+	Protocol       string `binding:"required" json:"protocol" label:"协议"`
+	ClientCode     string `binding:"required" json:"clientCode" label:"客户端编号"`
+	NodeCode       string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ConfigCode     string `binding:"required" json:"configCode" label:"套餐配置"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -133,17 +135,19 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		}
 
 		var proxy = model.GostClientProxy{
-			Name:       req.Name,
-			Protocol:   req.Protocol,
-			Port:       port,
-			AuthUser:   req.AuthUser,
-			AuthPwd:    req.AuthPwd,
-			NodeCode:   req.NodeCode,
-			Node:       model.GostNode{},
-			ClientCode: req.ClientCode,
-			Client:     model.GostClient{},
-			UserCode:   claims.Code,
-			User:       model.SystemUser{},
+			Name:           req.Name,
+			Protocol:       req.Protocol,
+			Port:           port,
+			AuthUser:       req.AuthUser,
+			AuthPwd:        req.AuthPwd,
+			NodeCode:       req.NodeCode,
+			Node:           model.GostNode{},
+			ClientCode:     req.ClientCode,
+			Client:         model.GostClient{},
+			UserCode:       claims.Code,
+			User:           model.SystemUser{},
+			UseEncryption:  req.UseEncryption,
+			UseCompression: req.UseCompression,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,

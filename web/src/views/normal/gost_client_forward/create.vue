@@ -6,7 +6,7 @@ import {regexpRule, requiredRule} from "../../../utils/formDataRule.js";
 import {regexpLocalIp, regexpPort} from "../../../utils/regexp.js";
 import {apiNormalGostNodeList} from "../../../api/normal/gost_node.js";
 import {apiNormalGostClientList} from "../../../api/normal/gost_client.js";
-import {cLimiterText, configText, limiterText, rLimiterText} from "../gost_client_host/index.js";
+import {configText, limiterText} from "../gost_client_host/index.js";
 import AppCard from "../../../layout/components/AppCard.vue";
 import {NSpace} from "naive-ui";
 import Online from "../../../icon/online.vue";
@@ -25,6 +25,8 @@ const state = ref({
     targetIp: '',
     targetPort: '',
     proxyProtocol: 0,
+    useEncryption: 1,
+    useCompression: 1,
   },
   dataRules: {
     name: requiredRule('请输入名称'),
@@ -269,7 +271,7 @@ onBeforeMount(() => {
           <n-input v-model:value="state.data.targetPort" placeholder="80"></n-input>
         </n-form-item>
         <n-alert type="info" :show-icon="true">
-          可选远程端口：{{state.node.forwardPorts}}
+          可选远程端口：{{ state.node.forwardPorts }}
         </n-alert>
         <p></p>
         <n-form-item path="port" label="远程端口(留空则自动分配)">
@@ -279,6 +281,18 @@ onBeforeMount(() => {
           <n-select
               :options="[{label:'不启用',value:0},{label:'V1',value:1},{label:'V2',value:2}]"
               v-model:value="state.data.proxyProtocol"
+          ></n-select>
+        </n-form-item>
+        <n-form-item label="加密(开启后，会增加一些延迟)">
+          <n-select
+              :options="[{label:'停用',value:2},{label:'启用',value:1}]"
+              v-model:value="state.data.useEncryption"
+          ></n-select>
+        </n-form-item>
+        <n-form-item label="压缩(开启后，会增加一些延迟)">
+          <n-select
+              :options="[{label:'停用',value:2},{label:'启用',value:1}]"
+              v-model:value="state.data.useCompression"
           ></n-select>
         </n-form-item>
       </n-form>

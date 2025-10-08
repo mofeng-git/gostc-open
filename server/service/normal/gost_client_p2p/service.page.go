@@ -19,20 +19,22 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code        string     `json:"code"`
-	Name        string     `json:"name"`
-	TargetIp    string     `json:"targetIp"`
-	TargetPort  string     `json:"targetPort"`
-	VKey        string     `json:"vKey"`
-	Forward     int        `json:"forward"`
-	Node        ItemNode   `json:"node"`
-	Client      ItemClient `json:"client"`
-	UserCode    string     `json:"userCode"`
-	UserAccount string     `json:"userAccount"`
-	Config      ItemConfig `json:"config"`
-	Enable      int        `json:"enable"`
-	WarnMsg     string     `json:"warnMsg"`
-	CreatedAt   string     `json:"createdAt"`
+	Code           string     `json:"code"`
+	Name           string     `json:"name"`
+	TargetIp       string     `json:"targetIp"`
+	TargetPort     string     `json:"targetPort"`
+	VKey           string     `json:"vKey"`
+	Forward        int        `json:"forward"`
+	Node           ItemNode   `json:"node"`
+	Client         ItemClient `json:"client"`
+	UserCode       string     `json:"userCode"`
+	UserAccount    string     `json:"userAccount"`
+	Config         ItemConfig `json:"config"`
+	Enable         int        `json:"enable"`
+	UseEncryption  int        `json:"useEncryption"`
+	UseCompression int        `json:"useCompression"`
+	WarnMsg        string     `json:"warnMsg"`
+	CreatedAt      string     `json:"createdAt"`
 }
 
 type ItemClient struct {
@@ -112,9 +114,11 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     p2p.CLimiter,
 				ExpAt: time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:    p2p.Enable,
-			WarnMsg:   warn_msg.GetP2PWarnMsg(*p2p),
-			CreatedAt: p2p.CreatedAt.Format(time.DateTime),
+			Enable:         p2p.Enable,
+			WarnMsg:        warn_msg.GetP2PWarnMsg(*p2p),
+			CreatedAt:      p2p.CreatedAt.Format(time.DateTime),
+			UseEncryption:  p2p.UseEncryption,
+			UseCompression: p2p.UseCompression,
 		})
 	}
 	return list, total

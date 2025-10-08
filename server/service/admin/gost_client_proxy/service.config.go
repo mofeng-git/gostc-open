@@ -62,7 +62,6 @@ func (service *service) Config(req ConfigReq) error {
 			log.Error("修改代理隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientProxyConfig(tx, proxy.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        proxy.Code,
 			Type:        model.GOST_TUNNEL_TYPE_PROXY,
@@ -73,6 +72,7 @@ func (service *service) Config(req ConfigReq) error {
 			ExpAt:       proxy.ExpAt,
 			Limiter:     proxy.Limiter,
 		})
+		engine.ClientProxyConfig(tx, proxy.Code)
 		return nil
 	})
 }

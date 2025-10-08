@@ -17,14 +17,16 @@ import (
 )
 
 type CreateReq struct {
-	Name          string `binding:"required" json:"name" label:"名称"`
-	TargetIp      string `binding:"required" json:"targetIp" label:"内网IP"`
-	TargetPort    string `binding:"required" json:"targetPort" label:"内网端口"`
-	ProxyProtocol int    `json:"proxyProtocol"`
-	Port          string `json:"port"`
-	ClientCode    string `binding:"required" json:"clientCode" label:"客户端编号"`
-	NodeCode      string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ConfigCode    string `binding:"required" json:"configCode" label:"套餐配置"`
+	Name           string `binding:"required" json:"name" label:"名称"`
+	TargetIp       string `binding:"required" json:"targetIp" label:"内网IP"`
+	TargetPort     string `binding:"required" json:"targetPort" label:"内网端口"`
+	ProxyProtocol  int    `json:"proxyProtocol"`
+	Port           string `json:"port"`
+	ClientCode     string `binding:"required" json:"clientCode" label:"客户端编号"`
+	NodeCode       string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ConfigCode     string `binding:"required" json:"configCode" label:"套餐配置"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
@@ -139,14 +141,16 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 		}
 
 		var forward = model.GostClientForward{
-			Name:          req.Name,
-			TargetIp:      req.TargetIp,
-			TargetPort:    req.TargetPort,
-			Port:          port,
-			ProxyProtocol: req.ProxyProtocol,
-			NodeCode:      req.NodeCode,
-			ClientCode:    req.ClientCode,
-			UserCode:      claims.Code,
+			Name:           req.Name,
+			TargetIp:       req.TargetIp,
+			TargetPort:     req.TargetPort,
+			Port:           port,
+			ProxyProtocol:  req.ProxyProtocol,
+			NodeCode:       req.NodeCode,
+			ClientCode:     req.ClientCode,
+			UserCode:       claims.Code,
+			UseEncryption:  req.UseEncryption,
+			UseCompression: req.UseCompression,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,

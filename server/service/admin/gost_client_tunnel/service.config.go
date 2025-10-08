@@ -61,7 +61,6 @@ func (service *service) Config(req ConfigReq) error {
 			log.Error("修改私有隧道配置失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientTunnelConfig(tx, tunnel.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        tunnel.Code,
 			Type:        model.GOST_TUNNEL_TYPE_TUNNEL,
@@ -72,6 +71,7 @@ func (service *service) Config(req ConfigReq) error {
 			ExpAt:       tunnel.ExpAt,
 			Limiter:     tunnel.Limiter,
 		})
+		engine.ClientTunnelConfig(tx, tunnel.Code)
 		return nil
 	})
 }

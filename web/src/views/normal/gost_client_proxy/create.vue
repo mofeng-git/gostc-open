@@ -25,6 +25,8 @@ const state = ref({
     authUser: '',
     authPwd: '',
     protocol: 'socks5',
+    useEncryption: 1,
+    useCompression: 1,
   },
   dataRules: {
     name: requiredRule('请输入名称'),
@@ -278,6 +280,18 @@ onBeforeMount(() => {
         <p></p>
         <n-form-item path="port" label="远程端口(留空则自动分配)">
           <n-input v-model:value="state.data.port" placeholder="10001"></n-input>
+        </n-form-item>
+        <n-form-item label="加密(开启后，会增加一些延迟)">
+          <n-select
+              :options="[{label:'停用',value:2},{label:'启用',value:1}]"
+              v-model:value="state.data.useEncryption"
+          ></n-select>
+        </n-form-item>
+        <n-form-item label="压缩(开启后，会增加一些延迟)">
+          <n-select
+              :options="[{label:'停用',value:2},{label:'启用',value:1}]"
+              v-model:value="state.data.useCompression"
+          ></n-select>
         </n-form-item>
       </n-form>
       <n-space>

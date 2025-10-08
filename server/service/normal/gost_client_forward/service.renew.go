@@ -62,7 +62,6 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			log.Error("续费用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientForwardConfig(tx, forward.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        forward.Code,
 			Type:        model.GOST_TUNNEL_TYPE_FORWARD,
@@ -73,6 +72,7 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			ExpAt:       forward.ExpAt,
 			Limiter:     forward.Limiter,
 		})
+		engine.ClientForwardConfig(tx, forward.Code)
 		return nil
 	})
 }
