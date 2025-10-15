@@ -25,6 +25,6 @@ export function regexpDomain(value) {
 }
 
 export function regexpDomainPrefix(value) {
-    return /^[a-z0-9]+$/.test(value)
+    return /^(?!-)[a-z0-9-]{1,63}(?<!-)$/.test(value);
 }
 

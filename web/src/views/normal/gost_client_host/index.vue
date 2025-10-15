@@ -54,7 +54,7 @@ const state = ref({
       name: requiredRule('请输入名称'),
       targetIp: regexpRule(regexpLocalIp, '内网IP格式错误'),
       targetPort: regexpRule(regexpPort, '内网端口格式错误'),
-      domainPrefix: regexpRule(regexpDomainPrefix, '只允许数字和小写字母'),
+      domainPrefix: regexpRule(regexpDomainPrefix, '只允许数字、小写字母和-，开头结尾不能是-'),
     },
     open: false,
     loading: false,
