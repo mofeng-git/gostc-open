@@ -13,6 +13,8 @@ github.com/SianHH/frp-package v0.0.0-20250918052633-ef6c80c56a15 h1:LxJpv84g9LuX
 github.com/SianHH/frp-package v0.0.0-20250918052633-ef6c80c56a15/go.mod h1:oUeU6INQXDrJiKjUD3MQVR7aUxEGs0giN62/7+RNjG0=
 github.com/SianHH/frp-package v0.0.0-20251016143341-0358da57f801 h1:sdk0BdC1TufgvbRvDjyVxwbudJEJ5+QOVuHy3975OWg=
 github.com/SianHH/frp-package v0.0.0-20251016143341-0358da57f801/go.mod h1:oUeU6INQXDrJiKjUD3MQVR7aUxEGs0giN62/7+RNjG0=
+github.com/SianHH/frp-package v0.0.0-20251016164436-ffd1c753b2b2 h1:4+hlGziiL4vC+8ma7ESHz4URzBWQwTfmq82n36zduMQ=
+github.com/SianHH/frp-package v0.0.0-20251016164436-ffd1c753b2b2/go.mod h1:oUeU6INQXDrJiKjUD3MQVR7aUxEGs0giN62/7+RNjG0=
 github.com/apernet/quic-go v0.54.1-0.20250907230547-eb32f8aec5e2 h1:03y2WeGln3/QmBzm+KGQ3yej7Uz+76CqHoisdzYzf30=
 github.com/apernet/quic-go v0.54.1-0.20250907230547-eb32f8aec5e2/go.mod h1:Y4cCWi64O51TRUKDPy0ShA2/pevlWiWJJnlNo2fO2ds=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=

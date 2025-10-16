@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	gioui.org v0.8.0
-	github.com/SianHH/frp-package v0.0.0-20251016143341-0358da57f801
+	github.com/SianHH/frp-package v0.0.0-20251016164436-ffd1c753b2b2
 	github.com/energye/systray v1.0.2
 	github.com/fatedier/golib v0.5.1
 	github.com/gin-gonic/gin v1.10.0
