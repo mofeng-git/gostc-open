@@ -35,6 +35,7 @@ type Item struct {
 	OutputBytes    int64      `json:"outputBytes"`
 	UseEncryption  int        `json:"useEncryption"`
 	UseCompression int        `json:"useCompression"`
+	PoolCount      int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -49,6 +50,7 @@ type ItemNode struct {
 	Address      string `json:"address"`
 	Online       int    `json:"online"`
 	ForwardPorts string `json:"forwardPorts"`
+	MaxPoolCount int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -98,6 +100,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				}(),
 				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(proxy.NodeCode), 1, 2),
 				ForwardPorts: proxy.Node.ForwardPorts,
+				MaxPoolCount: proxy.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   proxy.ClientCode,
@@ -120,6 +123,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			OutputBytes:    obsInfo.OutputBytes,
 			UseEncryption:  proxy.UseEncryption,
 			UseCompression: proxy.UseCompression,
+			PoolCount:      proxy.PoolCount,
 		})
 	}
 	return list, total

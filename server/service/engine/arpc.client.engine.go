@@ -62,7 +62,7 @@ func (e *ARpcClientEngine) HostConfig(tx *query.Query, hostCode string) error {
 	var data = HostConfig{
 		Key:       host.Code,
 		UpdateTag: host.UpdatedAt.Format(time.DateTime) + "#" + host.Node.UpdatedAt.Format(time.DateTime),
-		BaseCfg:   e.generateServerCommonCfg(host.Node, *auth),
+		BaseCfg:   e.generateServerCommonCfg(host.PoolCount, host.Node, *auth),
 		IsHttps:   host.TargetHttps == 1,
 		Http: HTTPProxyConfig{
 			HTTPProxyConfig: v1.HTTPProxyConfig{
@@ -143,7 +143,7 @@ func (e *ARpcClientEngine) ForwardConfig(tx *query.Query, forwardCode string) er
 	var data = ForwardConfig{
 		Key:       forward.Code,
 		UpdateTag: forward.UpdatedAt.Format(time.DateTime) + "#" + forward.Node.UpdatedAt.Format(time.DateTime),
-		BaseCfg:   e.generateServerCommonCfg(forward.Node, *auth),
+		BaseCfg:   e.generateServerCommonCfg(forward.PoolCount, forward.Node, *auth),
 		TCP: TCPProxyConfig{
 			TCPProxyConfig: v1.TCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -249,7 +249,7 @@ func (e *ARpcClientEngine) TunnelConfig(tx *query.Query, tunnelCode string) erro
 	var data = TunnelConfig{
 		Key:       tunnel.Code,
 		UpdateTag: tunnel.UpdatedAt.Format(time.DateTime) + "#" + tunnel.Node.UpdatedAt.Format(time.DateTime),
-		BaseCfg:   e.generateServerCommonCfg(tunnel.Node, *auth),
+		BaseCfg:   e.generateServerCommonCfg(tunnel.PoolCount, tunnel.Node, *auth),
 		STCP: STCPProxyConfig{
 			STCPProxyConfig: v1.STCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -348,7 +348,7 @@ func (e *ARpcClientEngine) P2PConfig(tx *query.Query, p2pCode string) error {
 	var data = P2PConfig{
 		Key:       p2p.Code,
 		UpdateTag: p2p.UpdatedAt.Format(time.DateTime) + "#" + p2p.Node.UpdatedAt.Format(time.DateTime),
-		BaseCfg:   e.generateServerCommonCfg(p2p.Node, *auth),
+		BaseCfg:   e.generateServerCommonCfg(p2p.PoolCount, p2p.Node, *auth),
 		XTCP: XTCPProxyConfig{
 			XTCPProxyConfig: v1.XTCPProxyConfig{
 				ProxyBaseConfig: v1.ProxyBaseConfig{
@@ -449,7 +449,7 @@ func (e *ARpcClientEngine) ProxyConfig(tx *query.Query, proxyCode string) error 
 
 	var data = ProxyConfig{
 		Key:      proxy.Code,
-		BaseCfg:  e.generateServerCommonCfg(proxy.Node, *auth),
+		BaseCfg:  e.generateServerCommonCfg(proxy.PoolCount, proxy.Node, *auth),
 		Name:     proxy.Code + "_proxy",
 		Port:     utils.StrMustInt(proxy.Port),
 		AuthUser: proxy.AuthUser,
@@ -493,7 +493,7 @@ func (e *ARpcClientEngine) RemoveProxy(tx *query.Query, proxy model.GostClientPr
 	return nil
 }
 
-func (e *ARpcClientEngine) generateServerCommonCfg(node model.GostNode, auth model.GostAuth) v1.ClientCommonConfig {
+func (e *ARpcClientEngine) generateServerCommonCfg(poolCount int, node model.GostNode, auth model.GostAuth) v1.ClientCommonConfig {
 	serverAddr, serverPort := node.GetAddress()
 	return v1.ClientCommonConfig{
 		Auth: v1.AuthClientConfig{
@@ -503,7 +503,7 @@ func (e *ARpcClientEngine) generateServerCommonCfg(node model.GostNode, auth mod
 		ServerPort: serverPort,
 		Transport: v1.ClientTransportConfig{
 			Protocol:  node.Protocol,
-			PoolCount: 5,
+			PoolCount: poolCount,
 		},
 		Metadatas: map[string]string{
 			"user":     auth.User,

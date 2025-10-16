@@ -41,6 +41,7 @@ type Item struct {
 	WhiteList      []string      `json:"whiteList"`
 	UseEncryption  int           `json:"useEncryption"`
 	UseCompression int           `json:"useCompression"`
+	PoolCount      int           `json:"poolCount"`
 }
 
 type ItemMatcher struct {
@@ -61,6 +62,7 @@ type ItemNode struct {
 	Address      string `json:"address"`
 	Online       int    `json:"online"`
 	ForwardPorts string `json:"forwardPorts"`
+	MaxPoolCount int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -120,6 +122,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				}(),
 				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(forward.NodeCode), 1, 2),
 				ForwardPorts: forward.Node.ForwardPorts,
+				MaxPoolCount: forward.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   forward.ClientCode,
@@ -154,6 +157,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			WhiteList:      forward.GetWhiteList(),
 			UseEncryption:  forward.UseEncryption,
 			UseCompression: forward.UseCompression,
+			PoolCount:      forward.PoolCount,
 		})
 	}
 	return list, total

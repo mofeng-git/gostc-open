@@ -27,6 +27,7 @@ const state = ref({
     proxyProtocol: 0,
     useEncryption: 1,
     useCompression: 1,
+    poolCount: 0,
   },
   dataRules: {
     name: requiredRule('请输入名称'),

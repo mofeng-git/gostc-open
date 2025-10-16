@@ -56,6 +56,7 @@ type Item struct {
 	LimitTotal      int   `json:"limitTotal"`
 	LimitUseTotal   int64 `json:"limitUseTotal"`
 	LimitKind       int   `json:"limitKind"`
+	MaxPoolCount    int   `json:"maxPoolCount"`
 }
 
 func (service *service) Page(req PageReq) (list []Item, total int64) {
@@ -147,6 +148,7 @@ func (service *service) Page(req PageReq) (list []Item, total int64) {
 			LimitTotal:         node.LimitTotal,
 			LimitUseTotal:      obsUseTotal,
 			LimitKind:          node.LimitKind,
+			MaxPoolCount:       node.MaxPoolCount,
 		})
 	}
 	return list, total

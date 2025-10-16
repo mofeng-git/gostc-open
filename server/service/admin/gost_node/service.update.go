@@ -32,6 +32,7 @@ type UpdateReq struct {
 	ForwardPorts       string   `json:"forwardPorts"`
 	P2PDisableForward  int      `json:"p2pDisableForward"`
 	IndexValue         int      `json:"indexValue"`
+	MaxPoolCount       int      `json:"maxPoolCount"`
 
 	LimitResetIndex int `json:"limitResetIndex"`
 	LimitTotal      int `json:"limitTotal"`
@@ -68,6 +69,7 @@ func (service *service) Update(req UpdateReq) error {
 	node.ForwardPorts = req.ForwardPorts
 	node.P2PDisableForward = req.P2PDisableForward
 	node.IndexValue = req.IndexValue
+	node.MaxPoolCount = req.MaxPoolCount
 
 	node.LimitResetIndex = req.LimitResetIndex
 	node.LimitTotal = req.LimitTotal

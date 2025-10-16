@@ -71,7 +71,7 @@ func (e *ARpcNodeEngine) Config(tx *query.Query) error {
 			EnablePrometheus:      false,
 			Log:                   v1.LogConfig{},
 			Transport: v1.ServerTransportConfig{
-				MaxPoolCount: 30,
+				MaxPoolCount: int64(node.MaxPoolCount),
 			},
 			HTTPPlugins: []v1.HTTPPluginOptions{
 				{

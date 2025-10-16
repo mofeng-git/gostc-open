@@ -61,6 +61,7 @@ const state = ref({
       limitResetIndex: 0,
       limitTotal: 1,
       limitKind: 0,
+      maxPoolCount: 10,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -95,6 +96,7 @@ const state = ref({
       limitResetIndex: 0,
       limitTotal: 1,
       limitKind: 0,
+      maxPoolCount: 10,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -156,6 +158,7 @@ const openCreate = () => {
     limitResetIndex: 0,
     limitTotal: 1,
     limitKind: 0,
+    maxPoolCount: 10,
   }
   state.value.create.open = true
 }
@@ -453,6 +456,9 @@ const generateCmdString = () => {
               value-field="value"
           ></n-select>
         </n-form-item>
+        <n-form-item path="maxPoolCount" label="最大复用连接数量">
+          <n-input-number v-model:value="state.create.data.maxPoolCount" :min="0"></n-input-number>
+        </n-form-item>
         <n-form-item label="功能">
           <n-space>
             <n-checkbox
@@ -619,6 +625,9 @@ const generateCmdString = () => {
               label-field="label"
               value-field="value"
           ></n-select>
+        </n-form-item>
+        <n-form-item path="maxPoolCount" label="最大复用连接数量">
+          <n-input-number v-model:value="state.update.data.maxPoolCount" :min="0"></n-input-number>
         </n-form-item>
         <n-form-item label="功能">
           <n-space>

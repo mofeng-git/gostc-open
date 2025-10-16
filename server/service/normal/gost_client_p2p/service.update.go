@@ -18,6 +18,7 @@ type UpdateReq struct {
 	Forward        int    `json:"forward"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -46,6 +47,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		p2p.Forward = req.Forward
 		p2p.UseEncryption = req.UseEncryption
 		p2p.UseCompression = req.UseCompression
+		p2p.PoolCount = req.PoolCount
 
 		if err := tx.GostClientP2P.Save(p2p); err != nil {
 			log.Error("修改P2P隧道失败", zap.Error(err))

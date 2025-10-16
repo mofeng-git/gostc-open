@@ -32,6 +32,7 @@ type CreateReq struct {
 	ForwardPorts       string   `json:"forwardPorts"`
 	P2PDisableForward  int      `json:"p2pDisableForward"`
 	IndexValue         int      `json:"indexValue"`
+	MaxPoolCount       int      `json:"maxPoolCount"`
 
 	LimitResetIndex int `json:"limitResetIndex"`
 	LimitTotal      int `json:"limitTotal"`
@@ -65,6 +66,7 @@ func (service *service) Create(req CreateReq) error {
 		LimitResetIndex:    req.LimitResetIndex,
 		LimitTotal:         req.LimitTotal,
 		LimitKind:          req.LimitKind,
+		MaxPoolCount:       req.MaxPoolCount,
 	}
 	if err := db.GostNode.Create(&node); err != nil {
 		log.Error("新增节点失败", zap.Error(err))

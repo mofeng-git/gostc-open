@@ -64,6 +64,7 @@ const state = ref({
       limitResetIndex: 0,
       limitTotal: 1,
       limitKind: 0,
+      maxPoolCount: 10,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -98,6 +99,7 @@ const state = ref({
       limitResetIndex: 0,
       limitTotal: 1,
       limitKind: 0,
+      maxPoolCount: 10,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -169,6 +171,7 @@ const openCreate = () => {
     limitResetIndex: 0,
     limitTotal: 1,
     limitKind: 0,
+    maxPoolCount: 10,
   }
   state.value.create.open = true
 }
@@ -528,6 +531,9 @@ onBeforeMount(() => {
               value-field="value"
           ></n-select>
         </n-form-item>
+        <n-form-item path="maxPoolCount" label="最大复用连接数量">
+          <n-input-number v-model:value="state.create.data.maxPoolCount" :min="0"></n-input-number>
+        </n-form-item>
         <n-form-item label="功能">
           <n-space>
             <n-checkbox
@@ -599,7 +605,8 @@ onBeforeMount(() => {
             <n-alert type="warning" show-icon>用户如果绑定泛域名，不利于隧道审查</n-alert>
             <p/>
             <n-form-item path="allowDomainMatcher" label="绑定泛域名">
-              <n-switch v-model:value="state.create.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1" :round="false">
+              <n-switch v-model:value="state.create.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1"
+                        :round="false">
                 <template #checked>允许</template>
                 <template #unchecked>禁止</template>
               </n-switch>
@@ -716,6 +723,9 @@ onBeforeMount(() => {
               value-field="value"
           ></n-select>
         </n-form-item>
+        <n-form-item path="maxPoolCount" label="最大复用连接数量">
+          <n-input-number v-model:value="state.update.data.maxPoolCount" :min="0"></n-input-number>
+        </n-form-item>
         <n-form-item label="功能">
           <n-space>
             <n-checkbox
@@ -787,7 +797,8 @@ onBeforeMount(() => {
             <n-alert type="warning" show-icon>用户如果绑定泛域名，不利于隧道审查</n-alert>
             <p/>
             <n-form-item path="allowDomainMatcher" label="绑定泛域名">
-              <n-switch v-model:value="state.update.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1" :round="false">
+              <n-switch v-model:value="state.update.data.allowDomainMatcher" :unchecked-value="0" :checked-value="1"
+                        :round="false">
                 <template #checked>允许</template>
                 <template #unchecked>禁止</template>
               </n-switch>

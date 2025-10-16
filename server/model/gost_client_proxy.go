@@ -17,5 +17,6 @@ type GostClientProxy struct {
 	Status         int        `gorm:"column:status;size:1;default:1;comment:状态"`
 	UseEncryption  int        `gorm:"column:use_encryption;size:1;default:1;comment:加密"`
 	UseCompression int        `gorm:"column:use_compression;size:1;default:1;comment:压缩"`
+	PoolCount      int        `gorm:"column:pool_count;default:0;comment:复用连接数量"`
 	GostClientConfig
 }

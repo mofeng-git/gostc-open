@@ -23,6 +23,7 @@ type UpdateReq struct {
 	AuthPwd        string `json:"authPwd"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -59,6 +60,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		proxy.AuthPwd = req.AuthPwd
 		proxy.UseEncryption = req.UseEncryption
 		proxy.UseCompression = req.UseCompression
+		proxy.PoolCount = req.PoolCount
 
 		var oldPort = proxy.Port
 		if req.Port != "" && req.Port != oldPort {

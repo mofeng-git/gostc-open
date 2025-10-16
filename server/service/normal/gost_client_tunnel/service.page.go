@@ -36,6 +36,7 @@ type Item struct {
 	OutputBytes    int64      `json:"outputBytes"`
 	UseEncryption  int        `json:"useEncryption"`
 	UseCompression int        `json:"useCompression"`
+	PoolCount      int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -45,10 +46,11 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Address      string `json:"address"`
+	Online       int    `json:"online"`
+	MaxPoolCount int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -95,7 +97,8 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := tunnel.Node.GetAddress()
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache2.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				MaxPoolCount: tunnel.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   tunnel.ClientCode,
@@ -120,6 +123,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			OutputBytes:    obsInfo.OutputBytes,
 			UseEncryption:  tunnel.UseEncryption,
 			UseCompression: tunnel.UseCompression,
+			PoolCount:      tunnel.PoolCount,
 		})
 	}
 	return list, total

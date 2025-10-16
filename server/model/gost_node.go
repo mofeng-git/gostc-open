@@ -37,10 +37,10 @@ type GostNode struct {
 	Rules              string           `gorm:"column:rules;comment:规则限制"`
 	Tags               string           `gorm:"column:tags;comment:标签"`
 	Configs            []GostNodeConfig `gorm:"foreignKey:NodeCode;references:Code"`
-
-	LimitResetIndex int `gorm:"column:limit_reset_index;comment:重置日期索引"`
-	LimitTotal      int `gorm:"column:limit_total;comment:预警流量(GB)"`
-	LimitKind       int `gorm:"column:limit_kind;size:1;default:0;comment:限制方式"`
+	MaxPoolCount       int              `gorm:"column:max_pool_count;default:5;comment:复用连接最大数量"`
+	LimitResetIndex    int              `gorm:"column:limit_reset_index;comment:重置日期索引"`
+	LimitTotal         int              `gorm:"column:limit_total;comment:预警流量(GB)"`
+	LimitKind          int              `gorm:"column:limit_kind;size:1;default:0;comment:限制方式"`
 }
 
 // 生成更新指纹，对比指纹判断是否需要标记更新

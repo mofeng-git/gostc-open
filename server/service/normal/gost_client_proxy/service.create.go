@@ -27,6 +27,7 @@ type CreateReq struct {
 	ConfigCode     string `binding:"required" json:"configCode" label:"套餐配置"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -148,6 +149,7 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 			User:           model.SystemUser{},
 			UseEncryption:  req.UseEncryption,
 			UseCompression: req.UseCompression,
+			PoolCount:      req.PoolCount,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,

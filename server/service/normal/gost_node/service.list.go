@@ -32,6 +32,7 @@ type ListItem struct {
 	Configs      []ListItemConfig `json:"configs"`
 	Online       int              `json:"online"`
 	CustomDomain int              `json:"customDomain"`
+	MaxPoolCount int              `json:"maxPoolCount"`
 }
 
 type ListItemConfig struct {
@@ -103,6 +104,7 @@ func (service *service) List(claims jwt.Claims, req ListReq) (list []ListItem) {
 			Configs:            configs,
 			Online:             utils.TrinaryOperation(cache.GetNodeOnline(node.Code), 1, 2),
 			CustomDomain:       utils.TrinaryOperation(cache.GetNodeCustomDomain(node.Code), 1, 2),
+			MaxPoolCount:       node.MaxPoolCount,
 		})
 	}
 	return list

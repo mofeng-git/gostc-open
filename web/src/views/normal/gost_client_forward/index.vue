@@ -49,6 +49,7 @@ const state = ref({
       proxyProtocol: 0,
       useEncryption: 1,
       useCompression: 1,
+      poolCount: 0,
     },
     dataRules: {
       name: requiredRule('请输入名称'),
@@ -570,6 +571,14 @@ const operatorRenderLabel = (option) => {
               :options="[{label:'停用',value:2},{label:'启用',value:1}]"
               v-model:value="state.update.data.useCompression"
           ></n-select>
+        </n-form-item>
+        <n-alert :show-icon="false" type="info">并发请求数很高的服务，推荐适量设置一下连接复用数量，一般情况设置为0</n-alert>
+        <p/>
+        <n-form-item label="连接复用数量">
+          <n-input-number
+              v-model:value="state.update.data.poolCount" :min="0"
+              :max="state.update.data.node.maxPoolCount"
+          ></n-input-number>
         </n-form-item>
       </n-form>
     </Modal>

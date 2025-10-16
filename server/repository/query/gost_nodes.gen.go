@@ -55,6 +55,7 @@ func newGostNode(db *gorm.DB, opts ...gen.DOOption) gostNode {
 	_gostNode.P2PDisableForward = field.NewInt(tableName, "p2p_disable_forward")
 	_gostNode.Rules = field.NewString(tableName, "rules")
 	_gostNode.Tags = field.NewString(tableName, "tags")
+	_gostNode.MaxPoolCount = field.NewInt(tableName, "max_pool_count")
 	_gostNode.LimitResetIndex = field.NewInt(tableName, "limit_reset_index")
 	_gostNode.LimitTotal = field.NewInt(tableName, "limit_total")
 	_gostNode.LimitKind = field.NewInt(tableName, "limit_kind")
@@ -114,6 +115,7 @@ type gostNode struct {
 	P2PDisableForward  field.Int
 	Rules              field.String
 	Tags               field.String
+	MaxPoolCount       field.Int
 	LimitResetIndex    field.Int
 	LimitTotal         field.Int
 	LimitKind          field.Int
@@ -162,6 +164,7 @@ func (g *gostNode) updateTableName(table string) *gostNode {
 	g.P2PDisableForward = field.NewInt(table, "p2p_disable_forward")
 	g.Rules = field.NewString(table, "rules")
 	g.Tags = field.NewString(table, "tags")
+	g.MaxPoolCount = field.NewInt(table, "max_pool_count")
 	g.LimitResetIndex = field.NewInt(table, "limit_reset_index")
 	g.LimitTotal = field.NewInt(table, "limit_total")
 	g.LimitKind = field.NewInt(table, "limit_kind")
@@ -181,7 +184,7 @@ func (g *gostNode) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *gostNode) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 32)
+	g.fieldMap = make(map[string]field.Expr, 33)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -210,6 +213,7 @@ func (g *gostNode) fillFieldMap() {
 	g.fieldMap["p2p_disable_forward"] = g.P2PDisableForward
 	g.fieldMap["rules"] = g.Rules
 	g.fieldMap["tags"] = g.Tags
+	g.fieldMap["max_pool_count"] = g.MaxPoolCount
 	g.fieldMap["limit_reset_index"] = g.LimitResetIndex
 	g.fieldMap["limit_total"] = g.LimitTotal
 	g.fieldMap["limit_kind"] = g.LimitKind

@@ -18,6 +18,7 @@ type UpdateReq struct {
 	NoDelay        int    `json:"noDelay" label:"兼容模式"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -46,6 +47,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		tunnel.NoDelay = req.NoDelay
 		tunnel.UseEncryption = req.UseEncryption
 		tunnel.UseCompression = req.UseCompression
+		tunnel.PoolCount = req.PoolCount
 
 		if err := tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道失败", zap.Error(err))

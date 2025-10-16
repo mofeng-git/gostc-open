@@ -35,6 +35,7 @@ type Item struct {
 	UseCompression int        `json:"useCompression"`
 	WarnMsg        string     `json:"warnMsg"`
 	CreatedAt      string     `json:"createdAt"`
+	PoolCount      int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -49,6 +50,7 @@ type ItemNode struct {
 	Address           string `json:"address"`
 	Online            int    `json:"online"`
 	P2PDisableForward int    `json:"p2pDisableForward"`
+	MaxPoolCount      int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -97,6 +99,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				}(),
 				Online:            utils.TrinaryOperation(cache2.GetNodeOnline(p2p.NodeCode), 1, 2),
 				P2PDisableForward: p2p.Node.P2PDisableForward,
+				MaxPoolCount:      p2p.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,
@@ -119,6 +122,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 			CreatedAt:      p2p.CreatedAt.Format(time.DateTime),
 			UseEncryption:  p2p.UseEncryption,
 			UseCompression: p2p.UseCompression,
+			PoolCount:      p2p.PoolCount,
 		})
 	}
 	return list, total

@@ -23,6 +23,7 @@ type UpdateReq struct {
 	ProxyProtocol  int    `json:"proxyProtocol"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -57,6 +58,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		forward.ProxyProtocol = req.ProxyProtocol
 		forward.UseEncryption = req.UseEncryption
 		forward.UseCompression = req.UseCompression
+		forward.PoolCount = req.PoolCount
 
 		var oldPort = forward.Port
 		if req.Port != "" && req.Port != oldPort {

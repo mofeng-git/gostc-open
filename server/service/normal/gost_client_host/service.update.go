@@ -20,6 +20,7 @@ type UpdateReq struct {
 	DomainPrefix   string `binding:"required" json:"domainPrefix"`
 	UseEncryption  int    `json:"useEncryption"`
 	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -64,6 +65,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		host.DomainPrefix = req.DomainPrefix
 		host.UseEncryption = req.UseEncryption
 		host.UseCompression = req.UseCompression
+		host.PoolCount = req.PoolCount
 
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析失败", zap.Error(err))
