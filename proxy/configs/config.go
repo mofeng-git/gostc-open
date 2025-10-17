@@ -39,6 +39,7 @@ func (c *Config) GenerateCaddyfile() string {
 	cfgs = append(cfgs, `
 { 
     admin off
+	auto_https disable_redirects
 }
 `)
 
