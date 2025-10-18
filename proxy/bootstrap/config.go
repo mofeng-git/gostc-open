@@ -45,35 +45,21 @@ func watchConfigReload(configFilePath string) {
 	w := watcher.New()
 	w.SetMaxEvents(1)
 	w.FilterOps(watcher.Write)
+
+	delay := 3 * time.Second // 延迟更新时间，避免反复更新导致配置出现遗漏
+	var delayTimer *time.Timer
+
 	go func() {
 		for {
 			select {
 			case <-w.Event:
 				global.Logger.Info("watch config reload", zap.String("path", configFilePath))
-				configFileBytes, err := os.ReadFile(configFilePath)
-				if err != nil {
-					global.Logger.Warn("reload config fail", zap.String("path", configFilePath), zap.Error(err))
-					continue
+				if delayTimer != nil {
+					delayTimer.Stop()
 				}
-				var newConfig = configs.Config{}
-				if err := yaml.Unmarshal(configFileBytes, &newConfig); err != nil {
-					global.Logger.Warn("reload config fail", zap.String("path", configFilePath), zap.Error(err))
-					continue
-				}
-
-				cfgBytes, _, err := global.Config.ParseCaddyFileConfig()
-				if err != nil {
-					global.Logger.Warn("reload config fail, parse caddyfile fail", zap.String("path", configFilePath), zap.Error(err))
-					continue
-				}
-
-				if err := caddy.Load(cfgBytes, true); err != nil {
-					global.Logger.Warn("reload config fail, reload caddyfile fail", zap.String("path", configFilePath), zap.Error(err))
-					continue
-				}
-
-				global.Logger.Info("reload caddyfile", zap.String("caddyfile", string(cfgBytes)))
-				global.Config = &newConfig
+				delayTimer = time.AfterFunc(delay, func() {
+					reloadCaddyConfig(configFilePath)
+				})
 			case _ = <-w.Error:
 				return
 			case <-w.Closed:
@@ -90,6 +76,33 @@ func watchConfigReload(configFilePath string) {
 		return
 	}
 	global.Logger.Info("watcher config file success")
+}
+
+func reloadCaddyConfig(configFilePath string) {
+	configFileBytes, err := os.ReadFile(configFilePath)
+	if err != nil {
+		global.Logger.Error("reload config fail", zap.String("path", configFilePath), zap.Error(err))
+		return
+	}
+	var newConfig = configs.Config{}
+	if err := yaml.Unmarshal(configFileBytes, &newConfig); err != nil {
+		global.Logger.Error("reload config fail", zap.String("path", configFilePath), zap.Error(err))
+		return
+	}
+
+	cfgBytes, _, err := newConfig.ParseCaddyFileConfig()
+	if err != nil {
+		global.Logger.Error("reload config fail, parse caddyfile fail", zap.String("path", configFilePath), zap.Error(err))
+		return
+	}
+
+	if err := caddy.Load(cfgBytes, false); err != nil {
+		global.Logger.Error("reload config fail, reload caddyfile fail", zap.String("path", configFilePath), zap.Error(err))
+		return
+	}
+
+	global.Logger.Info("reload caddyfile", zap.String("caddyfile", string(cfgBytes)))
+	global.Config = &newConfig
 }
 
 func writeConfigFile(path string) error {
