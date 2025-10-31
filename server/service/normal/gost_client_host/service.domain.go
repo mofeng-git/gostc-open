@@ -84,7 +84,7 @@ func (service *service) Domain(userCode string, req DomainReq) error {
 		}
 
 		if req.CustomDomain != "" {
-			if strings.Contains(req.CustomDomain, node.Domain) {
+			if isSubdomain(req.CustomDomain, node.Domain) {
 				return errors.New("请使用你自己的域名")
 			}
 
@@ -118,4 +118,14 @@ func verifyCertificateAndKey(cert, key string) error {
 		return fmt.Errorf("证书对验证失败: %v", err)
 	}
 	return nil
+}
+
+// 判断是否为子域名
+func isSubdomain(target, base string) bool {
+	target = strings.ToLower(strings.TrimSuffix(target, "."))
+	base = strings.ToLower(strings.TrimSuffix(base, "."))
+	if target == base {
+		return true
+	}
+	return strings.HasSuffix(target, "."+base)
 }
