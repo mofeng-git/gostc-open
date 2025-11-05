@@ -49,6 +49,8 @@ func newGostClientHost(db *gorm.DB, opts ...gen.DOOption) gostClientHost {
 	_gostClientHost.UserCode = field.NewString(tableName, "user_code")
 	_gostClientHost.Enable = field.NewInt(tableName, "enable")
 	_gostClientHost.Status = field.NewInt(tableName, "status")
+	_gostClientHost.UseEncryption = field.NewInt(tableName, "use_encryption")
+	_gostClientHost.UseCompression = field.NewInt(tableName, "use_compression")
 	_gostClientHost.WhiteEnable = field.NewInt(tableName, "white_enable")
 	_gostClientHost.WhiteList = field.NewString(tableName, "white_list")
 	_gostClientHost.ChargingType = field.NewInt(tableName, "charging_type")
@@ -133,6 +135,8 @@ type gostClientHost struct {
 	UserCode            field.String
 	Enable              field.Int
 	Status              field.Int
+	UseEncryption       field.Int
+	UseCompression      field.Int
 	WhiteEnable         field.Int
 	WhiteList           field.String
 	ChargingType        field.Int
@@ -185,6 +189,8 @@ func (g *gostClientHost) updateTableName(table string) *gostClientHost {
 	g.UserCode = field.NewString(table, "user_code")
 	g.Enable = field.NewInt(table, "enable")
 	g.Status = field.NewInt(table, "status")
+	g.UseEncryption = field.NewInt(table, "use_encryption")
+	g.UseCompression = field.NewInt(table, "use_compression")
 	g.WhiteEnable = field.NewInt(table, "white_enable")
 	g.WhiteList = field.NewString(table, "white_list")
 	g.ChargingType = field.NewInt(table, "charging_type")
@@ -210,7 +216,7 @@ func (g *gostClientHost) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (g *gostClientHost) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 34)
+	g.fieldMap = make(map[string]field.Expr, 36)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -233,6 +239,8 @@ func (g *gostClientHost) fillFieldMap() {
 	g.fieldMap["user_code"] = g.UserCode
 	g.fieldMap["enable"] = g.Enable
 	g.fieldMap["status"] = g.Status
+	g.fieldMap["use_encryption"] = g.UseEncryption
+	g.fieldMap["use_compression"] = g.UseCompression
 	g.fieldMap["white_enable"] = g.WhiteEnable
 	g.fieldMap["white_list"] = g.WhiteList
 	g.fieldMap["charging_type"] = g.ChargingType

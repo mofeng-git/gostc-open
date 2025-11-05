@@ -58,7 +58,6 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			log.Error("续费用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientP2PConfig(tx, p2p.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        p2p.Code,
 			Type:        model.GOST_TUNNEL_TYPE_P2P,
@@ -69,6 +68,7 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			ExpAt:       p2p.ExpAt,
 			Limiter:     p2p.Limiter,
 		})
+		engine.ClientP2PConfig(tx, p2p.Code)
 		return nil
 	})
 }

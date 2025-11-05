@@ -16,12 +16,15 @@ import (
 )
 
 type CreateReq struct {
-	Name       string `binding:"required" json:"name" label:"名称"`
-	TargetIp   string `binding:"required" json:"targetIp" label:"内网IP"`
-	TargetPort string `binding:"required" json:"targetPort" label:"内网端口"`
-	NodeCode   string `binding:"required" json:"nodeCode" label:"节点编号"`
-	ClientCode string `binding:"required" json:"clientCode" label:"客户端编号"`
-	ConfigCode string `binding:"required" json:"configCode" label:"套餐配置"`
+	Name           string `binding:"required" json:"name" label:"名称"`
+	TargetIp       string `binding:"required" json:"targetIp" label:"内网IP"`
+	TargetPort     string `binding:"required" json:"targetPort" label:"内网端口"`
+	NodeCode       string `binding:"required" json:"nodeCode" label:"节点编号"`
+	ClientCode     string `binding:"required" json:"clientCode" label:"客户端编号"`
+	ConfigCode     string `binding:"required" json:"configCode" label:"套餐配置"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) error {
@@ -103,13 +106,16 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) error {
 		}
 
 		var p2p = model.GostClientP2P{
-			Name:       req.Name,
-			TargetIp:   req.TargetIp,
-			TargetPort: req.TargetPort,
-			VKey:       uuid.NewString(),
-			NodeCode:   req.NodeCode,
-			ClientCode: req.ClientCode,
-			UserCode:   claims.Code,
+			Name:           req.Name,
+			TargetIp:       req.TargetIp,
+			TargetPort:     req.TargetPort,
+			VKey:           uuid.NewString(),
+			NodeCode:       req.NodeCode,
+			ClientCode:     req.ClientCode,
+			UserCode:       claims.Code,
+			UseEncryption:  req.UseEncryption,
+			UseCompression: req.UseCompression,
+			PoolCount:      req.PoolCount,
 			GostClientConfig: model.GostClientConfig{
 				ChargingType: cfg.ChargingType,
 				Cycle:        cfg.Cycle,

@@ -19,20 +19,23 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code        string     `json:"code"`
-	Name        string     `json:"name"`
-	TargetIp    string     `json:"targetIp"`
-	TargetPort  string     `json:"targetPort"`
-	VKey        string     `json:"vKey"`
-	Forward     int        `json:"forward"`
-	Node        ItemNode   `json:"node"`
-	Client      ItemClient `json:"client"`
-	UserCode    string     `json:"userCode"`
-	UserAccount string     `json:"userAccount"`
-	Config      ItemConfig `json:"config"`
-	Enable      int        `json:"enable"`
-	WarnMsg     string     `json:"warnMsg"`
-	CreatedAt   string     `json:"createdAt"`
+	Code           string     `json:"code"`
+	Name           string     `json:"name"`
+	TargetIp       string     `json:"targetIp"`
+	TargetPort     string     `json:"targetPort"`
+	VKey           string     `json:"vKey"`
+	Forward        int        `json:"forward"`
+	Node           ItemNode   `json:"node"`
+	Client         ItemClient `json:"client"`
+	UserCode       string     `json:"userCode"`
+	UserAccount    string     `json:"userAccount"`
+	Config         ItemConfig `json:"config"`
+	Enable         int        `json:"enable"`
+	UseEncryption  int        `json:"useEncryption"`
+	UseCompression int        `json:"useCompression"`
+	WarnMsg        string     `json:"warnMsg"`
+	CreatedAt      string     `json:"createdAt"`
+	PoolCount      int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -47,6 +50,7 @@ type ItemNode struct {
 	Address           string `json:"address"`
 	Online            int    `json:"online"`
 	P2PDisableForward int    `json:"p2pDisableForward"`
+	MaxPoolCount      int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -95,6 +99,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				}(),
 				Online:            utils.TrinaryOperation(cache2.GetNodeOnline(p2p.NodeCode), 1, 2),
 				P2PDisableForward: p2p.Node.P2PDisableForward,
+				MaxPoolCount:      p2p.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   p2p.ClientCode,
@@ -112,9 +117,12 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     p2p.CLimiter,
 				ExpAt: time.Unix(p2p.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:    p2p.Enable,
-			WarnMsg:   warn_msg.GetP2PWarnMsg(*p2p),
-			CreatedAt: p2p.CreatedAt.Format(time.DateTime),
+			Enable:         p2p.Enable,
+			WarnMsg:        warn_msg.GetP2PWarnMsg(*p2p),
+			CreatedAt:      p2p.CreatedAt.Format(time.DateTime),
+			UseEncryption:  p2p.UseEncryption,
+			UseCompression: p2p.UseCompression,
+			PoolCount:      p2p.PoolCount,
 		})
 	}
 	return list, total

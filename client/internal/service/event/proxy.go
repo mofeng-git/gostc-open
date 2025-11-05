@@ -30,8 +30,8 @@ func ProxyHandle(client *arpc.Client, callback func(key, updateTag string), chec
 					Name: req.Name,
 					Type: "tcp",
 					Transport: v1.ProxyTransport{
-						UseEncryption:  true,
-						UseCompression: true,
+						UseEncryption:  req.UseEncryption == 1,
+						UseCompression: req.UseCompression == 1,
 						BandwidthLimit: func() types.BandwidthQuantity {
 							quantity, _ := types.NewBandwidthQuantity(req.Limiter)
 							return quantity

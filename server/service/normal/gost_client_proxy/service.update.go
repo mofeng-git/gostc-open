@@ -15,12 +15,15 @@ import (
 )
 
 type UpdateReq struct {
-	Code     string `binding:"required" json:"code"`
-	Name     string `binding:"required" json:"name"`
-	Port     string `json:"port" label:"本地端口"`
-	Protocol string `binding:"required" json:"protocol" label:"协议"`
-	AuthUser string `json:"authUser"`
-	AuthPwd  string `json:"authPwd"`
+	Code           string `binding:"required" json:"code"`
+	Name           string `binding:"required" json:"name"`
+	Port           string `json:"port" label:"本地端口"`
+	Protocol       string `binding:"required" json:"protocol" label:"协议"`
+	AuthUser       string `json:"authUser"`
+	AuthPwd        string `json:"authPwd"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -55,6 +58,9 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		proxy.Protocol = req.Protocol
 		proxy.AuthUser = req.AuthUser
 		proxy.AuthPwd = req.AuthPwd
+		proxy.UseEncryption = req.UseEncryption
+		proxy.UseCompression = req.UseCompression
+		proxy.PoolCount = req.PoolCount
 
 		var oldPort = proxy.Port
 		if req.Port != "" && req.Port != oldPort {

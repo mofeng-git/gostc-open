@@ -8,7 +8,6 @@ import (
 	"server/repository"
 	"server/repository/cache"
 	"server/repository/query"
-	"server/service/engine"
 	"time"
 )
 
@@ -62,7 +61,6 @@ func (service *service) Renew(claims jwt.Claims, req RenewReq) error {
 			log.Error("续费用户端口转发失败", zap.Error(err))
 			return errors.New("操作失败")
 		}
-		engine.ClientHostConfig(tx, host.Code)
 		cache.SetTunnelInfo(cache.TunnelInfo{
 			Code:        host.Code,
 			Type:        model.GOST_TUNNEL_TYPE_HOST,

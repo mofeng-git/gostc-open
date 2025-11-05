@@ -19,21 +19,24 @@ type PageReq struct {
 }
 
 type Item struct {
-	Code        string     `json:"code"`
-	Name        string     `json:"name"`
-	TargetIp    string     `json:"targetIp"`
-	TargetPort  string     `json:"targetPort"`
-	VKey        string     `json:"vKey"`
-	Node        ItemNode   `json:"node"`
-	Client      ItemClient `json:"client"`
-	UserCode    string     `json:"userCode"`
-	UserAccount string     `json:"userAccount"`
-	Config      ItemConfig `json:"config"`
-	Enable      int        `json:"enable"`
-	WarnMsg     string     `json:"warnMsg"`
-	CreatedAt   string     `json:"createdAt"`
-	InputBytes  int64      `json:"inputBytes"`
-	OutputBytes int64      `json:"outputBytes"`
+	Code           string     `json:"code"`
+	Name           string     `json:"name"`
+	TargetIp       string     `json:"targetIp"`
+	TargetPort     string     `json:"targetPort"`
+	VKey           string     `json:"vKey"`
+	Node           ItemNode   `json:"node"`
+	Client         ItemClient `json:"client"`
+	UserCode       string     `json:"userCode"`
+	UserAccount    string     `json:"userAccount"`
+	Config         ItemConfig `json:"config"`
+	Enable         int        `json:"enable"`
+	WarnMsg        string     `json:"warnMsg"`
+	CreatedAt      string     `json:"createdAt"`
+	InputBytes     int64      `json:"inputBytes"`
+	OutputBytes    int64      `json:"outputBytes"`
+	UseEncryption  int        `json:"useEncryption"`
+	UseCompression int        `json:"useCompression"`
+	PoolCount      int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -43,10 +46,11 @@ type ItemClient struct {
 }
 
 type ItemNode struct {
-	Code    string `json:"code"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Online  int    `json:"online"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Address      string `json:"address"`
+	Online       int    `json:"online"`
+	MaxPoolCount int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -93,7 +97,8 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 					address, _ := tunnel.Node.GetAddress()
 					return address
 				}(),
-				Online: utils.TrinaryOperation(cache2.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				Online:       utils.TrinaryOperation(cache2.GetNodeOnline(tunnel.NodeCode), 1, 2),
+				MaxPoolCount: tunnel.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   tunnel.ClientCode,
@@ -111,11 +116,14 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     tunnel.CLimiter,
 				ExpAt: time.Unix(tunnel.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:      tunnel.Enable,
-			WarnMsg:     warn_msg.GetTunnelWarnMsg(*tunnel),
-			CreatedAt:   tunnel.CreatedAt.Format(time.DateTime),
-			InputBytes:  obsInfo.InputBytes,
-			OutputBytes: obsInfo.OutputBytes,
+			Enable:         tunnel.Enable,
+			WarnMsg:        warn_msg.GetTunnelWarnMsg(*tunnel),
+			CreatedAt:      tunnel.CreatedAt.Format(time.DateTime),
+			InputBytes:     obsInfo.InputBytes,
+			OutputBytes:    obsInfo.OutputBytes,
+			UseEncryption:  tunnel.UseEncryption,
+			UseCompression: tunnel.UseCompression,
+			PoolCount:      tunnel.PoolCount,
 		})
 	}
 	return list, total

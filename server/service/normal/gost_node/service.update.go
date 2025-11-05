@@ -37,6 +37,7 @@ type UpdateReq struct {
 	LimitResetIndex int `json:"limitResetIndex"`
 	LimitTotal      int `json:"limitTotal"`
 	LimitKind       int `json:"limitKind"`
+	MaxPoolCount    int `json:"maxPoolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -72,6 +73,7 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 	node.ForwardPorts = req.ForwardPorts
 	node.P2PDisableForward = req.P2PDisableForward
 	node.IndexValue = req.IndexValue
+	node.MaxPoolCount = req.MaxPoolCount
 
 	node.LimitResetIndex = req.LimitResetIndex
 	node.LimitTotal = req.LimitTotal

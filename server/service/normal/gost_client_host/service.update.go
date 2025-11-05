@@ -12,12 +12,15 @@ import (
 )
 
 type UpdateReq struct {
-	Code         string `binding:"required" json:"code"`
-	Name         string `binding:"required" json:"name"`
-	TargetIp     string `binding:"required" json:"targetIp"`
-	TargetPort   string `binding:"required" json:"targetPort"`
-	TargetHttps  int    `json:"targetHttps"`
-	DomainPrefix string `binding:"required" json:"domainPrefix"`
+	Code           string `binding:"required" json:"code"`
+	Name           string `binding:"required" json:"name"`
+	TargetIp       string `binding:"required" json:"targetIp"`
+	TargetPort     string `binding:"required" json:"targetPort"`
+	TargetHttps    int    `json:"targetHttps"`
+	DomainPrefix   string `binding:"required" json:"domainPrefix"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -60,6 +63,9 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		host.TargetPort = req.TargetPort
 		host.TargetHttps = req.TargetHttps
 		host.DomainPrefix = req.DomainPrefix
+		host.UseEncryption = req.UseEncryption
+		host.UseCompression = req.UseCompression
+		host.PoolCount = req.PoolCount
 
 		if err := tx.GostClientHost.Save(host); err != nil {
 			log.Error("修改域名解析失败", zap.Error(err))

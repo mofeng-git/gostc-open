@@ -44,6 +44,8 @@ func newGostClientTunnel(db *gorm.DB, opts ...gen.DOOption) gostClientTunnel {
 	_gostClientTunnel.UserCode = field.NewString(tableName, "user_code")
 	_gostClientTunnel.Enable = field.NewInt(tableName, "enable")
 	_gostClientTunnel.Status = field.NewInt(tableName, "status")
+	_gostClientTunnel.UseEncryption = field.NewInt(tableName, "use_encryption")
+	_gostClientTunnel.UseCompression = field.NewInt(tableName, "use_compression")
 	_gostClientTunnel.ChargingType = field.NewInt(tableName, "charging_type")
 	_gostClientTunnel.Cycle = field.NewInt(tableName, "cycle")
 	_gostClientTunnel.Amount = field.NewField(tableName, "amount")
@@ -103,32 +105,34 @@ func newGostClientTunnel(db *gorm.DB, opts ...gen.DOOption) gostClientTunnel {
 type gostClientTunnel struct {
 	gostClientTunnelDo
 
-	ALL          field.Asterisk
-	Id           field.Int
-	Code         field.String
-	AllowEdit    field.Int
-	AllowDel     field.Int
-	Version      field.Int64
-	CreatedAt    field.Time
-	UpdatedAt    field.Time
-	Name         field.String
-	TargetIp     field.String
-	TargetPort   field.String
-	VKey         field.String
-	NoDelay      field.Int
-	NodeCode     field.String
-	ClientCode   field.String
-	UserCode     field.String
-	Enable       field.Int
-	Status       field.Int
-	ChargingType field.Int
-	Cycle        field.Int
-	Amount       field.Field
-	Limiter      field.Int
-	RLimiter     field.Int
-	CLimiter     field.Int
-	ExpAt        field.Int64
-	Node         gostClientTunnelBelongsToNode
+	ALL            field.Asterisk
+	Id             field.Int
+	Code           field.String
+	AllowEdit      field.Int
+	AllowDel       field.Int
+	Version        field.Int64
+	CreatedAt      field.Time
+	UpdatedAt      field.Time
+	Name           field.String
+	TargetIp       field.String
+	TargetPort     field.String
+	VKey           field.String
+	NoDelay        field.Int
+	NodeCode       field.String
+	ClientCode     field.String
+	UserCode       field.String
+	Enable         field.Int
+	Status         field.Int
+	UseEncryption  field.Int
+	UseCompression field.Int
+	ChargingType   field.Int
+	Cycle          field.Int
+	Amount         field.Field
+	Limiter        field.Int
+	RLimiter       field.Int
+	CLimiter       field.Int
+	ExpAt          field.Int64
+	Node           gostClientTunnelBelongsToNode
 
 	Client gostClientTunnelBelongsToClient
 
@@ -166,6 +170,8 @@ func (g *gostClientTunnel) updateTableName(table string) *gostClientTunnel {
 	g.UserCode = field.NewString(table, "user_code")
 	g.Enable = field.NewInt(table, "enable")
 	g.Status = field.NewInt(table, "status")
+	g.UseEncryption = field.NewInt(table, "use_encryption")
+	g.UseCompression = field.NewInt(table, "use_compression")
 	g.ChargingType = field.NewInt(table, "charging_type")
 	g.Cycle = field.NewInt(table, "cycle")
 	g.Amount = field.NewField(table, "amount")
@@ -189,7 +195,7 @@ func (g *gostClientTunnel) GetFieldByName(fieldName string) (field.OrderExpr, bo
 }
 
 func (g *gostClientTunnel) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 27)
+	g.fieldMap = make(map[string]field.Expr, 29)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -207,6 +213,8 @@ func (g *gostClientTunnel) fillFieldMap() {
 	g.fieldMap["user_code"] = g.UserCode
 	g.fieldMap["enable"] = g.Enable
 	g.fieldMap["status"] = g.Status
+	g.fieldMap["use_encryption"] = g.UseEncryption
+	g.fieldMap["use_compression"] = g.UseCompression
 	g.fieldMap["charging_type"] = g.ChargingType
 	g.fieldMap["cycle"] = g.Cycle
 	g.fieldMap["amount"] = g.Amount

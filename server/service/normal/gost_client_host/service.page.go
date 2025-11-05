@@ -42,6 +42,9 @@ type Item struct {
 	OutputBytes         int64      `json:"outputBytes"`
 	WhiteEnable         int        `json:"whiteEnable"`
 	WhiteList           []string   `json:"whiteList"`
+	UseEncryption       int        `json:"useEncryption"`
+	UseCompression      int        `json:"useCompression"`
+	PoolCount           int        `json:"poolCount"`
 }
 
 type ItemClient struct {
@@ -58,6 +61,7 @@ type ItemNode struct {
 	Domain             string `json:"domain"`
 	CustomDomain       int    `json:"customDomain"`
 	AllowDomainMatcher int    `json:"allowDomainMatcher"`
+	MaxPoolCount       int    `json:"maxPoolCount"`
 }
 
 type ItemConfig struct {
@@ -116,6 +120,7 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				Domain:             host.Node.Domain,
 				CustomDomain:       utils.TrinaryOperation(cache2.GetNodeCustomDomain(host.NodeCode), 1, 2),
 				AllowDomainMatcher: host.Node.AllowDomainMatcher,
+				MaxPoolCount:       host.Node.MaxPoolCount,
 			},
 			Client: ItemClient{
 				Code:   host.ClientCode,
@@ -131,13 +136,16 @@ func (service *service) Page(claims jwt.Claims, req PageReq) (list []Item, total
 				//CLimiter:     host.CLimiter,
 				ExpAt: time.Unix(host.ExpAt, 0).Format(time.DateTime),
 			},
-			Enable:      host.Enable,
-			WarnMsg:     warn_msg.GetHostWarnMsg(*host),
-			CreatedAt:   host.CreatedAt.Format(time.DateTime),
-			InputBytes:  obsInfo.InputBytes,
-			OutputBytes: obsInfo.OutputBytes,
-			WhiteEnable: host.WhiteEnable,
-			WhiteList:   host.GetWhiteList(),
+			Enable:         host.Enable,
+			WarnMsg:        warn_msg.GetHostWarnMsg(*host),
+			CreatedAt:      host.CreatedAt.Format(time.DateTime),
+			InputBytes:     obsInfo.InputBytes,
+			OutputBytes:    obsInfo.OutputBytes,
+			WhiteEnable:    host.WhiteEnable,
+			WhiteList:      host.GetWhiteList(),
+			UseEncryption:  host.UseEncryption,
+			UseCompression: host.UseCompression,
+			PoolCount:      host.PoolCount,
 		})
 	}
 	return list, total

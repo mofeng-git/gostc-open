@@ -48,6 +48,8 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 	_gostClientForward.Matcher = field.NewString(tableName, "matcher")
 	_gostClientForward.TcpMatcher = field.NewString(tableName, "tcp_matcher")
 	_gostClientForward.SSHMatcher = field.NewString(tableName, "ssh_matcher")
+	_gostClientForward.UseEncryption = field.NewInt(tableName, "use_encryption")
+	_gostClientForward.UseCompression = field.NewInt(tableName, "use_compression")
 	_gostClientForward.WhiteEnable = field.NewInt(tableName, "white_enable")
 	_gostClientForward.WhiteList = field.NewString(tableName, "white_list")
 	_gostClientForward.ChargingType = field.NewInt(tableName, "charging_type")
@@ -109,38 +111,40 @@ func newGostClientForward(db *gorm.DB, opts ...gen.DOOption) gostClientForward {
 type gostClientForward struct {
 	gostClientForwardDo
 
-	ALL           field.Asterisk
-	Id            field.Int
-	Code          field.String
-	AllowEdit     field.Int
-	AllowDel      field.Int
-	Version       field.Int64
-	CreatedAt     field.Time
-	UpdatedAt     field.Time
-	Name          field.String
-	TargetIp      field.String
-	TargetPort    field.String
-	Port          field.String
-	ProxyProtocol field.Int
-	NodeCode      field.String
-	ClientCode    field.String
-	UserCode      field.String
-	Enable        field.Int
-	Status        field.Int
-	MatcherEnable field.Int
-	Matcher       field.String
-	TcpMatcher    field.String
-	SSHMatcher    field.String
-	WhiteEnable   field.Int
-	WhiteList     field.String
-	ChargingType  field.Int
-	Cycle         field.Int
-	Amount        field.Field
-	Limiter       field.Int
-	RLimiter      field.Int
-	CLimiter      field.Int
-	ExpAt         field.Int64
-	Node          gostClientForwardBelongsToNode
+	ALL            field.Asterisk
+	Id             field.Int
+	Code           field.String
+	AllowEdit      field.Int
+	AllowDel       field.Int
+	Version        field.Int64
+	CreatedAt      field.Time
+	UpdatedAt      field.Time
+	Name           field.String
+	TargetIp       field.String
+	TargetPort     field.String
+	Port           field.String
+	ProxyProtocol  field.Int
+	NodeCode       field.String
+	ClientCode     field.String
+	UserCode       field.String
+	Enable         field.Int
+	Status         field.Int
+	MatcherEnable  field.Int
+	Matcher        field.String
+	TcpMatcher     field.String
+	SSHMatcher     field.String
+	UseEncryption  field.Int
+	UseCompression field.Int
+	WhiteEnable    field.Int
+	WhiteList      field.String
+	ChargingType   field.Int
+	Cycle          field.Int
+	Amount         field.Field
+	Limiter        field.Int
+	RLimiter       field.Int
+	CLimiter       field.Int
+	ExpAt          field.Int64
+	Node           gostClientForwardBelongsToNode
 
 	Client gostClientForwardBelongsToClient
 
@@ -182,6 +186,8 @@ func (g *gostClientForward) updateTableName(table string) *gostClientForward {
 	g.Matcher = field.NewString(table, "matcher")
 	g.TcpMatcher = field.NewString(table, "tcp_matcher")
 	g.SSHMatcher = field.NewString(table, "ssh_matcher")
+	g.UseEncryption = field.NewInt(table, "use_encryption")
+	g.UseCompression = field.NewInt(table, "use_compression")
 	g.WhiteEnable = field.NewInt(table, "white_enable")
 	g.WhiteList = field.NewString(table, "white_list")
 	g.ChargingType = field.NewInt(table, "charging_type")
@@ -207,7 +213,7 @@ func (g *gostClientForward) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (g *gostClientForward) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 33)
+	g.fieldMap = make(map[string]field.Expr, 35)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["code"] = g.Code
 	g.fieldMap["allow_edit"] = g.AllowEdit
@@ -229,6 +235,8 @@ func (g *gostClientForward) fillFieldMap() {
 	g.fieldMap["matcher"] = g.Matcher
 	g.fieldMap["tcp_matcher"] = g.TcpMatcher
 	g.fieldMap["ssh_matcher"] = g.SSHMatcher
+	g.fieldMap["use_encryption"] = g.UseEncryption
+	g.fieldMap["use_compression"] = g.UseCompression
 	g.fieldMap["white_enable"] = g.WhiteEnable
 	g.fieldMap["white_list"] = g.WhiteList
 	g.fieldMap["charging_type"] = g.ChargingType

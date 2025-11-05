@@ -11,11 +11,14 @@ import (
 )
 
 type UpdateReq struct {
-	Code       string `binding:"required" json:"code"`
-	Name       string `binding:"required" json:"name"`
-	TargetIp   string `binding:"required" json:"targetIp"`
-	TargetPort string `binding:"required" json:"targetPort"`
-	NoDelay    int    `json:"noDelay" label:"兼容模式"`
+	Code           string `binding:"required" json:"code"`
+	Name           string `binding:"required" json:"name"`
+	TargetIp       string `binding:"required" json:"targetIp"`
+	TargetPort     string `binding:"required" json:"targetPort"`
+	NoDelay        int    `json:"noDelay" label:"兼容模式"`
+	UseEncryption  int    `json:"useEncryption"`
+	UseCompression int    `json:"useCompression"`
+	PoolCount      int    `json:"poolCount"`
 }
 
 func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
@@ -42,6 +45,9 @@ func (service *service) Update(claims jwt.Claims, req UpdateReq) error {
 		tunnel.TargetIp = req.TargetIp
 		tunnel.TargetPort = req.TargetPort
 		tunnel.NoDelay = req.NoDelay
+		tunnel.UseEncryption = req.UseEncryption
+		tunnel.UseCompression = req.UseCompression
+		tunnel.PoolCount = req.PoolCount
 
 		if err := tx.GostClientTunnel.Save(tunnel); err != nil {
 			log.Error("修改私有隧道失败", zap.Error(err))
