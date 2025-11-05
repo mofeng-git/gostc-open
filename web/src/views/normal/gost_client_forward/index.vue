@@ -47,7 +47,7 @@ const state = ref({
       targetIp: '',
       targetPort: '',
       proxyProtocol: 0,
-      useEncryption: 1,
+      useEncryption: 2,
       useCompression: 1,
       poolCount: 0,
     },

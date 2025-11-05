@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	system_config_base_key  = "system:config:base"
-	system_config_gost_key  = "system:config:gost"
-	system_config_email_key = "system:config:email"
+    system_config_base_key  = "system:config:base"
+    system_config_gost_key  = "system:config:gost"
+    system_config_email_key = "system:config:email"
+    system_config_home_key  = "system:config:home"
 )
 
 func SetSystemConfigBase(cfg model.SystemConfigBase) {
@@ -33,5 +34,13 @@ func SetSystemConfigEmail(cfg model.SystemConfigEmail) {
 }
 
 func GetSystemConfigEmail(cfg *model.SystemConfigEmail) {
-	_ = global.Cache.GetStruct(system_config_email_key, cfg)
+    _ = global.Cache.GetStruct(system_config_email_key, cfg)
+}
+
+func SetSystemConfigHome(cfg model.SystemConfigHome) {
+    global.Cache.SetStruct(system_config_home_key, cfg, cache.NoExpiration)
+}
+
+func GetSystemConfigHome(cfg *model.SystemConfigHome) {
+    _ = global.Cache.GetStruct(system_config_home_key, cfg)
 }

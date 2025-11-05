@@ -39,6 +39,17 @@ export const adminRouters = [
                         },
                     },
                     {
+                        path: 'home',
+                        name: 'AdminSystemConfigHome',
+                        component: () => import('../../views/admin/system_config_home/index.vue'),
+                        meta: {
+                            title: '首页配置',
+                            layout: 'simple',
+                            hidden: 2,
+                            icon: '<svg t="1739192382239" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5463" width="200" height="200"><path d="M458.752 121.856l-332.8 294.912c-5.12 4.608-7.68 11.264-7.68 17.408v447.488c0 13.312 10.752 24.064 24.064 24.064h211.968c13.312 0 24.064-10.752 24.064-24.064V640h153.6v241.152c0 13.312 10.752 24.064 24.064 24.064h211.968c13.312 0 24.064-10.752 24.064-24.064V434.176c0-6.144-2.56-12.8-7.68-17.408L565.248 121.856c-8.704-7.68-22.528-7.68-30.72 0z" fill="#888888"></path></svg>',
+                        }
+                    },
+                    {
                         path: 'gost',
                         name: 'AdminSystemConfigGost',
                         component: () => import('../../views/admin/system_config_gost/index.vue'),

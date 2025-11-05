@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	SYSTEM_CONFIG_KIND_BASE  = "SystemConfigBase"  // 基础配置
-	SYSTEM_CONFIG_KIND_GOST  = "SystemConfigGost"  // Gost配置
-	SYSTEM_CONFIG_KIND_EMAIL = "SystemConfigEmail" // 邮件配置
+    SYSTEM_CONFIG_KIND_BASE  = "SystemConfigBase"  // 基础配置
+    SYSTEM_CONFIG_KIND_GOST  = "SystemConfigGost"  // Gost配置
+    SYSTEM_CONFIG_KIND_EMAIL = "SystemConfigEmail" // 邮件配置
+    SYSTEM_CONFIG_KIND_HOME  = "SystemConfigHome"  // 首页配置（服务端渲染HTML）
 )
 
 type SystemConfig struct {
@@ -159,15 +160,15 @@ func (cfg SystemConfigEmail) GenerateResetPwdResultTpl(account, password string,
 }
 
 func GenerateSystemConfigEmail(enable, nickName, host, port, user, pwd, resetPwdTpl string) []*SystemConfig {
-	return []*SystemConfig{
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "enable", Value: enable},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "nickName", Value: nickName},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "host", Value: host},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "port", Value: port},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "user", Value: user},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "pwd", Value: pwd},
-		{Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "resetPwdTpl", Value: resetPwdTpl},
-	}
+    return []*SystemConfig{
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "enable", Value: enable},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "nickName", Value: nickName},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "host", Value: host},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "port", Value: port},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "user", Value: user},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "pwd", Value: pwd},
+        {Kind: SYSTEM_CONFIG_KIND_EMAIL, Key: "resetPwdTpl", Value: resetPwdTpl},
+    }
 }
 
 func GetSystemConfigEmail(list []*SystemConfig) (result SystemConfigEmail) {
@@ -192,5 +193,33 @@ func GetSystemConfigEmail(list []*SystemConfig) (result SystemConfigEmail) {
 			result.ResetPwdTpl = item.Value
 		}
 	}
-	return result
+    return result
+}
+
+// 首页配置（仅支持HTML模板，不支持Markdown/JS渲染）
+type SystemConfigHome struct {
+    HomeEnable string `json:"homeEnable"` // "1"=开启动态首页；其它值则跳转 /login
+    HomeTpl    string `json:"homeTpl"`    // 自定义HTML模板（可含Go模板占位符）
+}
+
+func GenerateSystemConfigHome(homeEnable, homeTpl string) []*SystemConfig {
+    return []*SystemConfig{
+        {Kind: SYSTEM_CONFIG_KIND_HOME, Key: "homeEnable", Value: homeEnable},
+        {Kind: SYSTEM_CONFIG_KIND_HOME, Key: "homeTpl", Value: homeTpl},
+    }
+}
+
+func GetSystemConfigHome(list []*SystemConfig) (result SystemConfigHome) {
+    for _, item := range list {
+        if item.Kind != SYSTEM_CONFIG_KIND_HOME {
+            continue
+        }
+        switch item.Key {
+        case "homeEnable":
+            result.HomeEnable = item.Value
+        case "homeTpl":
+            result.HomeTpl = item.Value
+        }
+    }
+    return result
 }

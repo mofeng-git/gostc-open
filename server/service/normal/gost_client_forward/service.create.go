@@ -31,7 +31,7 @@ type CreateReq struct {
 }
 
 func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
-	db, _, log := repository.Get("")
+    db, _, log := repository.Get("")
 	if !utils.ValidateLocalIP(req.TargetIp) {
 		return errors.New("内网IP格式错误")
 	}
@@ -48,8 +48,8 @@ func (service *service) Create(claims jwt.Claims, req CreateReq) (err error) {
 		return errors.New("管理员未启用该功能")
 	}
 
-	return db.Transaction(func(tx *query.Query) error {
-		user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
+    return db.Transaction(func(tx *query.Query) error {
+        user, _ := tx.SystemUser.Where(tx.SystemUser.Code.Eq(claims.Code)).First()
 		if user == nil {
 			return errors.New("用户错误")
 		}

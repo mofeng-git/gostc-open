@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ .config.title }}</title>
+  {{ if .config.favicon }}<link rel="icon" href="{{ .config.favicon }}" />{{ end }}
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="robots" content="noindex" />
+  <meta name="referrer" content="same-origin" />
+  <base href="/" />
+  <!-- Tailwind CSS (CDN JIT) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { accent: '#2BD9D4' } } } }
+  </script>
+</head>
+<body class="bg-[#0F2234] text-slate-100 antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-slate-900/70 backdrop-blur border-b border-white/10">
+    <div class="mx-auto w-[88%] px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center font-bold text-[18px]"><span>{{ .config.title }}</span></div>
+      <nav class="hidden md:flex items-center gap-8 text-sm">
+        <a class="text-accent border-b-2 border-accent pb-1" href="/" target="_top">首页</a>
+        <a class="text-slate-400 hover:text-accent transition-colors pb-1" href="{{ .login_url }}" target="_top">控制台</a>
+        <a class="text-slate-400 hover:text-accent transition-colors pb-1" href="https://www.github.com/sianhh/gostc-open" target="_top">社区版</a>
+      </nav>
+      <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-accent transition" aria-label="Toggle menu">
+        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"><path d="M904 160H120v80h784v-80zM904 744H120v80h784v-80zM904 464H120v80h784v-80z" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden border-t border-white/10">
+      <div class="mx-auto w-[88%] px-4 py-3 flex flex-col space-y-3">
+        <a href="/" target="_top" class="text-accent font-medium py-2">首页</a>
+        <a href="{{ .login_url }}" target="_top" class="text-slate-300 font-medium hover:text-accent transition">控制台</a>
+        <a href="https://www.github.com/sianhh/gostc-open" target="_top" class="text-slate-300 font-medium hover:text-accent transition">社区版</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section class="bg-gradient-to-br from-[#121C27] to-[#0F2234] min-h-[60vh] flex items-center justify-center py-16 text-center">
+    <div class="mx-auto w-[88%] px-4">
+      <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-extrabold tracking-tight mb-6">{{ .config.title }}</h1>
+      <p class="text-[clamp(1.1rem,2vw,1.5rem)] text-slate-400 max-w-3xl mx-auto mb-10">基于 FRP 开发的内网穿透系统，提供高效、便捷的在线管理配置方案</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a class="inline-flex items-center justify-center h-12 px-8 rounded-xl bg-accent text-slate-900 font-semibold hover:-translate-y-0.5 transition" href="{{ .login_url }}" target="_top">开始使用</a>
+        <a class="inline-flex items-center justify-center h-12 px-8 rounded-xl ring-1 ring-accent text-accent hover:bg-accent/10 transition" href="https://www.github.com/sianhh/gostc-open" target="_top">社区版</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心特性 -->
+  <section class="py-20">
+    <div class="mx-auto w-[88%] px-4">
+      <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">核心特性</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="rounded-xl border border-white/10 bg-white/5 p-8 hover:-translate-y-0.5 transition">
+          <h3 class="text-xl font-bold mb-4">基础功能</h3>
+          <p class="text-slate-400">支持 HTTP(S)、TCP、UDP、STCP、SUDP、XTCP、SOCKS5_PROXY；支持流量统计</p>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-8 hover:-translate-y-0.5 transition">
+          <h3 class="text-xl font-bold mb-4">特色功能</h3>
+          <p class="text-slate-400">在线 Web 管理配置，修改实时生效；支持官方 FRP 配置下发；多用户、多节点，隧道可按需启停</p>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-8 hover:-translate-y-0.5 transition">
+          <h3 class="text-xl font-bold mb-4">性能高效</h3>
+          <p class="text-slate-400">保留 FRP 协议并优化 QUIC，相比原版更高效</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 数据统计 -->
+  <section class="py-20">
+    <div class="mx-auto w-[88%] px-4">
+      <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">数据统计</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">今日流量</div>
+          <div class="text-2xl font-bold">{{ .stats.today_flow }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">注册用户</div>
+          <div class="text-2xl font-bold">{{ .stats.user_total }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">今日签到</div>
+          <div class="text-2xl font-bold">{{ .stats.checkin_today }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">隧道数量</div>
+          <div class="text-2xl font-bold">{{ .stats.tunnel_total }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">在线节点</div>
+          <div class="text-2xl font-bold">{{ .stats.node_online }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <div class="text-sm text-slate-400 mb-2">在线客户端</div>
+          <div class="text-2xl font-bold">{{ .stats.client_online }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-slate-900/60 border-t border-white/10">
+    <div class="mx-auto w-[88%] px-4 py-12">
+      <div class="grid gap-8 md:grid-cols-3 mb-6">
+        <div>
+          <div class="font-bold mb-2">{{ .config.title }}</div>
+          <p class="text-slate-400 mb-2">为用户提供简单、易用的内网穿透服务</p>
+          <div class="flex gap-3"><a class="text-slate-400 hover:text-accent" href="https://www.github.com/sianhh/gostc-open" target="_top">GitHub</a></div>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">资源</h3>
+          <div class="flex flex-col gap-2">
+            <a class="text-slate-400 hover:text-accent" href="https://docs.sian.one" target="_top">文档</a>
+            <a class="text-slate-400 hover:text-accent" href="https://www.bilibili.com/video/BV191VhzFEX6" target="_top">视频教程</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">关于</h3>
+          <div class="text-slate-400 flex flex-col gap-2">
+            <span>QQ 交流群: 904675027</span>
+            <span>开发者 QQ: 2958422596</span>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-5 text-center text-slate-400 text-sm">© 2025 {{ .config.title }} · 保留所有权利</div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部按钮（右侧居中） -->
+  <button id="backToTop" class="fixed right-4 bottom-6 z-50 bg-accent text-slate-900 w-12 h-12 rounded-full flex items-center justify-center transition opacity-0 invisible" aria-label="Back to top">
+    <svg viewBox="0 0 1024 1024" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg"><path d="M534.6 403.5l294.2 294.2c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L557.3 335.6c-25-25-65.5-25-90.5 0L150 652.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l294.1-294.2c12.5-12.5 32.5-12.5 45.2 0z" fill="#031219"/></svg>
+  </button>
+
+  <script>
+    // 移动端菜单切换
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn')
+    const mobileMenu = document.getElementById('mobileMenu')
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'))
+    }
+
+    // 返回顶部显隐与点击
+    const backToTopBtn = document.getElementById('backToTop')
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) backToTopBtn.classList.remove('opacity-0','invisible')
+      else backToTopBtn.classList.add('opacity-0','invisible')
+    })
+    backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
+  </script>
+</body>
+</html>

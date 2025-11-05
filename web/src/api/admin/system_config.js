@@ -41,3 +41,11 @@ export const apiAdminSystemConfigQuery = (data) => {
         data
     })
 }
+
+export const apiAdminSystemConfigHome = (data) => {
+    return request.request({
+        url: `${baseUrl}/home`,
+        method: 'POST',
+        data
+    })
+}

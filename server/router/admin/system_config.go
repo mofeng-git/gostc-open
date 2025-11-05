@@ -8,10 +8,11 @@ import (
 )
 
 func InitSystemConfig(group *gin.RouterGroup) {
-	g := group.Group("system/config", middleware.Auth(global.Jwt), middleware.AuthAdmin())
-	g.POST("base", system_config.Base)
-	g.POST("gost", system_config.Gost)
-	g.POST("email", system_config.Email)
-	g.POST("emailVerify", system_config.EmailVerify)
-	g.POST("query", system_config.Query)
+    g := group.Group("system/config", middleware.Auth(global.Jwt), middleware.AuthAdmin())
+    g.POST("base", system_config.Base)
+    g.POST("gost", system_config.Gost)
+    g.POST("email", system_config.Email)
+    g.POST("emailVerify", system_config.EmailVerify)
+    g.POST("query", system_config.Query)
+    g.POST("home", system_config.Home)
 }

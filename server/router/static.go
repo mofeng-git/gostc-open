@@ -1,15 +1,20 @@
 package router
 
 import (
-	"archive/zip"
-	"bytes"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"io"
-	"net/http"
-	"path/filepath"
-	"server/web"
-	"strings"
+    "archive/zip"
+    "bytes"
+    "fmt"
+    "github.com/gin-gonic/gin"
+    "html/template"
+    "io"
+    "net/http"
+    "path/filepath"
+    "server/model"
+    cache2 "server/repository/cache"
+    dashboardSvc "server/service/admin/dashboard"
+    "server/web"
+    "strings"
+    "time"
 )
 
 var fileContentTypeMap = map[string]string{
@@ -65,12 +70,12 @@ func StaticFile(zipFile []byte, callback func(fileMap map[string][]byte)) error 
 }
 
 func InitStatic(engine *gin.Engine) error {
-	return StaticFile(web.Static(), func(fileMap map[string][]byte) {
-		// 预检查index.html是否存在
-		indexHTML, ok := fileMap["dist/index.html"]
-		if !ok {
-			panic("dist/index.html 文件不存在")
-		}
+    return StaticFile(web.Static(), func(fileMap map[string][]byte) {
+        // 预检查index.html是否存在
+        indexHTML, ok := fileMap["dist/index.html"]
+        if !ok {
+            panic("dist/index.html 文件不存在")
+        }
 
 		for fileKey, fileBytes := range fileMap {
 			// 创建局部变量避免闭包问题
@@ -82,16 +87,38 @@ func InitStatic(engine *gin.Engine) error {
 				continue
 			}
 
-			engine.GET(ginStaticFilePath,
-				cacheControlMiddleware(),
-				serveFileHandler(fileKey, fileBytes),
-			)
+            // 1) 默认根路径下的静态资源，例如 /assets/xxx
+            engine.GET(ginStaticFilePath,
+                cacheControlMiddleware(),
+                serveFileHandler(fileKey, fileBytes),
+            )
+
+            // 2) 兼容 Vite 构建使用的 base 前缀（web/vite.config.js: base: '/extras/gostc/'）
+            //    让 /extras/gostc/assets/xxx 也能命中到同一份静态资源
+            engine.GET("extras/gostc/"+ginStaticFilePath,
+                cacheControlMiddleware(),
+                serveFileHandler(fileKey, fileBytes),
+            )
 		}
 
-		engine.NoRoute(func(c *gin.Context) {
-			c.Data(http.StatusOK, "text/html; charset=utf-8", indexHTML)
-		})
-	})
+        engine.NoRoute(func(c *gin.Context) {
+            if c.Request.URL.Path == "/" {
+                // 首页分流：未开启则302到 /login；开启则渲染首页
+                var hCfg model.SystemConfigHome
+                cache2.GetSystemConfigHome(&hCfg)
+                if hCfg.HomeEnable != "1" {
+                    c.Redirect(http.StatusFound, "/login")
+                    return
+                }
+                c.Writer.Header().Set("Cache-Control", "no-store")
+                htmlBytes, status := renderHomeHTML()
+                c.Data(status, "text/html; charset=utf-8", htmlBytes)
+                return
+            }
+            // 其余路径继续交给前端路由
+            c.Data(http.StatusOK, "text/html; charset=utf-8", indexHTML)
+        })
+    })
 }
 
 // 中间件和处理器工厂函数
@@ -103,7 +130,72 @@ func cacheControlMiddleware() gin.HandlerFunc {
 }
 
 func serveFileHandler(fileKey string, fileBytes []byte) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Data(http.StatusOK, MatchFile(fileKey), fileBytes)
-	}
+    return func(c *gin.Context) {
+        c.Data(http.StatusOK, MatchFile(fileKey), fileBytes)
+    }
+}
+
+// renderHomeHTML 组装并渲染首页HTML（无软缓存，每次请求实时计算）
+func renderHomeHTML() ([]byte, int) {
+    // 读取首页配置与基础配置（首页开关已在 NoRoute 中处理，这里只负责渲染）
+    var hCfg model.SystemConfigHome
+    cache2.GetSystemConfigHome(&hCfg)
+
+    // 站点基础信息
+    var b model.SystemConfigBase
+    cache2.GetSystemConfigBase(&b)
+
+    // 统计（实时）
+    cnt := dashboardSvc.Service.Count()
+    todayFlow := formatBytes(cnt.InputBytes + cnt.OutputBytes)
+    tunnelTotal := cnt.Host + cnt.Forward + cnt.Tunnel + cnt.Proxy + cnt.P2P
+
+    data := map[string]any{
+        "config": map[string]any{
+            "title":   b.Title,
+            "favicon": b.Favicon,
+        },
+        "stats": map[string]any{
+            "today_flow":    todayFlow,
+            "user_total":    cnt.User,
+            "checkin_today": cnt.CheckInTotal,
+            "tunnel_total":  tunnelTotal,
+            "node_online":   cnt.NodeOnline,
+            "client_online": cnt.ClientOnline,
+            "updated_at":    time.Now().Format(time.DateTime),
+        },
+        "login_url": "/login",
+    }
+
+    // 模板选择：优先使用自定义模板，否则使用内置默认模板
+    tplText := string(web.HomeTpl())
+    if strings.TrimSpace(hCfg.HomeTpl) != "" {
+        tplText = hCfg.HomeTpl
+    }
+
+    // 使用 html/template 渲染，保证数据自动转义
+    t, err := template.New("home").Parse(tplText)
+    if err != nil {
+        return []byte("template parse error"), http.StatusInternalServerError
+    }
+    var buf bytes.Buffer
+    if err := t.Execute(&buf, data); err != nil {
+        return []byte("template execute error"), http.StatusInternalServerError
+    }
+    return buf.Bytes(), http.StatusOK
+}
+
+// formatBytes 将字节数转成人类可读字符串（B/KB/MB/GB/TB，保留两位小数）
+func formatBytes(n int64) string {
+    units := []string{"B", "KB", "MB", "GB", "TB"}
+    f := float64(n)
+    i := 0
+    for f >= 1024 && i < len(units)-1 {
+        f /= 1024
+        i++
+    }
+    if i == 0 {
+        return fmt.Sprintf("%d%s", n, units[i])
+    }
+    return fmt.Sprintf("%.2f%s", f, units[i])
 }

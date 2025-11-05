@@ -61,10 +61,23 @@ func EmailVerify(c *gin.Context) {
 }
 
 func Query(c *gin.Context) {
-	var req service.QueryReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		bean.Response.Param(c, err)
-		return
-	}
-	bean.Response.OkData(c, svr.Query(req))
+    var req service.QueryReq
+    if err := c.ShouldBindJSON(&req); err != nil {
+        bean.Response.Param(c, err)
+        return
+    }
+    bean.Response.OkData(c, svr.Query(req))
+}
+
+func Home(c *gin.Context) {
+    var req service.HomeReq
+    if err := c.ShouldBindJSON(&req); err != nil {
+        bean.Response.Param(c, err)
+        return
+    }
+    if err := svr.Home(req); err != nil {
+        bean.Response.Fail(c, err.Error())
+        return
+    }
+    bean.Response.Ok(c)
 }
