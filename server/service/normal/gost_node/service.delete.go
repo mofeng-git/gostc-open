@@ -42,6 +42,16 @@ func (service *service) Delete(claims jwt.Claims, req DeleteReq) error {
 			return errors.New("请先删除该节点的所有隧道")
 		}
 
+		p2pTotal, _ := tx.GostClientP2P.Where(tx.GostClientP2P.NodeCode.Eq(node.Code)).Count()
+		if p2pTotal > 0 {
+			return errors.New("请先删除该客户端的所有隧道")
+		}
+
+		proxyTotal, _ := tx.GostClientProxy.Where(tx.GostClientProxy.NodeCode.Eq(node.Code)).Count()
+		if proxyTotal > 0 {
+			return errors.New("请先删除该客户端的所有隧道")
+		}
+
 		if _, err := tx.GostNode.Where(tx.GostNode.Code.Eq(node.Code)).Delete(); err != nil {
 			log.Error("删除节点失败", zap.Error(err))
 			return errors.New("操作失败")

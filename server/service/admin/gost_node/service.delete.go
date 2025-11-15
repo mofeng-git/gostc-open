@@ -26,21 +26,6 @@ func (service *service) Delete(req DeleteReq) error {
 			return nil
 		}
 
-		//hostTotal, _ := tx.GostClientHost.Where(tx.GostClientHost.NodeCode.Eq(node.Code)).Count()
-		//if hostTotal > 0 {
-		//	return errors.New("请先删除该节点的所有隧道")
-		//}
-		//
-		//forwardTotal, _ := tx.GostClientForward.Where(tx.GostClientForward.NodeCode.Eq(node.Code)).Count()
-		//if forwardTotal > 0 {
-		//	return errors.New("请先删除该节点的所有隧道")
-		//}
-		//
-		//tunnelTotal, _ := tx.GostClientTunnel.Where(tx.GostClientTunnel.NodeCode.Eq(node.Code)).Count()
-		//if tunnelTotal > 0 {
-		//	return errors.New("请先删除该节点的所有隧道")
-		//}
-
 		if _, err := tx.GostNode.Where(tx.GostNode.Code.Eq(node.Code)).Delete(); err != nil {
 			log.Error("删除节点失败", zap.Error(err))
 			return errors.New("操作失败")
